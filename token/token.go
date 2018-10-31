@@ -27,6 +27,24 @@ const (
 	ASSIGN = "="
 	// PLUS the addition operator
 	PLUS = "+"
+	// MINUS the substraction operator
+	MINUS = "-"
+	// BANG the factorial operator
+	BANG = "!"
+	// ASTERISK the multiplication operator
+	ASTERISK = "*"
+	// SLASH the division operator
+	SLASH = "/"
+
+	// LT the less than comparision operator
+	LT = "<"
+	// GT the greater than comparision operator
+	GT = ">"
+
+	// EQ the equality operator
+	EQ = "=="
+	// NOT_EQ the inequality operator
+	NOT_EQ = "!="
 
 	//
 	// Delimiters
@@ -54,11 +72,26 @@ const (
 	FUNCTION = "FUNCTION"
 	// LET the `let` keyword (let)
 	LET = "LET"
+	// TRUE the `true` keyword (true)
+	TRUE = "TRUE"
+	// FALSE the `false` keyword (false)
+	FALSE = "FALSE"
+	// IF the `if` keyword (if)
+	IF = "IF"
+	// ELSE the `else` keyword (else)
+	ELSE = "ELSE"
+	// RETURN the `return` keyword (return)
+	RETURN = "RETURN"
 )
 
 var keywords = map[string]Type{
-	"fn":  FUNCTION,
-	"let": LET,
+	"fn":     FUNCTION,
+	"let":    LET,
+	"true":   TRUE,
+	"false":  FALSE,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
 }
 
 // Type represents the type of a token
