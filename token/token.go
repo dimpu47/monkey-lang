@@ -56,6 +56,11 @@ const (
 	LET = "LET"
 )
 
+var keywords = map[string]Type{
+	"fn":  FUNCTION,
+	"let": LET,
+}
+
 // Type represents the type of a token
 type Type string
 
@@ -63,4 +68,13 @@ type Type string
 type Token struct {
 	Type    Type
 	Literal string
+}
+
+// LookupIdent looks up the identifier in ident and returns the appropriate
+// token type depending on whether the identifier is user-defined or a keyword
+func LookupIdent(ident string) Type {
+	if token, ok := keywords[ident]; ok {
+		return token
+	}
+	return IDENT
 }
