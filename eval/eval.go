@@ -9,6 +9,24 @@ import (
 	"git.mills.io/prologic/monkey/object"
 )
 
+var (
+	// TRUE is a cached Boolean object holding the `true` value
+	TRUE = &object.Boolean{Value: true}
+
+	// FALSE is a cached Boolean object holding the `false` value
+	FALSE = &object.Boolean{Value: false}
+
+	// NULL is a cached Null object
+	NULL = &object.Null{}
+)
+
+func fromNativeBoolean(input bool) *object.Boolean {
+	if input {
+		return TRUE
+	}
+	return FALSE
+}
+
 // Eval evaluates the node and returns an object
 func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
@@ -23,6 +41,8 @@ func Eval(node ast.Node) object.Object {
 	// Expressions
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
+	case *ast.Boolean:
+		return fromNativeBoolean(node.Value)
 	}
 
 	return nil
