@@ -17,6 +17,9 @@ const (
 
 	// NULL is the Null object type
 	NULL = "NULL"
+
+	// RETURN is the Return object type
+	RETURN = "RETURN"
 )
 
 // Type represents the type of an object
@@ -61,3 +64,17 @@ func (n *Null) Type() Type { return NULL }
 
 // Inspect returns a stringified version of the object for debugging
 func (n *Null) Inspect() string { return "null" }
+
+// Return is the return type and used to hold the value of another object.
+// This is used for `return` statements and this object is tracked through
+// the evalulator and when encountered stops evaluation of the program,
+// or body of a function.
+type Return struct {
+	Value Object
+}
+
+// Type returns the type of the object
+func (rv *Return) Type() Type { return RETURN }
+
+// Inspect returns a stringified version of the object for debugging
+func (rv *Return) Inspect() string { return rv.Value.Inspect() }
