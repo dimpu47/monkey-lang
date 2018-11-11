@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 
+	"git.mills.io/prologic/monkey/eval"
 	"git.mills.io/prologic/monkey/lexer"
 	"git.mills.io/prologic/monkey/parser"
 )
@@ -51,8 +52,11 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		obj := eval.Eval(program)
+		if obj != nil {
+			io.WriteString(out, obj.Inspect())
+			io.WriteString(out, "\n")
+		}
 	}
 }
 
