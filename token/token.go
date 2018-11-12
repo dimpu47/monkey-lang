@@ -56,6 +56,8 @@ const (
 	COMMA = ","
 	// SEMICOLON a semi-colon
 	SEMICOLON = ";"
+	// COLON a comon
+	COLON = ":"
 
 	// LPAREN a left paranthesis
 	LPAREN = "("
