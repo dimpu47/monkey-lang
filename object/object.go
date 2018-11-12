@@ -33,7 +33,13 @@ const (
 
 	// FUNCTION is the Function object type
 	FUNCTION = "FUNCTION"
+
+	// BUILTIN is the Builtin object type
+	BUILTIN = "BUILTIN"
 )
+
+// BuiltinFunction represents the builtin function type
+type BuiltinFunction func(args ...Object) Object
 
 // Type represents the type of an object
 type Type string
@@ -146,3 +152,16 @@ func (f *Function) Inspect() string {
 
 	return out.String()
 }
+
+// Builtin  is the builtin object type that simply holds a reference to
+// a BuiltinFunction type that takes zero or more objects as arguments
+// and returns an object.
+type Builtin struct {
+	Fn BuiltinFunction
+}
+
+// Type returns the type of the object
+func (b *Builtin) Type() Type { return BUILTIN }
+
+// Inspect returns a stringified version of the object for debugging
+func (b *Builtin) Inspect() string { return "builtin function" }
