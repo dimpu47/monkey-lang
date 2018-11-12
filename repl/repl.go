@@ -10,6 +10,7 @@ import (
 
 	"git.mills.io/prologic/monkey/eval"
 	"git.mills.io/prologic/monkey/lexer"
+	"git.mills.io/prologic/monkey/object"
 	"git.mills.io/prologic/monkey/parser"
 )
 
@@ -34,6 +35,7 @@ const MonkeyFace = `            __,__
 // Start starts the REPL in a continious loop
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnvironment()
 
 	for {
 		fmt.Printf(PROMPT)
@@ -52,7 +54,7 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		obj := eval.Eval(program)
+		obj := eval.Eval(program, env)
 		if obj != nil {
 			io.WriteString(out, obj.Inspect())
 			io.WriteString(out, "\n")
