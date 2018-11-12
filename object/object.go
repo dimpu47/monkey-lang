@@ -20,6 +20,9 @@ const (
 
 	// RETURN is the Return object type
 	RETURN = "RETURN"
+
+	// ERROR is the Error object type
+	ERROR = "ERROR"
 )
 
 // Type represents the type of an object
@@ -78,3 +81,16 @@ func (rv *Return) Type() Type { return RETURN }
 
 // Inspect returns a stringified version of the object for debugging
 func (rv *Return) Inspect() string { return rv.Value.Inspect() }
+
+// Error is the error type and used to hold a message denoting the details of
+// error encountered. This object is trakced through the evaluator and when
+// encountered stops evaulation of the program or body of a function.
+type Error struct {
+	Message string
+}
+
+// Type returns the type of the object
+func (e *Error) Type() Type { return ERROR }
+
+// Inspect returns a stringified version of the object for debugging
+func (e *Error) Inspect() string { return "ERROR: " + e.Message }
