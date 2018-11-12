@@ -193,6 +193,20 @@ func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 // String returns a stringified version of the AST for debugging
 func (il *IntegerLiteral) String() string { return il.Token.Literal }
 
+// StringLiteral represents a literal string and holds a string value
+type StringLiteral struct {
+	Token token.Token
+	Value string
+}
+
+func (sl *StringLiteral) expressionNode() {}
+
+// TokenLiteral prints the literal value of the token associated with this node
+func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
+
+// String returns a stringified version of the AST for debugging
+func (sl *StringLiteral) String() string { return sl.Token.Literal }
+
 // PrefixExpression represents a prefix expression and holds the operator
 // as well as the right-hand side expression
 type PrefixExpression struct {

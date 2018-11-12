@@ -18,6 +18,8 @@ const (
 	IDENT = "IDENT"
 	// INT an integer, e.g: 1234
 	INT = "INT"
+	// STRING a string, e.g: "1234"
+	STRING = "STRING"
 
 	//
 	// Operators
