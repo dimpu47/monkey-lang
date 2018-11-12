@@ -45,8 +45,8 @@ const (
 
 	// EQ the equality operator
 	EQ = "=="
-	// NOT_EQ the inequality operator
-	NOT_EQ = "!="
+	// NEQ the inequality operator
+	NEQ = "!="
 
 	//
 	// Delimiters
@@ -65,6 +65,10 @@ const (
 	LBRACE = "{"
 	// RBRACE a right brace
 	RBRACE = "}"
+	// LBRACKET a left bracket
+	LBRACKET = "["
+	// RBRACKET a right bracket
+	RBRACKET = "]"
 
 	//
 	// Keywords
