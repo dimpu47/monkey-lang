@@ -36,6 +36,9 @@ const (
 
 	// BUILTIN is the Builtin object type
 	BUILTIN = "BUILTIN"
+
+	// ARRAY is the Array object type
+	ARRAY = "ARRAY"
 )
 
 // BuiltinFunction represents the builtin function type
@@ -165,3 +168,27 @@ func (b *Builtin) Type() Type { return BUILTIN }
 
 // Inspect returns a stringified version of the object for debugging
 func (b *Builtin) Inspect() string { return "builtin function" }
+
+// Array is the array literal type that holds a slice of Object(s)
+type Array struct {
+	Elements []Object
+}
+
+// Type returns the type of the object
+func (ao *Array) Type() Type { return ARRAY }
+
+// Inspect returns a stringified version of the object for debugging
+func (ao *Array) Inspect() string {
+	var out bytes.Buffer
+
+	elements := []string{}
+	for _, e := range ao.Elements {
+		elements = append(elements, e.Inspect())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
+}
