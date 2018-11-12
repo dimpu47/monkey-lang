@@ -3,7 +3,7 @@ package lexer
 import (
 	"testing"
 
-	"git.mills.io/prologic/monkey/token"
+	"github.com/prologic/monkey-lang/token"
 )
 
 func TestNextToken(t *testing.T) {

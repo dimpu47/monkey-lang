@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"io"
 
-	"git.mills.io/prologic/monkey/eval"
-	"git.mills.io/prologic/monkey/lexer"
-	"git.mills.io/prologic/monkey/object"
-	"git.mills.io/prologic/monkey/parser"
+	"github.com/prologic/monkey-lang/eval"
+	"github.com/prologic/monkey-lang/lexer"
+	"github.com/prologic/monkey-lang/object"
+	"github.com/prologic/monkey-lang/parser"
 )
 
 // PROMPT is the REPL prompt displayed for each input

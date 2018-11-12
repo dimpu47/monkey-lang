@@ -3,9 +3,9 @@ package eval
 import (
 	"testing"
 
-	"git.mills.io/prologic/monkey/lexer"
-	"git.mills.io/prologic/monkey/object"
-	"git.mills.io/prologic/monkey/parser"
+	"github.com/prologic/monkey-lang/lexer"
+	"github.com/prologic/monkey-lang/object"
+	"github.com/prologic/monkey-lang/parser"
 )
 
 func TestEvalIntegerExpression(t *testing.T) {

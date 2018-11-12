@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"strings"
 
-	"git.mills.io/prologic/monkey/token"
+	"github.com/prologic/monkey-lang/token"
 )
 
 // Node defines an interface for all nodes in the AST.

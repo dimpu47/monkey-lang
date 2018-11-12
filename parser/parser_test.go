@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"git.mills.io/prologic/monkey/ast"
-	"git.mills.io/prologic/monkey/lexer"
+	"github.com/prologic/monkey-lang/ast"
+	"github.com/prologic/monkey-lang/lexer"
 )
 
 func TestLetStatements(t *testing.T) {

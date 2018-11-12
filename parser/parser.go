@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"git.mills.io/prologic/monkey/ast"
-	"git.mills.io/prologic/monkey/lexer"
-	"git.mills.io/prologic/monkey/token"
+	"github.com/prologic/monkey-lang/ast"
+	"github.com/prologic/monkey-lang/lexer"
+	"github.com/prologic/monkey-lang/token"
 )
 
 const (

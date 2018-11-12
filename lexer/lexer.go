@@ -5,7 +5,7 @@ package lexer
 // parsing by the parser.
 
 import (
-	"git.mills.io/prologic/monkey/token"
+	"github.com/prologic/monkey-lang/token"
 )
 
 func isDigit(ch byte) bool {

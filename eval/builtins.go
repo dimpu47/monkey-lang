@@ -3,7 +3,7 @@ package eval
 import (
 	"fmt"
 
-	"git.mills.io/prologic/monkey/object"
+	"github.com/prologic/monkey-lang/object"
 )
 
 var builtins = map[string]*object.Builtin{

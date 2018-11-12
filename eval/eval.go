@@ -7,8 +7,8 @@ package eval
 import (
 	"fmt"
 
-	"git.mills.io/prologic/monkey/ast"
-	"git.mills.io/prologic/monkey/object"
+	"github.com/prologic/monkey-lang/ast"
+	"github.com/prologic/monkey-lang/object"
 )
 
 var (

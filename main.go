@@ -8,7 +8,7 @@ import (
 	"os"
 	"os/user"
 
-	"git.mills.io/prologic/monkey/repl"
+	"github.com/prologic/monkey-lang/repl"
 )
 
 func main() {

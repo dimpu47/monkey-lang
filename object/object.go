@@ -10,7 +10,7 @@ import (
 	"hash/fnv"
 	"strings"
 
-	"git.mills.io/prologic/monkey/ast"
+	"github.com/prologic/monkey-lang/ast"
 )
 
 const (

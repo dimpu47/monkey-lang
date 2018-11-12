@@ -3,7 +3,7 @@ package ast
 import (
 	"testing"
 
-	"git.mills.io/prologic/monkey/token"
+	"github.com/prologic/monkey-lang/token"
 )
 
 func TestString(t *testing.T) {
