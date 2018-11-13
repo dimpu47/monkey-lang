@@ -1,9 +1,9 @@
 # monkey
 
-[![Build Status](https://travis-ci.org/prologic/monkey-lang.svg?branch=master)](https://travis-ci.org/prologic/go-linkedlist)
-[![CodeCov](https://codecov.io/gh/prologic/monkey-lang/branch/master/graph/badge.svg)](https://codecov.io/gh/prologic/go-linkedlist)
-[![Go Report Card](https://goreportcard.com/badge/prologic/monkey-lang)](https://goreportcard.com/report/prologic/go-linkedlist)
-[![GoDoc](https://godoc.org/github.com/prologic/monkey-lang?status.svg)](https://godoc.org/github.com/prologic/go-linkedlist) 
+[![Build Status](https://travis-ci.org/prologic/monkey-lang.svg?branch=master)](https://travis-ci.org/prologic/monkey-lang)
+[![CodeCov](https://codecov.io/gh/prologic/monkey-lang/branch/master/graph/badge.svg)](https://codecov.io/gh/prologic/monkey-lang)
+[![Go Report Card](https://goreportcard.com/badge/prologic/monkey-lang)](https://goreportcard.com/report/prologic/monkey-lang)
+[![GoDoc](https://godoc.org/github.com/prologic/monkey-lang?status.svg)](https://godoc.org/github.com/prologic/monkey-lang) 
 
 Monkey programming language interpreter designed in [_Writing An Interpreter In Go_](https://interpreterbook.com/).
 A step-by-step walk-through where each commit is a fully working part.
@@ -14,8 +14,8 @@ Read the book and follow along with the commit history.
 To build run `make`.
 
 ```#!bash
-$ go get -u github.com/prologic/monkey
-$ cd $GOPATH/github.com/prologic/monkey
+$ go get -u github.com/prologic/monkey-lang
+$ cd $GOPATH/github.com/prologic/monkey-lang
 $ make
 This is the Monkey programming language!
 Feel free to type in commands
