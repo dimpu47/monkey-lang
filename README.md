@@ -1,4 +1,4 @@
-# monkey
+# monkey-lang
 
 [![Build Status](https://travis-ci.org/prologic/monkey-lang.svg?branch=master)](https://travis-ci.org/prologic/monkey-lang)
 [![CodeCov](https://codecov.io/gh/prologic/monkey-lang/branch/master/graph/badge.svg)](https://codecov.io/gh/prologic/monkey-lang)
@@ -24,7 +24,8 @@ Feel free to type in commands
 
 To run the tests run `make test`
 
-Travis CI and Codecov are also integreated.
+[Travis CI](https://travis-ci.org/) and [Codecov](https://codecov.io/)
+are also integrated for Continuous Integration and Code Coverage reporting.
 
 ## Monkey Language
 
