@@ -7,7 +7,7 @@ deps:
 	@go get ./...
 
 build:
-	@go build .
+	@go build -o monkey .
 
 test:
 	@go test -v -cover -coverprofile=coverage.txt -covermode=atomic ./...
