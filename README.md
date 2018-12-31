@@ -1,9 +1,10 @@
 # monkey-lang
 
-[![Build Status](https://travis-ci.org/prologic/monkey-lang.svg?branch=master)](https://travis-ci.org/prologic/monkey-lang)
+[![Build Status](https://cloud.drone.io/api/badges/prologic/monkey-lang/status.svg)](https://cloud.drone.io/prologic/monkey-lang)
 [![CodeCov](https://codecov.io/gh/prologic/monkey-lang/branch/master/graph/badge.svg)](https://codecov.io/gh/prologic/monkey-lang)
 [![Go Report Card](https://goreportcard.com/badge/prologic/monkey-lang)](https://goreportcard.com/report/prologic/monkey-lang)
 [![GoDoc](https://godoc.org/github.com/prologic/monkey-lang?status.svg)](https://godoc.org/github.com/prologic/monkey-lang) 
+[![Sourcegraph](https://sourcegraph.com/github.com/prologic/monkey-lang/-/badge.svg)](https://sourcegraph.com/github.com/prologic/monkey-lang?badge)
 
 Monkey programming language interpreter designed in [_Writing An Interpreter In Go_](https://interpreterbook.com/).
 A step-by-step walk-through where each commit is a fully working part.
