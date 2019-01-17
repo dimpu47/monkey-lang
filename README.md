@@ -111,7 +111,7 @@ correct, an integer
 >> len("hello");
 5
 >> len("∑");
-3
+1
 >> let myArray = ["one", "two", "three"];
 >> len(myArray)
 3
