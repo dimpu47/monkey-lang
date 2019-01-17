@@ -2,6 +2,7 @@ package eval
 
 import (
 	"fmt"
+	"unicode/utf8"
 
 	"github.com/prologic/monkey-lang/object"
 )
@@ -18,7 +19,7 @@ var builtins = map[string]*object.Builtin{
 			case *object.Array:
 				return &object.Integer{Value: int64(len(arg.Elements))}
 			case *object.String:
-				return &object.Integer{Value: int64(len(arg.Value))}
+				return &object.Integer{Value: int64(utf8.RuneCountInString(arg.Value))}
 			default:
 				return newError("argument to `len` not supported, got %s",
 					args[0].Type())
