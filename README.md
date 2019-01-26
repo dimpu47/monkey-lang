@@ -25,10 +25,19 @@ Feel free to type in commands
 
 To run the tests run `make test`
 
-[Travis CI](https://travis-ci.org/) and [Codecov](https://codecov.io/)
-are also integrated for Continuous Integration and Code Coverage reporting.
+You can also execute program files by invoking `monkey-lang <filename>`
+There are also some command-line options:
+
+```#!bash
+$ ./monkey-lang -h
+Usage: monkey-lang [options] [<filename>]  -d	enable debug mode
+  -i	enable interactive mode
+  -v	display version information
+  ```
 
 ## Monkey Language
+
+> See also: [examples](./examples)
 
 ### Variable bindings and arithmetic expressions
 
