@@ -1,4 +1,5 @@
-*~*
+*~
 *.bak
 *.txt
-monkey
+
+/monkey-lang
