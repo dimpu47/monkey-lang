@@ -182,7 +182,7 @@ func (r *REPL) StartExecLoop(in io.Reader, out io.Writer, machine *vm.VM) {
 			return
 		}
 
-		stackTop := machine.StackTop()
+		stackTop := machine.LastPopped()
 		io.WriteString(out, stackTop.Inspect())
 		io.WriteString(out, "\n")
 	}

@@ -60,11 +60,13 @@ type Opcode byte
 const (
 	LoadConstant Opcode = iota
 	Add
+	Pop
 )
 
 var definitions = map[Opcode]*Definition{
 	LoadConstant: {"LoadConstant", []int{2}},
 	Add:          {"Add", []int{}},
+	Pop:          {"Pop", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
