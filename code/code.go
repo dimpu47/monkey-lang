@@ -59,6 +59,8 @@ type Opcode byte
 
 const (
 	LoadConstant Opcode = iota
+	LoadTrue
+	LoadFalse
 	Pop
 	Add
 	Sub
@@ -68,6 +70,8 @@ const (
 
 var definitions = map[Opcode]*Definition{
 	LoadConstant: {"LoadConstant", []int{2}},
+	LoadTrue:     {"LoadTrue", []int{}},
+	LoadFalse:    {"LoadFalse", []int{}},
 	Pop:          {"Pop", []int{}},
 	Add:          {"Add", []int{}},
 	Sub:          {"Sub", []int{}},
