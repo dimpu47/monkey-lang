@@ -16,6 +16,7 @@ import (
 )
 
 var (
+	engine      string
 	interactive bool
 	version     bool
 	debug       bool
@@ -23,7 +24,7 @@ var (
 
 func init() {
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [options] [<filename>]", path.Base(os.Args[0]))
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s [options] [<filename>]\n", path.Base(os.Args[0]))
 		flag.PrintDefaults()
 		os.Exit(0)
 	}
@@ -32,6 +33,7 @@ func init() {
 	flag.BoolVar(&debug, "d", false, "enable debug mode")
 
 	flag.BoolVar(&interactive, "i", false, "enable interactive mode")
+	flag.StringVar(&engine, "e", "vm", "engine to use (eval or vm)")
 }
 
 func main() {
@@ -47,18 +49,12 @@ func main() {
 		log.Fatalf("could not determine current user: %s", err)
 	}
 
-	if flag.NArg() == 1 {
-		f, err := os.Open(flag.Arg(0))
-		if err != nil {
-			log.Fatalf("could not open source file %s: %s", flag.Arg(0), err)
-		}
-		env := repl.Exec(f)
-		if interactive {
-			repl.Start(os.Stdin, os.Stdout, env)
-		}
-	} else {
-		fmt.Printf("Hello %s! This is the Monkey programming language!\n", user.Username)
-		fmt.Printf("Feel free to type in commands\n")
-		repl.Start(os.Stdin, os.Stdout, nil)
+	args := flag.Args()
+	opts := &repl.Options{
+		Debug:       debug,
+		Engine:      engine,
+		Interactive: interactive,
 	}
+	repl := repl.New(user.Username, args, opts)
+	repl.Run()
 }

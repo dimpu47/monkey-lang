@@ -8,12 +8,15 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 
+	"github.com/prologic/monkey-lang/compiler"
 	"github.com/prologic/monkey-lang/eval"
 	"github.com/prologic/monkey-lang/lexer"
 	"github.com/prologic/monkey-lang/object"
 	"github.com/prologic/monkey-lang/parser"
+	"github.com/prologic/monkey-lang/vm"
 )
 
 // PROMPT is the REPL prompt displayed for each input
@@ -34,9 +37,25 @@ const MonkeyFace = `            __,__
            '-----'
 `
 
-// Exec parses and executes the program given by f and returns the resulting
+type Options struct {
+	Debug       bool
+	Engine      string
+	Interactive bool
+}
+
+type REPL struct {
+	user string
+	args []string
+	opts *Options
+}
+
+func New(user string, args []string, opts *Options) *REPL {
+	return &REPL{user, args, opts}
+}
+
+// Eval parses and evalulates the program given by f and returns the resulting
 // environment, any errors are printed to stderr
-func Exec(f io.Reader) (env *object.Environment) {
+func (r *REPL) Eval(f io.Reader) (env *object.Environment) {
 	env = object.NewEnvironment()
 
 	b, err := ioutil.ReadAll(f)
@@ -58,8 +77,43 @@ func Exec(f io.Reader) (env *object.Environment) {
 	return
 }
 
-// Start starts the REPL in a continious loop
-func Start(in io.Reader, out io.Writer, env *object.Environment) {
+// Exec parses, compiles and executes the program given by f and returns
+// the resulting virtual machine, any errors are printed to stderr
+func (r *REPL) Exec(f io.Reader) (machine *vm.VM) {
+	b, err := ioutil.ReadAll(f)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error reading source file: %s", err)
+		return
+	}
+
+	l := lexer.New(string(b))
+	p := parser.New(l)
+
+	program := p.ParseProgram()
+	if len(p.Errors()) != 0 {
+		printParserErrors(os.Stderr, p.Errors())
+		return
+	}
+
+	c := compiler.New()
+	err = c.Compile(program)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Woops! Compilation failed:\n %s\n", err)
+		return
+	}
+
+	machine = vm.New(c.Bytecode())
+	err = machine.Run()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Woops! Executing bytecode failed:\n %s\n", err)
+		return
+	}
+
+	return
+}
+
+// StartEvalLoop starts the REPL in a continious eval loop
+func (r *REPL) StartEvalLoop(in io.Reader, out io.Writer, env *object.Environment) {
 	scanner := bufio.NewScanner(in)
 
 	if env == nil {
@@ -74,6 +128,7 @@ func Start(in io.Reader, out io.Writer, env *object.Environment) {
 		}
 
 		line := scanner.Text()
+
 		l := lexer.New(line)
 		p := parser.New(l)
 
@@ -87,6 +142,77 @@ func Start(in io.Reader, out io.Writer, env *object.Environment) {
 		if obj != nil {
 			io.WriteString(out, obj.Inspect())
 			io.WriteString(out, "\n")
+		}
+	}
+}
+
+// StartExecLoop starts the REPL in a continious exec loop
+func (r *REPL) StartExecLoop(in io.Reader, out io.Writer, machine *vm.VM) {
+	scanner := bufio.NewScanner(in)
+
+	for {
+		fmt.Printf(PROMPT)
+		scanned := scanner.Scan()
+		if !scanned {
+			return
+		}
+
+		line := scanner.Text()
+
+		l := lexer.New(line)
+		p := parser.New(l)
+
+		program := p.ParseProgram()
+		if len(p.Errors()) != 0 {
+			printParserErrors(out, p.Errors())
+			continue
+		}
+
+		c := compiler.New()
+		err := c.Compile(program)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Woops! Compilation failed:\n %s\n", err)
+			return
+		}
+
+		machine := vm.New(c.Bytecode())
+		err = machine.Run()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Woops! Executing bytecode failed:\n %s\n", err)
+			return
+		}
+
+		stackTop := machine.StackTop()
+		io.WriteString(out, stackTop.Inspect())
+		io.WriteString(out, "\n")
+	}
+}
+
+func (r *REPL) Run() {
+	if len(r.args) == 1 {
+		f, err := os.Open(r.args[0])
+		if err != nil {
+			log.Fatalf("could not open source file %s: %s", r.args[0], err)
+		}
+
+		if r.opts.Engine == "eval" {
+			env := r.Eval(f)
+			if r.opts.Interactive {
+				r.StartEvalLoop(os.Stdin, os.Stdout, env)
+			}
+		} else {
+			machine := r.Exec(f)
+			if r.opts.Interactive {
+				r.StartExecLoop(os.Stdin, os.Stdout, machine)
+			}
+		}
+	} else {
+		fmt.Printf("Hello %s! This is the Monkey programming language!\n", r.user)
+		fmt.Printf("Feel free to type in commands\n")
+		if r.opts.Engine == "eval" {
+			r.StartEvalLoop(os.Stdin, os.Stdout, nil)
+		} else {
+			r.StartExecLoop(os.Stdin, os.Stdout, nil)
 		}
 	}
 }
