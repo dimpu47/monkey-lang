@@ -140,6 +140,36 @@ func TestIntegerArithmetic(t *testing.T) {
 				code.Make(code.Pop),
 			},
 		},
+		{
+			input:             "1 - 2",
+			expectedConstants: []interface{}{1, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.Sub),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input:             "1 * 2",
+			expectedConstants: []interface{}{1, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.Mul),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input:             "2 / 1",
+			expectedConstants: []interface{}{2, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.Div),
+				code.Make(code.Pop),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)
