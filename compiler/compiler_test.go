@@ -126,6 +126,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			expectedInstructions: []code.Instructions{
 				code.Make(code.LoadConstant, 0),
 				code.Make(code.LoadConstant, 1),
+				code.Make(code.Add),
 			},
 		},
 	}

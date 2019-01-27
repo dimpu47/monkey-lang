@@ -43,6 +43,12 @@ func (vm *VM) push(o object.Object) error {
 	return nil
 }
 
+func (vm *VM) pop() object.Object {
+	o := vm.stack[vm.sp-1]
+	vm.sp--
+	return o
+}
+
 func (vm *VM) StackTop() object.Object {
 	if vm.sp == 0 {
 		return nil
@@ -64,6 +70,15 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+
+		case code.Add:
+			right := vm.pop()
+			left := vm.pop()
+			leftValue := left.(*object.Integer).Value
+			rightValue := right.(*object.Integer).Value
+
+			result := leftValue + rightValue
+			vm.push(&object.Integer{Value: result})
 
 		}
 	}
