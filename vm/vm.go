@@ -139,6 +139,30 @@ func (vm *VM) executeIntegerComparison(
 	}
 }
 
+func (vm *VM) executeBangOperator() error {
+	operand := vm.pop()
+
+	switch operand {
+	case True:
+		return vm.push(False)
+	case False:
+		return vm.push(True)
+	default:
+		return vm.push(False)
+	}
+}
+
+func (vm *VM) executeMinusOperator() error {
+	operand := vm.pop()
+
+	if operand.Type() != object.INTEGER {
+		return fmt.Errorf("unsupported type for negation: %s", operand.Type())
+	}
+
+	value := operand.(*object.Integer).Value
+	return vm.push(&object.Integer{Value: -value})
+}
+
 func (vm *VM) LastPopped() object.Object {
 	return vm.stack[vm.sp]
 }
@@ -178,6 +202,18 @@ func (vm *VM) Run() error {
 
 		case code.Equal, code.NotEqual, code.GreaterThan:
 			err := vm.executeComparison(op)
+			if err != nil {
+				return err
+			}
+
+		case code.Bang:
+			err := vm.executeBangOperator()
+			if err != nil {
+				return err
+			}
+
+		case code.Minus:
+			err := vm.executeMinusOperator()
 			if err != nil {
 				return err
 			}

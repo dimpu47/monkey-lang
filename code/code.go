@@ -69,6 +69,8 @@ const (
 	Equal
 	NotEqual
 	GreaterThan
+	Minus
+	Bang
 )
 
 var definitions = map[Opcode]*Definition{
@@ -83,6 +85,8 @@ var definitions = map[Opcode]*Definition{
 	Equal:        {"Equal", []int{}},
 	NotEqual:     {"NotEqual", []int{}},
 	GreaterThan:  {"GreaterThan", []int{}},
+	Minus:        {"Minus", []int{}},
+	Bang:         {"Bang", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
