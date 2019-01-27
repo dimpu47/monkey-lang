@@ -66,6 +66,9 @@ const (
 	Sub
 	Mul
 	Div
+	Equal
+	NotEqual
+	GreaterThan
 )
 
 var definitions = map[Opcode]*Definition{
@@ -77,6 +80,9 @@ var definitions = map[Opcode]*Definition{
 	Sub:          {"Sub", []int{}},
 	Mul:          {"Mul", []int{}},
 	Div:          {"Div", []int{}},
+	Equal:        {"Equal", []int{}},
+	NotEqual:     {"NotEqual", []int{}},
+	GreaterThan:  {"GreaterThan", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
