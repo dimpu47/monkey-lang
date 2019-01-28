@@ -61,6 +61,7 @@ const (
 	LoadConstant Opcode = iota
 	LoadTrue
 	LoadFalse
+	LoadNull
 	Pop
 	Add
 	Sub
@@ -71,12 +72,15 @@ const (
 	GreaterThan
 	Minus
 	Bang
+	JumpIfFalse
+	Jump
 )
 
 var definitions = map[Opcode]*Definition{
 	LoadConstant: {"LoadConstant", []int{2}},
 	LoadTrue:     {"LoadTrue", []int{}},
 	LoadFalse:    {"LoadFalse", []int{}},
+	LoadNull:     {"LoadNull", []int{}},
 	Pop:          {"Pop", []int{}},
 	Add:          {"Add", []int{}},
 	Sub:          {"Sub", []int{}},
@@ -87,6 +91,8 @@ var definitions = map[Opcode]*Definition{
 	GreaterThan:  {"GreaterThan", []int{}},
 	Minus:        {"Minus", []int{}},
 	Bang:         {"Bang", []int{}},
+	JumpIfFalse:  {"JumpIfFalse", []int{2}},
+	Jump:         {"Jump", []int{2}},
 }
 
 func Lookup(op byte) (*Definition, error) {

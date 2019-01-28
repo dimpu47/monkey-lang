@@ -17,6 +17,7 @@ const StackSize = 2048
 var (
 	True  = &object.Boolean{Value: true}
 	False = &object.Boolean{Value: false}
+	Null  = &object.Null{}
 )
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {
@@ -24,6 +25,20 @@ func nativeBoolToBooleanObject(input bool) *object.Boolean {
 		return True
 	}
 	return False
+}
+
+func isTruthy(obj object.Object) bool {
+	switch obj := obj.(type) {
+
+	case *object.Boolean:
+		return obj.Value
+
+	case *object.Null:
+		return false
+
+	default:
+		return true
+	}
 }
 
 type VM struct {
@@ -147,6 +162,8 @@ func (vm *VM) executeBangOperator() error {
 		return vm.push(False)
 	case False:
 		return vm.push(True)
+	case Null:
+		return vm.push(True)
 	default:
 		return vm.push(False)
 	}
@@ -194,6 +211,12 @@ func (vm *VM) Run() error {
 				return err
 			}
 
+		case code.LoadNull:
+			err := vm.push(Null)
+			if err != nil {
+				return err
+			}
+
 		case code.Add, code.Sub, code.Mul, code.Div:
 			err := vm.executeBinaryOperation(op)
 			if err != nil {
@@ -217,6 +240,19 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+
+		case code.JumpIfFalse:
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			condition := vm.pop()
+			if !isTruthy(condition) {
+				ip = pos - 1
+			}
+
+		case code.Jump:
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip = pos - 1
 
 		case code.Pop:
 			vm.pop()
