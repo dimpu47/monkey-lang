@@ -43,6 +43,20 @@ type Options struct {
 	Interactive bool
 }
 
+type VMState struct {
+	constants []object.Object
+	globals   []object.Object
+	symbols   *compiler.SymbolTable
+}
+
+func NewVMState() *VMState {
+	return &VMState{
+		constants: []object.Object{},
+		globals:   make([]object.Object, vm.MaxGlobals),
+		symbols:   compiler.NewSymbolTable(),
+	}
+}
+
 type REPL struct {
 	user string
 	args []string
@@ -79,12 +93,14 @@ func (r *REPL) Eval(f io.Reader) (env *object.Environment) {
 
 // Exec parses, compiles and executes the program given by f and returns
 // the resulting virtual machine, any errors are printed to stderr
-func (r *REPL) Exec(f io.Reader) (machine *vm.VM) {
+func (r *REPL) Exec(f io.Reader) (state *VMState) {
 	b, err := ioutil.ReadAll(f)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error reading source file: %s", err)
 		return
 	}
+
+	state = NewVMState()
 
 	l := lexer.New(string(b))
 	p := parser.New(l)
@@ -95,14 +111,16 @@ func (r *REPL) Exec(f io.Reader) (machine *vm.VM) {
 		return
 	}
 
-	c := compiler.New()
+	c := compiler.NewWithState(state.symbols, state.constants)
 	err = c.Compile(program)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Woops! Compilation failed:\n %s\n", err)
 		return
 	}
 
-	machine = vm.New(c.Bytecode())
+	code := c.Bytecode()
+
+	machine := vm.NewWithGlobalsStore(code, state.globals)
 	err = machine.Run()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Woops! Executing bytecode failed:\n %s\n", err)
@@ -147,8 +165,12 @@ func (r *REPL) StartEvalLoop(in io.Reader, out io.Writer, env *object.Environmen
 }
 
 // StartExecLoop starts the REPL in a continious exec loop
-func (r *REPL) StartExecLoop(in io.Reader, out io.Writer, machine *vm.VM) {
+func (r *REPL) StartExecLoop(in io.Reader, out io.Writer, state *VMState) {
 	scanner := bufio.NewScanner(in)
+
+	if state == nil {
+		state = NewVMState()
+	}
 
 	for {
 		fmt.Printf(PROMPT)
@@ -168,14 +190,17 @@ func (r *REPL) StartExecLoop(in io.Reader, out io.Writer, machine *vm.VM) {
 			continue
 		}
 
-		c := compiler.New()
+		c := compiler.NewWithState(state.symbols, state.constants)
 		err := c.Compile(program)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Woops! Compilation failed:\n %s\n", err)
 			return
 		}
 
-		machine := vm.New(c.Bytecode())
+		code := c.Bytecode()
+		state.constants = code.Constants
+
+		machine := vm.NewWithGlobalsStore(code, state.globals)
 		err = machine.Run()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Woops! Executing bytecode failed:\n %s\n", err)
@@ -201,9 +226,9 @@ func (r *REPL) Run() {
 				r.StartEvalLoop(os.Stdin, os.Stdout, env)
 			}
 		} else {
-			machine := r.Exec(f)
+			state := r.Exec(f)
 			if r.opts.Interactive {
-				r.StartExecLoop(os.Stdin, os.Stdout, machine)
+				r.StartExecLoop(os.Stdin, os.Stdout, state)
 			}
 		}
 	} else {

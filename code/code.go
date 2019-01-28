@@ -59,6 +59,8 @@ type Opcode byte
 
 const (
 	LoadConstant Opcode = iota
+	LoadGlobal
+	BindGlobal
 	LoadTrue
 	LoadFalse
 	LoadNull
@@ -78,6 +80,8 @@ const (
 
 var definitions = map[Opcode]*Definition{
 	LoadConstant: {"LoadConstant", []int{2}},
+	LoadGlobal:   {"LoadGlobal", []int{2}},
+	BindGlobal:   {"BindGlobal", []int{2}},
 	LoadTrue:     {"LoadTrue", []int{}},
 	LoadFalse:    {"LoadFalse", []int{}},
 	LoadNull:     {"LoadNull", []int{}},
