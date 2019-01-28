@@ -64,6 +64,7 @@ const (
 	LoadTrue
 	LoadFalse
 	LoadNull
+	MakeArray
 	Pop
 	Add
 	Sub
@@ -85,6 +86,7 @@ var definitions = map[Opcode]*Definition{
 	LoadTrue:     {"LoadTrue", []int{}},
 	LoadFalse:    {"LoadFalse", []int{}},
 	LoadNull:     {"LoadNull", []int{}},
+	MakeArray:    {"MakeArray", []int{2}},
 	Pop:          {"Pop", []int{}},
 	Add:          {"Add", []int{}},
 	Sub:          {"Sub", []int{}},
