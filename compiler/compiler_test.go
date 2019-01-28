@@ -49,6 +49,12 @@ func testConstants(
 	}
 	for i, constant := range expected {
 		switch constant := constant.(type) {
+		case string:
+			err := testStringObject(constant, actual[i])
+			if err != nil {
+				return fmt.Errorf("constant %d - testStringObject failed: %s",
+					i, err)
+			}
 		case int:
 			err := testIntegerObject(int64(constant), actual[i])
 			if err != nil {
@@ -56,6 +62,21 @@ func testConstants(
 					i, err)
 			}
 		}
+	}
+
+	return nil
+}
+
+func testStringObject(expected string, actual object.Object) error {
+	result, ok := actual.(*object.String)
+	if !ok {
+		return fmt.Errorf("object is not String. got=%T (%+v)",
+			actual, actual)
+	}
+
+	if result.Value != expected {
+		return fmt.Errorf("object has wrong value. got=%q, want=%q",
+			result.Value, expected)
 	}
 
 	return nil
@@ -372,6 +393,31 @@ func TestGlobalLetStatements(t *testing.T) {
 				code.Make(code.LoadGlobal, 0),
 				code.Make(code.BindGlobal, 1),
 				code.Make(code.LoadGlobal, 1),
+				code.Make(code.Pop),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
+func TestStringExpressions(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input:             `"monkey"`,
+			expectedConstants: []interface{}{"monkey"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input:             `"mon" + "key"`,
+			expectedConstants: []interface{}{"mon", "key"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.Add),
 				code.Make(code.Pop),
 			},
 		},
