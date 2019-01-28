@@ -79,6 +79,9 @@ const (
 	Index
 	JumpIfFalse
 	Jump
+	Call
+	Return
+	ReturnValue
 )
 
 var definitions = map[Opcode]*Definition{
@@ -103,6 +106,9 @@ var definitions = map[Opcode]*Definition{
 	Index:        {"Index", []int{}},
 	JumpIfFalse:  {"JumpIfFalse", []int{2}},
 	Jump:         {"Jump", []int{2}},
+	Call:         {"Call", []int{}},
+	Return:       {"Return", []int{}},
+	ReturnValue:  {"ReturnValue", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {

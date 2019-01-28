@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/prologic/monkey-lang/ast"
+	"github.com/prologic/monkey-lang/code"
 )
 
 const (
@@ -34,6 +35,9 @@ const (
 
 	// FUNCTION is the Function object type
 	FUNCTION = "FUNCTION"
+
+	// COMPILED_FUNCTION is the CompiledFunction object type
+	COMPILED_FUNCTION = "COMPILED_FUNCTION"
 
 	// BUILTIN is the Builtin object type
 	BUILTIN = "BUILTIN"
@@ -135,6 +139,20 @@ func (e *Error) Type() Type { return ERROR }
 
 // Inspect returns a stringified version of the object for debugging
 func (e *Error) Inspect() string { return "ERROR: " + e.Message }
+
+// CompiledFunction is the compiled function type that holds the function's
+// compiled body as bytecode instructions
+type CompiledFunction struct {
+	Instructions code.Instructions
+}
+
+// Type returns the type of the object
+func (cf *CompiledFunction) Type() Type { return COMPILED_FUNCTION }
+
+// Inspect returns a stringified version of the object for debugging
+func (cf *CompiledFunction) Inspect() string {
+	return fmt.Sprintf("CompiledFunction[%p]", cf)
+}
 
 // Function is the function type that holds the function's formal parameters,
 // body and an environment to support closures.
