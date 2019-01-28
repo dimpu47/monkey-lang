@@ -468,3 +468,48 @@ func TestArrayLiterals(t *testing.T) {
 
 	runCompilerTests(t, tests)
 }
+
+func TestHashLiterals(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input:             "{}",
+			expectedConstants: []interface{}{},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.MakeHash, 0),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input:             "{1: 2, 3: 4, 5: 6}",
+			expectedConstants: []interface{}{1, 2, 3, 4, 5, 6},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.LoadConstant, 2),
+				code.Make(code.LoadConstant, 3),
+				code.Make(code.LoadConstant, 4),
+				code.Make(code.LoadConstant, 5),
+				code.Make(code.MakeHash, 6),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input:             "{1: 2 + 3, 4: 5 * 6}",
+			expectedConstants: []interface{}{1, 2, 3, 4, 5, 6},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.LoadConstant, 2),
+				code.Make(code.Add),
+				code.Make(code.LoadConstant, 3),
+				code.Make(code.LoadConstant, 4),
+				code.Make(code.LoadConstant, 5),
+				code.Make(code.Mul),
+				code.Make(code.MakeHash, 4),
+				code.Make(code.Pop),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
