@@ -76,6 +76,7 @@ const (
 	GreaterThan
 	Minus
 	Bang
+	Index
 	JumpIfFalse
 	Jump
 )
@@ -99,6 +100,7 @@ var definitions = map[Opcode]*Definition{
 	GreaterThan:  {"GreaterThan", []int{}},
 	Minus:        {"Minus", []int{}},
 	Bang:         {"Bang", []int{}},
+	Index:        {"Index", []int{}},
 	JumpIfFalse:  {"JumpIfFalse", []int{2}},
 	Jump:         {"Jump", []int{2}},
 }
