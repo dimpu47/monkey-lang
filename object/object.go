@@ -144,6 +144,7 @@ func (e *Error) Inspect() string { return "ERROR: " + e.Message }
 // compiled body as bytecode instructions
 type CompiledFunction struct {
 	Instructions code.Instructions
+	NumLocals    int
 }
 
 // Type returns the type of the object
