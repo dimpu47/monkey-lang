@@ -719,7 +719,7 @@ func TestFunctionCalls(t *testing.T) {
 			},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.LoadConstant, 1), // The compiled function
-				code.Make(code.Call),
+				code.Make(code.Call, 0),
 				code.Make(code.Pop),
 			},
 		},
@@ -739,7 +739,57 @@ func TestFunctionCalls(t *testing.T) {
 				code.Make(code.LoadConstant, 1), // The compiled function
 				code.Make(code.BindGlobal, 0),
 				code.Make(code.LoadGlobal, 0),
-				code.Make(code.Call),
+				code.Make(code.Call, 0),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input: `
+            let oneArg = fn(a) { a };
+            oneArg(24);
+            `,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.LoadLocal, 0),
+					code.Make(code.ReturnValue),
+				},
+				24,
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.BindGlobal, 0),
+				code.Make(code.LoadGlobal, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.Call, 1),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input: `
+            let manyArg = fn(a, b, c) { a; b; c };
+            manyArg(24, 25, 26);
+            `,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.LoadLocal, 0),
+					code.Make(code.Pop),
+					code.Make(code.LoadLocal, 1),
+					code.Make(code.Pop),
+					code.Make(code.LoadLocal, 2),
+					code.Make(code.ReturnValue),
+				},
+				24,
+				25,
+				26,
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.BindGlobal, 0),
+				code.Make(code.LoadGlobal, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.LoadConstant, 2),
+				code.Make(code.LoadConstant, 3),
+				code.Make(code.Call, 3),
 				code.Make(code.Pop),
 			},
 		},

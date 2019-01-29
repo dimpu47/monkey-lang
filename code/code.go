@@ -110,7 +110,7 @@ var definitions = map[Opcode]*Definition{
 	Index:        {"Index", []int{}},
 	JumpIfFalse:  {"JumpIfFalse", []int{2}},
 	Jump:         {"Jump", []int{2}},
-	Call:         {"Call", []int{}},
+	Call:         {"Call", []int{1}},
 	Return:       {"Return", []int{}},
 	ReturnValue:  {"ReturnValue", []int{}},
 }

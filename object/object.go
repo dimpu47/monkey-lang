@@ -143,8 +143,9 @@ func (e *Error) Inspect() string { return "ERROR: " + e.Message }
 // CompiledFunction is the compiled function type that holds the function's
 // compiled body as bytecode instructions
 type CompiledFunction struct {
-	Instructions code.Instructions
-	NumLocals    int
+	Instructions  code.Instructions
+	NumLocals     int
+	NumParameters int
 }
 
 // Type returns the type of the object
