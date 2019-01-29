@@ -39,30 +39,37 @@ func New() *Compiler {
 		previousInstruction: EmittedInstruction{},
 	}
 
+	symbolTable := NewSymbolTable()
+
+	for i, v := range object.Builtins {
+		symbolTable.DefineBuiltin(i, v.Name)
+	}
+
 	return &Compiler{
 		constants: []object.Object{},
 
 		scopes:     []Scope{mainScope},
 		scopeIndex: 0,
 
-		symbolTable: NewSymbolTable(),
+		symbolTable: symbolTable,
 	}
 }
 
-func NewWithState(s *SymbolTable, constants []object.Object) *Compiler {
-	mainScope := Scope{
-		instructions:        code.Instructions{},
-		lastInstruction:     EmittedInstruction{},
-		previousInstruction: EmittedInstruction{},
-	}
+func NewWithState(symbolTable *SymbolTable, constants []object.Object) *Compiler {
+	c := New()
+	c.symbolTable = symbolTable
+	c.constants = constants
+	return c
+}
 
-	return &Compiler{
-		constants: constants,
-
-		scopes:     []Scope{mainScope},
-		scopeIndex: 0,
-
-		symbolTable: s,
+func (c *Compiler) loadSymbol(s Symbol) {
+	switch s.Scope {
+	case GlobalScope:
+		c.emit(code.LoadGlobal, s.Index)
+	case LocalScope:
+		c.emit(code.LoadLocal, s.Index)
+	case BuiltinScope:
+		c.emit(code.LoadBuiltin, s.Index)
 	}
 }
 
@@ -195,11 +202,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return fmt.Errorf("undefined variable %s", node.Value)
 		}
 
-		if symbol.Scope == GlobalScope {
-			c.emit(code.LoadGlobal, symbol.Index)
-		} else {
-			c.emit(code.LoadLocal, symbol.Index)
-		}
+		c.loadSymbol(symbol)
 
 	case *ast.ExpressionStatement:
 		err := c.Compile(node.Expression)

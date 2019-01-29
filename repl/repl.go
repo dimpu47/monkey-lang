@@ -50,10 +50,15 @@ type VMState struct {
 }
 
 func NewVMState() *VMState {
+	symbolTable := compiler.NewSymbolTable()
+	for i, v := range object.Builtins {
+		symbolTable.DefineBuiltin(i, v.Name)
+	}
+
 	return &VMState{
 		constants: []object.Object{},
 		globals:   make([]object.Object, vm.MaxGlobals),
-		symbols:   compiler.NewSymbolTable(),
+		symbols:   symbolTable,
 	}
 }
 
