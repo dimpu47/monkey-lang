@@ -124,6 +124,7 @@ func (r *REPL) Exec(f io.Reader) (state *VMState) {
 	}
 
 	code := c.Bytecode()
+	state.constants = code.Constants
 
 	machine := vm.NewWithGlobalsStore(code, state.globals)
 	err = machine.Run()
