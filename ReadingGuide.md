@@ -1,0 +1,67 @@
+# Reading Guide
+
+## Writing an Interpreter in Go
+
+* [1.2 Tokens 2018-10-30](https://github.com/prologic/monkey-lang/commit/3320dc452dfb30648f03c96711e27a06d63935ac)
+* [1.3 Lexer (basic) 2018-10-31](https://github.com/prologic/monkey-lang/commit/538995df8daac46dc4b1386074a3b9ce418b966e)
+* [1.4 Lexer (extended) 2018-10-31](https://github.com/prologic/monkey-lang/commit/462dab0218b5d429071c9d72fe9bd1df0b53c581)
+* [1.5 REPL (basic) 2018-10-31](https://github.com/prologic/monkey-lang/commit/4ff40960166dedcc1b6f6d52ecf969478cf0ba1c)
+* [2.4 Parser (basic) 2018-11-04](https://github.com/prologic/monkey-lang/commit/6c466b8d7c19fa158f0e5c2f421b633d9332f016)
+* [2.4 Parser (error handling) 2018-11-04](https://github.com/prologic/monkey-lang/commit/aa417967d4d6a36cba2c8990ec7b7032cf49c15c)
+* [2.5 Parser (return) 2018-11-07](https://github.com/prologic/monkey-lang/commit/ec367c732413d69751be5e0d91dfca904c0b221e)
+* [2.6 Pratt Parser (prefix) 2018-11-08](https://github.com/prologic/monkey-lang/commit/6bab31d2f5b8f84e509c5929edb7d8874d74484c)
+* [2.6 Pratt Parser (infix) 2018-11-10](https://github.com/prologic/monkey-lang/commit/84d767208af02180ce1167503b652724a1030bda)
+* [2.8 Parser tracing 2018-11-11](https://github.com/prologic/monkey-lang/commit/74142f10091e69c80b332d26e698b92bed9d074b)
+* [2.8 Parser (extended) 2018-11-12](https://github.com/prologic/monkey-lang/commit/24e04e54d1ed613ea9a53ee196fa19604e588a76)
+* [2.9 REPL (read-parse-print-loop) 2018-11-12](https://github.com/prologic/monkey-lang/commit/877476e35cb4d7a47ae3752a2be109c532423533)
+* [3.4 Evaluation (Object System) 2018-11-12](https://github.com/prologic/monkey-lang/commit/ed682462d565dd77fc780493f5d786c6095b404c)
+* [3.5 Evaluation (basic) 2018-11-12](https://github.com/prologic/monkey-lang/commit/981a7c45a406f9321eb0b26d90c8483132fe4799)
+* [3.5 REPL (complee) 2018-11-12](https://github.com/prologic/monkey-lang/commit/1f10ca5192182a3dea7766383f651575823dc2b3)
+* [3.5 Evaluation (literals) 2018-11-12](https://github.com/prologic/monkey-lang/commit/4f04664e63a4c999cd7af3a6ff99f50c03530124)
+* [3.5 Evaluation (prefix expressions) 2018-11-12](https://github.com/prologic/monkey-lang/commit/9d4a941cbcf432444b6c50802450705be0a7307f)
+* [3.5 Evaluation (infix expressions) 2018-11-12](https://github.com/prologic/monkey-lang/commit/69831466458a73e913da87a99948e62c867a641c)
+* [3.6 Evaluation (conditionals) 2018-11-12](https://github.com/prologic/monkey-lang/commit/c8cb0ba556888338f4fec623a6b88b3d841e3a3a)
+* [3.7 Evaluation (return statements) 2018-11-12](https://github.com/prologic/monkey-lang/commit/ed7c3883d75b264dab37ea41ef590fd0a1c214fc)
+* [3.8 Evaluation (error handling) 2018-11-12](https://github.com/prologic/monkey-lang/commit/bcfe39891874d00b70289e35cbdf16cf9a76b0c3)
+* [3.9 Evaluation (bindings and environment) 2018-11-12](https://github.com/prologic/monkey-lang/commit/8dcff4c24a5ac75c87b049c0f60ff51e7c40732a)
+* [3.10 Evaluation (functions and call expressions) 2018-11-12](https://github.com/prologic/monkey-lang/commit/f1e8bb2e6a19e795f8405e67a9d3c9541427c64e)
+* [4.2 Data Types (strings) 2018-11-12](https://github.com/prologic/monkey-lang/commit/3180a5753586afef839f5a3343938d1d249552fc)
+* [4.2 Data Types (string concatentation) 2018-11-12](https://github.com/prologic/monkey-lang/commit/7915100ee876557f179e2e76d73d77376419224a)
+* [4.3 Builtins (len) 2018-11-12](https://github.com/prologic/monkey-lang/commit/a84658da092ef003a420a7c8e5a9edddf121bbd8)
+* [4.4 Arrays (parsing array literals) 2018-11-12](https://github.com/prologic/monkey-lang/commit/795afaca9538cb8fe8ca330451a2c82157837c0f)
+* [4.4 Arrays (index operator expressions) 2018-11-12](https://github.com/prologic/monkey-lang/commit/350e73cbf5bb0296d16ae3dbbd92c3e552b4efc6)
+* [4.4 Arrays (evaluating array literals) 2018-11-12](https://github.com/prologic/monkey-lang/commit/cf6563386008f09841baae418c2a7752f6ca9cfa)
+* [4.4 Arrays (indexing) 2018-11-12](https://github.com/prologic/monkey-lang/commit/fc0cbe5cb8e7aed35db1067b0e778b36799dd973)
+* [4.4 Arrays (more builtins) 2018-11-12](https://github.com/prologic/monkey-lang/commit/7ccbb41ab5422f5701fa15904c1d92d4dafad251)
+* [4.5 Hash Maps 2018-11-12](https://github.com/prologic/monkey-lang/commit/11a9b81d83928de4fe08af86a3a15e227baca388)
+* [4.6 Hello World 2018-11-13](https://github.com/prologic/monkey-lang/commit/ea753dee534fc33900db4b5ab7c9d93fc4e48176)
+
+## Writing a Compiler in Go
+
+* [Hello Bytecode - First instructions 2019-01-27](https://github.com/prologic/monkey-lang/commit/2c1639631e6b7a6baa20062b93c52e2f32a94c49)
+* [Hello Bytecode - Adding on the stack 2019-01-27](https://github.com/prologic/monkey-lang/commit/e5674fcd0522fef351d30b357f34627748764ed3)
+* [Hello Bytecode - Hooking up the REPL 2019-01-27](https://github.com/prologic/monkey-lang/commit/1379285101d4b386106b578b2f09c200bf315aaa)
+* [Compiling Expressions - Cleaning up the stack 2019-01-27](https://github.com/prologic/monkey-lang/commit/91a40896ba77e6776014a0373f9c2ac49d33777d)
+* [Compiling Expressions - Infix Expressions 2019-01-27](https://github.com/prologic/monkey-lang/commit/c8ffcd8d2553a1ee3fb9790f774bfd3ce7ca0774)
+* [Compiling Expressions - Booleans 2019-01-28](https://github.com/prologic/monkey-lang/commit/dba40ebe9f72bc52eaab83734574d1219101c8a4)
+* [Compiling Expressions - Comparision Operators 2019-01-28](https://github.com/prologic/monkey-lang/commit/74323b1266b3b233e8e9dca9b6ce489649699fd1)
+* [Compiling Expressions - Prefix Expressions 2019-01-28](https://github.com/prologic/monkey-lang/commit/b6426073352db726e2ab2a2d94706d0f4a03ad67)
+* [Conditionals 2019-01-28](https://github.com/prologic/monkey-lang/commit/4dff8b7a19030ea608cfa61e917e8cb9fad0f0d4)
+* [Keeping track of names 2019-01-28](https://github.com/prologic/monkey-lang/commit/5622b5626ee07f79daf579b375fccb41eba7a2ed)
+* [String, Array, Hash - Strings 2019-01-28](https://github.com/prologic/monkey-lang/commit/8f49b0ad73a2871a889679c6004897818dd7202e)
+* [String, Array, Hash - Arrays 2019-01-28](https://github.com/prologic/monkey-lang/commit/b1a6828d3334054134cdf9a25cf52b406512b373)
+* [String, Array, Hash - Hashes 2019-01-28](https://github.com/prologic/monkey-lang/commit/091c0792c4c39e1fb4bdaf8b002a6e6b0f857889)
+* [String, Array, Hash - Adding the index operator 2019-01-28](https://github.com/prologic/monkey-lang/commit/24b03b4e4776bd7c839a12b6cae79467e4f0faf5)
+* [Functions - a Simple Function 2019-01-29](https://github.com/prologic/monkey-lang/commit/f7a2b1e14cce94f70d3b2dfdbc79fc1c89122066)
+* [Functions - Local Bindings 2019-01-29](https://github.com/prologic/monkey-lang/commit/3cc222e9118ee8e9f370040efb9d51e36b6d8555)
+* [Functions - Arguments 2019-01-29](https://github.com/prologic/monkey-lang/commit/eda6ccf4162b9d8c652af9f28f0861a7de1dae87)
+* [Builtin Functions - Refactoring 2019-01-29](https://github.com/prologic/monkey-lang/commit/e047f6fdf843b9eb752304736ec6eceb20d376b0)
+* [Builtin Functions - Builtins 2019-01-29](https://github.com/prologic/monkey-lang/commit/6999e937fff5a497eefc2145672677f66ca1a425)
+* [CLosures - Everything is a closure 2019-01-30](https://github.com/prologic/monkey-lang/commit/01c086901a223a0641610c2f26c7c16580f118b2)
+* [Closures - Creating real closures at runtime 2019-01-30](https://github.com/prologic/monkey-lang/commit/4d096f9381f0833dae6a840b4f2640b0428b0cc3)
+* [Fixed recursive function lookups 2019-01-30](https://github.com/prologic/monkey-lang/commit/4275fea6de8c65df441e0b055f8665500970afc5)
+
+## Buy the Books :D
+
+- [Writing an Interpreter in Go](https://interpreterbook.com/) -- Interpreter Book
+- [Writing a Compiler in Go](https://compilerbook.com/) -- Compiler Book

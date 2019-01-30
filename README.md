@@ -10,6 +10,13 @@ Monkey programming language interpreter designed in [_Writing An Interpreter In 
 A step-by-step walk-through where each commit is a fully working part.
 Read the book and follow along with the commit history.
 
+## Read and Follow
+
+> Read the books and follow along with the following commit history.
+(*This also happens to be the elapsed days I took to read both books!*)
+
+See: [Reading Guide](./ReadingGuide.md)
+
 ## Usage
 
 To build run `make`.
