@@ -137,6 +137,7 @@ func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 		compiler := New()
 		err := compiler.Compile(program)
 		if err != nil {
+			t.Log(tt.input)
 			t.Fatalf("compiler error: %s", err)
 		}
 
@@ -144,11 +145,13 @@ func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 
 		err = testInstructions(tt.expectedInstructions, bytecode.Instructions)
 		if err != nil {
+			t.Log(tt.input)
 			t.Fatalf("testInstructions failed: %s", err)
 		}
 
 		err = testConstants(t, tt.expectedConstants, bytecode.Constants)
 		if err != nil {
+			t.Log(tt.input)
 			t.Fatalf("testConstants failed: %s", err)
 		}
 	}
@@ -904,6 +907,133 @@ func TestBuiltins(t *testing.T) {
 			},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.MakeClosure, 0, 0),
+				code.Make(code.Pop),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
+func TestClosures(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+            fn(a) {
+                fn(b) {
+                    a + b
+                }
+            }
+            `,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.LoadFree, 0),
+					code.Make(code.LoadLocal, 0),
+					code.Make(code.Add),
+					code.Make(code.ReturnValue),
+				},
+				[]code.Instructions{
+					code.Make(code.LoadLocal, 0),
+					code.Make(code.MakeClosure, 0, 1),
+					code.Make(code.ReturnValue),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.MakeClosure, 1, 0),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input: `
+            fn(a) {
+                fn(b) {
+                    fn(c) {
+                        a + b + c
+                    }
+                }
+            };
+            `,
+			expectedConstants: []interface{}{
+				[]code.Instructions{
+					code.Make(code.LoadFree, 0),
+					code.Make(code.LoadFree, 1),
+					code.Make(code.Add),
+					code.Make(code.LoadLocal, 0),
+					code.Make(code.Add),
+					code.Make(code.ReturnValue),
+				},
+				[]code.Instructions{
+					code.Make(code.LoadFree, 0),
+					code.Make(code.LoadLocal, 0),
+					code.Make(code.MakeClosure, 0, 2),
+					code.Make(code.ReturnValue),
+				},
+				[]code.Instructions{
+					code.Make(code.LoadLocal, 0),
+					code.Make(code.MakeClosure, 1, 1),
+					code.Make(code.ReturnValue),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.MakeClosure, 2, 0),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input: `
+            let global = 55;
+
+            fn() {
+                let a = 66;
+
+                fn() {
+                    let b = 77;
+
+                    fn() {
+                        let c = 88;
+
+                        global + a + b + c;
+                    }
+                }
+            }
+            `,
+			expectedConstants: []interface{}{
+				55,
+				66,
+				77,
+				88,
+				[]code.Instructions{
+					code.Make(code.LoadConstant, 3),
+					code.Make(code.BindLocal, 0),
+					code.Make(code.LoadGlobal, 0),
+					code.Make(code.LoadFree, 0),
+					code.Make(code.Add),
+					code.Make(code.LoadFree, 1),
+					code.Make(code.Add),
+					code.Make(code.LoadLocal, 0),
+					code.Make(code.Add),
+					code.Make(code.ReturnValue),
+				},
+				[]code.Instructions{
+					code.Make(code.LoadConstant, 2),
+					code.Make(code.BindLocal, 0),
+					code.Make(code.LoadFree, 0),
+					code.Make(code.LoadLocal, 0),
+					code.Make(code.MakeClosure, 4, 2),
+					code.Make(code.ReturnValue),
+				},
+				[]code.Instructions{
+					code.Make(code.LoadConstant, 1),
+					code.Make(code.BindLocal, 0),
+					code.Make(code.LoadLocal, 0),
+					code.Make(code.MakeClosure, 5, 1),
+					code.Make(code.ReturnValue),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.BindGlobal, 0),
+				code.Make(code.MakeClosure, 6, 0),
 				code.Make(code.Pop),
 			},
 		},
