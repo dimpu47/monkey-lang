@@ -42,6 +42,9 @@ const (
 	// BUILTIN is the Builtin object type
 	BUILTIN = "BUILTIN"
 
+	// CLOSURE is the Closure object type
+	CLOSURE = "CLOSURE"
+
 	// ARRAY is the Array object type
 	ARRAY = "ARRAY"
 
@@ -198,6 +201,21 @@ func (b *Builtin) Type() Type { return BUILTIN }
 
 // Inspect returns a stringified version of the object for debugging
 func (b *Builtin) Inspect() string { return "builtin function" }
+
+// Closure is the closure object type that holds a reference to a compiled
+// functions and its free variables
+type Closure struct {
+	Fn   *CompiledFunction
+	Free []Object
+}
+
+// Type returns the type of the object
+func (c *Closure) Type() Type { return CLOSURE }
+
+// Inspect returns a stringified version of the object for debugging
+func (c *Closure) Inspect() string {
+	return fmt.Sprintf("Closure[%p]", c)
+}
 
 // Array is the array literal type that holds a slice of Object(s)
 type Array struct {

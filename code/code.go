@@ -50,6 +50,8 @@ func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
 		return def.Name
 	case 1:
 		return fmt.Sprintf("%s %d", def.Name, operands[0])
+	case 2:
+		return fmt.Sprintf("%s %d %d", def.Name, operands[0], operands[1])
 	}
 
 	return fmt.Sprintf("ERROR: unhandled operandCount for %s\n", def.Name)
@@ -69,6 +71,7 @@ const (
 	LoadNull
 	MakeArray
 	MakeHash
+	MakeClosure
 	Pop
 	Add
 	Sub
@@ -99,6 +102,7 @@ var definitions = map[Opcode]*Definition{
 	LoadNull:     {"LoadNull", []int{}},
 	MakeArray:    {"MakeArray", []int{2}},
 	MakeHash:     {"MakeHash", []int{2}},
+	MakeClosure:  {"MakeClosure", []int{2, 1}},
 	Pop:          {"Pop", []int{}},
 	Add:          {"Add", []int{}},
 	Sub:          {"Sub", []int{}},
