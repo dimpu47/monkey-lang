@@ -10,7 +10,7 @@ let book = {
 let printBookName = fn(book) {
     let title = book["title"];
     let author = book["author"];
-    puts(author + " - " + title);
+    print(author + " - " + title);
 };
 
 printBookName(book);

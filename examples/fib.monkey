@@ -8,4 +8,4 @@ let fib = fn(x) {
   return fib(x-1) + fib(x-2)
 }
 
-puts(fib(35))
+print(fib(35))

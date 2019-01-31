@@ -6,7 +6,7 @@ import (
 
 var builtins = map[string]*object.Builtin{
 	"len":   object.LookupBuiltin("len"),
-	"puts":  object.LookupBuiltin("puts"),
+	"print": object.LookupBuiltin("print"),
 	"first": object.LookupBuiltin("first"),
 	"last":  object.LookupBuiltin("last"),
 	"rest":  object.LookupBuiltin("rest"),

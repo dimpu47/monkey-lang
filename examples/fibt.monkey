@@ -8,4 +8,4 @@ let fib = fn(n, a, b) {
   return fib(n - 1, b, a + b)
 }
 
-puts(fib(35, 0, 1))
+print(fib(35, 0, 1))
