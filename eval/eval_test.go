@@ -1,6 +1,7 @@
 package eval
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/prologic/monkey-lang/lexer"
@@ -53,6 +54,20 @@ func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
 	}
 	if result.Value != expected {
 		t.Errorf("object has wrong value. got=%d, want=%d",
+			result.Value, expected)
+		return false
+	}
+	return true
+}
+
+func testStringObject(t *testing.T, obj object.Object, expected string) bool {
+	result, ok := obj.(*object.String)
+	if !ok {
+		t.Errorf("object is not String. got=%T (%+v)", obj, obj)
+		return false
+	}
+	if result.Value != expected {
+		t.Errorf("object has wrong value. got=%s, want=%s",
 			result.Value, expected)
 		return false
 	}
@@ -364,22 +379,23 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`len("")`, 0},
 		{`len("four")`, 4},
 		{`len("hello world")`, 11},
-		{`len(1)`, "argument to `len` not supported, got INTEGER"},
-		{`len("one", "two")`, "wrong number of arguments. got=2, want=1"},
+		{`len(1)`, errors.New("argument to `len` not supported, got INTEGER")},
+		{`len("one", "two")`, errors.New("wrong number of arguments. got=2, want=1")},
 		{`len("∑")`, 1},
 		{`len([1, 2, 3])`, 3},
 		{`len([])`, 0},
 		{`first([1, 2, 3])`, 1},
 		{`first([])`, nil},
-		{`first(1)`, "argument to `first` must be ARRAY, got INTEGER"},
+		{`first(1)`, errors.New("argument to `first` must be ARRAY, got INTEGER")},
 		{`last([1, 2, 3])`, 3},
 		{`last([])`, nil},
-		{`last(1)`, "argument to `last` must be ARRAY, got INTEGER"},
+		{`last(1)`, errors.New("argument to `last` must be ARRAY, got INTEGER")},
 		{`rest([1, 2, 3])`, []int{2, 3}},
 		{`rest([])`, nil},
 		{`push([], 1)`, []int{1}},
-		{`push(1, 1)`, "argument to `push` must be ARRAY, got INTEGER"},
+		{`push(1, 1)`, errors.New("argument to `push` must be ARRAY, got INTEGER")},
 		{`print("Hello World")`, nil},
+		{`input()`, ""},
 	}
 
 	for _, tt := range tests {
@@ -389,13 +405,15 @@ func TestBuiltinFunctions(t *testing.T) {
 		case int:
 			testIntegerObject(t, evaluated, int64(expected))
 		case string:
+			testStringObject(t, evaluated, expected)
+		case error:
 			errObj, ok := evaluated.(*object.Error)
 			if !ok {
 				t.Errorf("object is not Error. got=%T (%+v)",
 					evaluated, evaluated)
 				continue
 			}
-			if errObj.Message != expected {
+			if errObj.Message != expected.Error() {
 				t.Errorf("wrong error message. expected=%q, got=%q",
 					expected, errObj.Message)
 			}

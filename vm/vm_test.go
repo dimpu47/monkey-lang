@@ -626,6 +626,7 @@ func TestBuiltinFunctions(t *testing.T) {
 				Message: "argument to `push` must be ARRAY, got INTEGER",
 			},
 		},
+		{`input()`, ""},
 	}
 
 	runVmTests(t, tests)

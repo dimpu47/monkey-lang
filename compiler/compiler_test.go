@@ -888,7 +888,7 @@ func TestBuiltins(t *testing.T) {
 				code.Make(code.MakeArray, 0),
 				code.Make(code.Call, 1),
 				code.Make(code.Pop),
-				code.Make(code.LoadBuiltin, 5),
+				code.Make(code.LoadBuiltin, 6),
 				code.Make(code.MakeArray, 0),
 				code.Make(code.LoadConstant, 0),
 				code.Make(code.Call, 2),
