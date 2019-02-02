@@ -421,6 +421,8 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`push(1, 1)`, errors.New("argument to `push` must be ARRAY, got INTEGER")},
 		{`print("Hello World")`, nil},
 		{`input()`, ""},
+		{`pop([])`, errors.New("cannot pop from an empty array")},
+		{`pop([1])`, 1},
 	}
 
 	for _, tt := range tests {

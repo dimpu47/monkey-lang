@@ -643,6 +643,11 @@ func TestBuiltinFunctions(t *testing.T) {
 			},
 		},
 		{`input()`, ""},
+		{`pop([])`, &object.Error{
+			Message: "cannot pop from an empty array",
+		},
+		},
+		{`pop([1])`, 1},
 	}
 
 	runVmTests(t, tests)
