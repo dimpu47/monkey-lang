@@ -7,17 +7,22 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
 	"path"
 
+	"github.com/prologic/monkey-lang/compiler"
+	"github.com/prologic/monkey-lang/lexer"
+	"github.com/prologic/monkey-lang/parser"
 	"github.com/prologic/monkey-lang/repl"
 )
 
 var (
 	engine      string
 	interactive bool
+	compile     bool
 	version     bool
 	debug       bool
 )
@@ -31,6 +36,7 @@ func init() {
 
 	flag.BoolVar(&version, "v", false, "display version information")
 	flag.BoolVar(&debug, "d", false, "enable debug mode")
+	flag.BoolVar(&compile, "c", false, "compile input to bytecode")
 
 	flag.BoolVar(&interactive, "i", false, "enable interactive mode")
 	flag.StringVar(&engine, "e", "vm", "engine to use (eval or vm)")
@@ -50,11 +56,42 @@ func main() {
 	}
 
 	args := flag.Args()
-	opts := &repl.Options{
-		Debug:       debug,
-		Engine:      engine,
-		Interactive: interactive,
+
+	if compile {
+		if len(args) < 1 {
+			log.Fatal("no source file given to compile")
+		}
+		f, err := os.Open(args[0])
+		defer f.Close()
+
+		b, err := ioutil.ReadAll(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		l := lexer.New(string(b))
+		p := parser.New(l)
+
+		program := p.ParseProgram()
+		if len(p.Errors()) != 0 {
+			log.Fatal(p.Errors())
+		}
+
+		c := compiler.New()
+		err = c.Compile(program)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		code := c.Bytecode()
+		fmt.Printf("%s\n", code.Instructions)
+	} else {
+		opts := &repl.Options{
+			Debug:       debug,
+			Engine:      engine,
+			Interactive: interactive,
+		}
+		repl := repl.New(user.Username, args, opts)
+		repl.Run()
 	}
-	repl := repl.New(user.Username, args, opts)
-	repl.Run()
 }
