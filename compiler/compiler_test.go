@@ -870,6 +870,24 @@ func TestLetStatementScopes(t *testing.T) {
 				code.Make(code.Pop),
 			},
 		},
+		{
+			input: `
+			let a = 0;
+			let a = a + 1;
+			`,
+			expectedConstants: []interface{}{
+				0,
+				1,
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.BindGlobal, 0),
+				code.Make(code.LoadGlobal, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.Add),
+				code.Make(code.BindGlobal, 1),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)

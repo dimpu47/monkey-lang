@@ -186,7 +186,15 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 	case *ast.LetStatement:
-		symbol := c.symbolTable.Define(node.Name.Value)
+		var (
+			ok     bool
+			symbol Symbol
+		)
+
+		symbol, ok = c.symbolTable.Resolve(node.Name.Value)
+		if !ok {
+			symbol = c.symbolTable.Define(node.Name.Value)
+		}
 
 		err := c.Compile(node.Value)
 		if err != nil {
