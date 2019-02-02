@@ -398,6 +398,56 @@ func TestStringConcatenation(t *testing.T) {
 	}
 }
 
+func TestStringIndexExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			`"abc"[0]`,
+			"a",
+		},
+		{
+			`"abc"[1]`,
+			"b",
+		},
+		{
+			`"abc"[2]`,
+			"c",
+		},
+		{
+			`let i = 0; "abc"[i];`,
+			"a",
+		},
+		{
+			`"abc"[1 + 1];`,
+			"c",
+		},
+		{
+			`let myString = "abc"; myString[0] + myString[1] + myString[2];`,
+			"abc",
+		},
+		{
+			`"abc"[3]`,
+			"",
+		},
+		{
+			`"foo"[-1]`,
+			"",
+		},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		str, ok := tt.expected.(string)
+		if ok {
+			testStringObject(t, evaluated, string(str))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
+}
+
 func TestBuiltinFunctions(t *testing.T) {
 	tests := []struct {
 		input    string

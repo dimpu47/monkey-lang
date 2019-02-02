@@ -253,6 +253,8 @@ func (vm *VM) executeMinusOperator() error {
 
 func (vm *VM) executeIndexExpression(left, index object.Object) error {
 	switch {
+	case left.Type() == object.STRING && index.Type() == object.INTEGER:
+		return vm.executeStringIndex(left, index)
 	case left.Type() == object.ARRAY && index.Type() == object.INTEGER:
 		return vm.executeArrayIndex(left, index)
 	case left.Type() == object.HASH:
@@ -260,6 +262,18 @@ func (vm *VM) executeIndexExpression(left, index object.Object) error {
 	default:
 		return fmt.Errorf("index operator not supported: %s", left.Type())
 	}
+}
+
+func (vm *VM) executeStringIndex(str, index object.Object) error {
+	stringObject := str.(*object.String)
+	i := index.(*object.Integer).Value
+	max := int64(len(stringObject.Value) - 1)
+
+	if i < 0 || i > max {
+		return vm.push(&object.String{Value: ""})
+	}
+
+	return vm.push(&object.String{Value: string(stringObject.Value[i])})
 }
 
 func (vm *VM) executeArrayIndex(array, index object.Object) error {

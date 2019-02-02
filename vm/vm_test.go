@@ -340,6 +340,11 @@ func TestIndexExpressions(t *testing.T) {
 		{"{1: 1, 2: 2}[2]", 2},
 		{"{1: 1}[0]", Null},
 		{"{}[0]", Null},
+		{`"abc"[0]`, "a"},
+		{`"abc"[1]`, "b"},
+		{`"abc"[2]`, "c"},
+		{`"abc"[3]`, ""},
+		{`"abc"[-1]`, ""},
 	}
 
 	runVmTests(t, tests)

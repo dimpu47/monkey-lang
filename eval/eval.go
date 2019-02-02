@@ -416,6 +416,8 @@ func unwrapReturnValue(obj object.Object) object.Object {
 
 func evalIndexExpression(left, index object.Object) object.Object {
 	switch {
+	case left.Type() == object.STRING && index.Type() == object.INTEGER:
+		return evalStringIndexExpression(left, index)
 	case left.Type() == object.ARRAY && index.Type() == object.INTEGER:
 		return evalArrayIndexExpression(left, index)
 	case left.Type() == object.HASH:
@@ -451,6 +453,18 @@ func evalArrayIndexExpression(array, index object.Object) object.Object {
 	}
 
 	return arrayObject.Elements[idx]
+}
+
+func evalStringIndexExpression(str, index object.Object) object.Object {
+	stringObject := str.(*object.String)
+	idx := index.(*object.Integer).Value
+	max := int64(len(stringObject.Value) - 1)
+
+	if idx < 0 || idx > max {
+		return &object.String{Value: ""}
+	}
+
+	return &object.String{Value: string(stringObject.Value[idx])}
 }
 
 func evalHashLiteral(
