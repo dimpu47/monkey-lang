@@ -11,11 +11,11 @@ endif
 
 syntax case match
 
-" equivalent to io-mode-prototype-names in io-mode.el
 syntax keyword xType true false
 
-" equivalent to io-mode-message-names in io-mode.el
-syntax keyword xKeyword let fn if else return
+syntax keyword xKeyword let fn if else return while
+
+syntax keyword xFunction first last rest push print
 
 syntax keyword xOperator == != < > !
 syntax keyword xOperator + - * /
@@ -26,6 +26,7 @@ syntax region xString start=/"/ skip=/\\./ end=/"/
 
 highlight link xType Type
 highlight link xKeyword Keyword
+highlight link xFunction Function
 highlight link xString String
 " highlight link xComment Comment
 highlight link xOperator Operator
