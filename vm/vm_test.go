@@ -2,6 +2,8 @@ package vm
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"testing"
 
 	"github.com/prologic/monkey-lang/ast"
@@ -754,4 +756,36 @@ func TestRecursiveFibonacci(t *testing.T) {
 	}
 
 	runVmTests(t, tests)
+}
+
+func TestExamples(t *testing.T) {
+	matches, err := filepath.Glob("./examples/*.monkey")
+	if err != nil {
+		t.Error(err)
+	}
+
+	for _, match := range matches {
+		b, err := ioutil.ReadFile(match)
+		if err != nil {
+			t.Error(err)
+		}
+
+		input := string(b)
+		program := parse(input)
+
+		c := compiler.New()
+		err = c.Compile(program)
+		if err != nil {
+			t.Log(input)
+			t.Fatalf("compiler error: %s", err)
+		}
+
+		vm := New(c.Bytecode())
+
+		err = vm.Run()
+		if err != nil {
+			t.Log(input)
+			t.Fatalf("vm error: %s", err)
+		}
+	}
 }

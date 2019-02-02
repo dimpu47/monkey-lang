@@ -2,6 +2,8 @@ package eval
 
 import (
 	"errors"
+	"io/ioutil"
+	"path/filepath"
 	"testing"
 
 	"github.com/prologic/monkey-lang/lexer"
@@ -608,5 +610,20 @@ func TestHashIndexExpressions(t *testing.T) {
 		} else {
 			testNullObject(t, evaluated)
 		}
+	}
+}
+
+func TestExamples(t *testing.T) {
+	matches, err := filepath.Glob("./examples/*.monkey")
+	if err != nil {
+		t.Error(err)
+	}
+
+	for _, match := range matches {
+		b, err := ioutil.ReadFile(match)
+		if err != nil {
+			t.Error(err)
+		}
+		testEval(string(b))
 	}
 }
