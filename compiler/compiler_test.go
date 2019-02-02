@@ -370,6 +370,33 @@ func TestConditionals(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestIteration(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+			while (true) { 10 };
+            `,
+			expectedConstants: []interface{}{10},
+			expectedInstructions: []code.Instructions{
+				// 0000
+				code.Make(code.LoadTrue),
+				// 0001
+				code.Make(code.JumpIfFalse, 11),
+				// 0004
+				code.Make(code.LoadConstant, 0),
+				// 0007
+				code.Make(code.Pop),
+				// 0008
+				code.Make(code.Jump, 0),
+				// 0011
+				code.Make(code.Noop),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func TestGlobalLetStatements(t *testing.T) {
 	tests := []compilerTestCase{
 		{
@@ -885,7 +912,7 @@ func TestLetStatementScopes(t *testing.T) {
 				code.Make(code.LoadGlobal, 0),
 				code.Make(code.LoadConstant, 1),
 				code.Make(code.Add),
-				code.Make(code.BindGlobal, 1),
+				code.Make(code.BindGlobal, 0),
 			},
 		},
 	}

@@ -220,7 +220,10 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if err != nil {
 			return err
 		}
-		c.emit(code.Pop)
+
+		if !c.lastInstructionIs(code.Noop) {
+			c.emit(code.Pop)
+		}
 
 	case *ast.BlockStatement:
 		for _, s := range node.Statements {
@@ -269,6 +272,32 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 		afterAlternativePos := len(c.currentInstructions())
 		c.changeOperand(jumpPos, afterAlternativePos)
+
+	case *ast.WhileExpression:
+		jumpConditionPos := len(c.currentInstructions())
+
+		err := c.Compile(node.Condition)
+		if err != nil {
+			return err
+		}
+
+		// Emit an `JumpIfFalse` with a bogus value
+		jumpIfFalsePos := c.emit(code.JumpIfFalse, 0xFFFF)
+
+		err = c.Compile(node.Consequence)
+		if err != nil {
+			return err
+		}
+
+		c.emit(code.Jump, jumpConditionPos)
+
+		// XXX: wtf?!
+		// XXX: THis is required so the last Pop doesn't blow up the VM
+		// XXX: when the stack pointer is already 0 -- This seems to be
+		// XXX: because after the while (...) { ... } AST is compiled
+		// XXX: the ast.ExpressionStatement node emits a final Pop
+		afterConsequencePos := c.emit(code.Noop)
+		c.changeOperand(jumpIfFalsePos, afterConsequencePos)
 
 	case *ast.PrefixExpression:
 		err := c.Compile(node.Right)

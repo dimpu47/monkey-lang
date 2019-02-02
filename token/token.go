@@ -90,6 +90,8 @@ const (
 	ELSE = "ELSE"
 	// RETURN the `return` keyword (return)
 	RETURN = "RETURN"
+	// WHILE the `while` keyword (while)
+	WHILE = "WHILE"
 )
 
 var keywords = map[string]Type{
@@ -100,6 +102,7 @@ var keywords = map[string]Type{
 	"if":     IF,
 	"else":   ELSE,
 	"return": RETURN,
+	"while":  WHILE,
 }
 
 // Type represents the type of a token

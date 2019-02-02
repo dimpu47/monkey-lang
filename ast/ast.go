@@ -290,6 +290,31 @@ func (ie *IfExpression) String() string {
 	return out.String()
 }
 
+// WhileExpression represents an `while` expression and holds the condition,
+// and consequence expression
+type WhileExpression struct {
+	Token       token.Token // The 'while' token
+	Condition   Expression
+	Consequence *BlockStatement
+}
+
+func (we *WhileExpression) expressionNode() {}
+
+// TokenLiteral prints the literal value of the token associated with this node
+func (we *WhileExpression) TokenLiteral() string { return we.Token.Literal }
+
+// String returns a stringified version of the AST for debugging
+func (we *WhileExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("while")
+	out.WriteString(we.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(we.Consequence.String())
+
+	return out.String()
+}
+
 // FunctionLiteral represents a literal functions and holds the function's
 // formal parameters and boy of the function as a block statement
 type FunctionLiteral struct {

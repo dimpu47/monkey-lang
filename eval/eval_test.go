@@ -178,6 +178,31 @@ func TestIfElseExpressions(t *testing.T) {
 	}
 }
 
+func TestWhileExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{"while (false) { }", nil},
+		{"let n = 0; while (n < 10) { let n = n + 1 }; n", 10},
+		{"let n = 10; while (n > 0) { let n = n - 1 }; n", 0},
+		// FIXME: let is an expression statement and bind new values
+		//        there is currently no assignment expressions :/
+		{"let n = 0; while (n < 10) { let n = n + 1 }", nil},
+		{"let n = 10; while (n > 0) { let n = n - 1 }", nil},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
+}
+
 func testNullObject(t *testing.T, obj object.Object) bool {
 	if obj != NULL {
 		t.Errorf("object is not NULL. got=%T (%+v)", obj, obj)

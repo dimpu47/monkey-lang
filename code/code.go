@@ -74,6 +74,7 @@ const (
 	MakeHash
 	MakeClosure
 	Pop
+	Noop
 	Add
 	Sub
 	Mul
@@ -106,6 +107,7 @@ var definitions = map[Opcode]*Definition{
 	MakeHash:     {"MakeHash", []int{2}},
 	MakeClosure:  {"MakeClosure", []int{2, 1}},
 	Pop:          {"Pop", []int{}},
+	Noop:         {"Noop", []int{}},
 	Add:          {"Add", []int{}},
 	Sub:          {"Sub", []int{}},
 	Mul:          {"Mul", []int{}},

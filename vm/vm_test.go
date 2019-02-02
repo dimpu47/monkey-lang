@@ -46,6 +46,7 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		comp := compiler.New()
 		err := comp.Compile(program)
 		if err != nil {
+			t.Log(tt.input)
 			t.Fatalf("compiler error: %s", err)
 		}
 
@@ -53,6 +54,7 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 
 		err = vm.Run()
 		if err != nil {
+			t.Log(tt.input)
 			t.Fatalf("vm error: %s", err)
 		}
 
@@ -251,6 +253,20 @@ func TestConditionals(t *testing.T) {
 		{"if (1 > 2) { 10 }", Null},
 		{"if (false) { 10 }", Null},
 		{"if ((if (false) { 10 })) { 10 } else { 20 }", 20},
+	}
+
+	runVmTests(t, tests)
+}
+
+func TestIterations(t *testing.T) {
+	tests := []vmTestCase{
+		{"while (false) { }", nil},
+		{"let n = 0; while (n < 10) { let n = n + 1 }; n", 10},
+		{"let n = 10; while (n > 0) { let n = n - 1 }; n", 0},
+		// FIXME: let is an expression statement and bind new values
+		//        there is currently no assignment expressions :/
+		{"let n = 0; while (n < 10) { let n = n + 1 }", nil},
+		{"let n = 10; while (n > 0) { let n = n - 1 }", nil},
 	}
 
 	runVmTests(t, tests)
