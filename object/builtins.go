@@ -182,6 +182,22 @@ var Builtins = []struct {
 		},
 		},
 	},
+	{
+		"exit",
+		&Builtin{Fn: func(args ...Object) Object {
+			if len(args) == 1 {
+				if args[0].Type() != INTEGER {
+					return newError("argument to `exit` must be INTEGER, got %s",
+						args[0].Type())
+				}
+				os.Exit(int(args[0].(*Integer).Value))
+			} else {
+				os.Exit(0)
+			}
+			return nil
+		},
+		},
+	},
 }
 
 func newError(format string, a ...interface{}) *Error {

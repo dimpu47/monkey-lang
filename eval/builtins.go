@@ -13,4 +13,5 @@ var builtins = map[string]*object.Builtin{
 	"rest":  object.LookupBuiltin("rest"),
 	"push":  object.LookupBuiltin("push"),
 	"pop":   object.LookupBuiltin("pop"),
+	"exit":  object.LookupBuiltin("exit"),
 }

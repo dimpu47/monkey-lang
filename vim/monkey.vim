@@ -15,7 +15,7 @@ syntax keyword xType true false
 
 syntax keyword xKeyword let fn if else return while
 
-syntax keyword xFunction len input print first last rest push pop
+syntax keyword xFunction len input print first last rest push pop exit
 
 syntax keyword xOperator == != < > !
 syntax keyword xOperator + - * /
