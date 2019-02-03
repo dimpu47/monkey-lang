@@ -266,12 +266,21 @@ func TestConditionals(t *testing.T) {
 func TestIterations(t *testing.T) {
 	tests := []vmTestCase{
 		{"while (false) { }", nil},
-		{"let n = 0; while (n < 10) { let n = n + 1 }; n", 10},
-		{"let n = 10; while (n > 0) { let n = n - 1 }; n", 0},
-		// FIXME: let is an expression statement and bind new values
-		//        there is currently no assignment expressions :/
-		{"let n = 0; while (n < 10) { let n = n + 1 }", nil},
-		{"let n = 10; while (n > 0) { let n = n - 1 }", nil},
+		{"let n = 0; while (n < 10) { n = n + 1 }; n", 10},
+		{"let n = 10; while (n > 0) { n = n - 1 }; n", 0},
+		{"let n = 0; while (n < 10) { n = n + 1 }", nil},
+		{"let n = 10; while (n > 0) { n = n - 1 }", nil},
+	}
+
+	runVmTests(t, tests)
+}
+
+func TestAssignmentStatements(t *testing.T) {
+	tests := []vmTestCase{
+		{"let one = 0; one = 1", 1},
+		{"let one = 0; one = 1; one", 1},
+		{"let one = 0; one = 1; let two = 0; two = 2; one + two", 3},
+		{"let one = 0; one = 1; let two = 0; two = one + one; one + two", 3},
 	}
 
 	runVmTests(t, tests)

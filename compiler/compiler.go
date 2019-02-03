@@ -185,6 +185,25 @@ func (c *Compiler) Compile(node ast.Node) error {
 			}
 		}
 
+	case *ast.AssignmentStatement:
+		symbol, ok := c.symbolTable.Resolve(node.Name.Value)
+		if !ok {
+			return fmt.Errorf("undefined variable %s", node.Value)
+		}
+
+		err := c.Compile(node.Value)
+		if err != nil {
+			return err
+		}
+
+		if symbol.Scope == GlobalScope {
+			c.emit(code.LoadGlobal, symbol.Index)
+		} else {
+			c.emit(code.LoadLocal, symbol.Index)
+		}
+
+		c.emit(code.Assign)
+
 	case *ast.LetStatement:
 		var (
 			ok     bool

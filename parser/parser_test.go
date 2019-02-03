@@ -8,6 +8,40 @@ import (
 	"github.com/prologic/monkey-lang/lexer"
 )
 
+func TestAssignmentStatements(t *testing.T) {
+	tests := []struct {
+		input              string
+		expectedIdentifier string
+		expectedValue      interface{}
+	}{
+		{"x = 5;", "x", 5},
+		{"y = true;", "y", true},
+		{"foobar = y;", "foobar", "y"},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain 1 statements. got=%d",
+				len(program.Statements))
+		}
+
+		stmt := program.Statements[0]
+		if !testAssignmentStatement(t, stmt, tt.expectedIdentifier) {
+			return
+		}
+
+		val := stmt.(*ast.AssignmentStatement).Value
+		if !testLiteralExpression(t, val, tt.expectedValue) {
+			return
+		}
+	}
+}
+
 func TestLetStatements(t *testing.T) {
 	tests := []struct {
 		input              string
@@ -722,6 +756,32 @@ func TestCallExpressionParameterParsing(t *testing.T) {
 			}
 		}
 	}
+}
+
+func testAssignmentStatement(t *testing.T, s ast.Statement, name string) bool {
+	if s.TokenLiteral() != "=" {
+		t.Errorf("s.TokenLiteral not '='. got=%q", s.TokenLiteral())
+		return false
+	}
+
+	assignStmt, ok := s.(*ast.AssignmentStatement)
+	if !ok {
+		t.Errorf("s not *ast.AssignmentStatement. got=%T", s)
+		return false
+	}
+
+	if assignStmt.Name.Value != name {
+		t.Errorf("assignStmt.Name.Value not '%s'. got=%s", name, assignStmt.Name.Value)
+		return false
+	}
+
+	if assignStmt.Name.TokenLiteral() != name {
+		t.Errorf("assignStmt.Name.TokenLiteral() not '%s'. got=%s",
+			name, assignStmt.Name.TokenLiteral())
+		return false
+	}
+
+	return true
 }
 
 func testLetStatement(t *testing.T, s ast.Statement, name string) bool {

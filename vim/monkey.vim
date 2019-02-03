@@ -18,7 +18,7 @@ syntax keyword xKeyword let fn if else return while
 syntax keyword xFunction len input print first last rest push pop exit
 
 syntax keyword xOperator == != < > !
-syntax keyword xOperator + - * /
+syntax keyword xOperator + - * / =
 
 syntax region xString start=/"/ skip=/\\./ end=/"/
 

@@ -52,6 +52,32 @@ func (p *Program) String() string {
 	return out.String()
 }
 
+// AssignmentStatement the `=` statement represents the AST node that rebinds
+// an expression to an identifier (assigning a new value).
+type AssignmentStatement struct {
+	Token token.Token // the token.ASSIGN token
+	Name  *Identifier
+	Value Expression
+}
+
+func (as *AssignmentStatement) statementNode() {}
+
+// TokenLiteral prints the literal value of the token associated with this node
+func (as *AssignmentStatement) TokenLiteral() string { return as.Token.Literal }
+
+// String returns a stringified version of the AST for debugging
+func (as *AssignmentStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(as.Name.String())
+	out.WriteString(as.TokenLiteral() + " ")
+	out.WriteString(as.Value.String())
+
+	out.WriteString(";")
+
+	return out.String()
+}
+
 // LetStatement the `let` statement represents the AST node that binds an
 // expression to an identifier
 type LetStatement struct {

@@ -70,6 +70,7 @@ const (
 	LoadTrue
 	LoadFalse
 	LoadNull
+	Assign
 	MakeArray
 	MakeHash
 	MakeClosure
@@ -103,6 +104,7 @@ var definitions = map[Opcode]*Definition{
 	LoadTrue:     {"LoadTrue", []int{}},
 	LoadFalse:    {"LoadFalse", []int{}},
 	LoadNull:     {"LoadNull", []int{}},
+	Assign:       {"Assign", []int{}},
 	MakeArray:    {"MakeArray", []int{2}},
 	MakeHash:     {"MakeHash", []int{2}},
 	MakeClosure:  {"MakeClosure", []int{2, 1}},

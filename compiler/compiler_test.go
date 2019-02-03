@@ -828,6 +828,103 @@ func TestFunctionCalls(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestAssignmentStatementScopes(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+            let num = 0;
+            fn() { num  = 55; }
+            `,
+			expectedConstants: []interface{}{
+				0,
+				55,
+				[]code.Instructions{
+					code.Make(code.LoadConstant, 1),
+					code.Make(code.LoadGlobal, 0),
+					code.Make(code.Assign),
+					code.Make(code.Return),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.BindGlobal, 0),
+				code.Make(code.MakeClosure, 2, 0),
+				code.Make(code.Pop),
+			},
+		},
+		/*
+					{
+						input: `
+			            fn() {
+			                let num = 55;
+			                num
+			            }
+			            `,
+						expectedConstants: []interface{}{
+							55,
+							[]code.Instructions{
+								code.Make(code.LoadConstant, 0),
+								code.Make(code.BindLocal, 0),
+								code.Make(code.LoadLocal, 0),
+								code.Make(code.ReturnValue),
+							},
+						},
+						expectedInstructions: []code.Instructions{
+							code.Make(code.MakeClosure, 1, 0),
+							code.Make(code.Pop),
+						},
+					},
+					{
+						input: `
+			            fn() {
+			                let a = 55;
+			                let b = 77;
+			                a + b
+			            }
+			            `,
+						expectedConstants: []interface{}{
+							55,
+							77,
+							[]code.Instructions{
+								code.Make(code.LoadConstant, 0),
+								code.Make(code.BindLocal, 0),
+								code.Make(code.LoadConstant, 1),
+								code.Make(code.BindLocal, 1),
+								code.Make(code.LoadLocal, 0),
+								code.Make(code.LoadLocal, 1),
+								code.Make(code.Add),
+								code.Make(code.ReturnValue),
+							},
+						},
+						expectedInstructions: []code.Instructions{
+							code.Make(code.MakeClosure, 2, 0),
+							code.Make(code.Pop),
+						},
+					},
+					{
+						input: `
+						let a = 0;
+						let a = a + 1;
+						`,
+						expectedConstants: []interface{}{
+							0,
+							1,
+						},
+						expectedInstructions: []code.Instructions{
+							code.Make(code.LoadConstant, 0),
+							code.Make(code.BindGlobal, 0),
+							code.Make(code.LoadGlobal, 0),
+							code.Make(code.LoadConstant, 1),
+							code.Make(code.Add),
+							code.Make(code.BindGlobal, 0),
+						},
+					},
+		*/
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func TestLetStatementScopes(t *testing.T) {
 	tests := []compilerTestCase{
 		{

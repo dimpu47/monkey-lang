@@ -52,6 +52,12 @@ const (
 	HASH = "HASH"
 )
 
+// Mutable is the interface for all mutable objects which must implement
+// the Set() method which rebinds its internal value for assignment statements
+type Mutable interface {
+	Set(obj Object)
+}
+
 // Hashable is the interface for all hashable objects which must implement
 // the HashKey() method which reutrns a HashKey result.
 type Hashable interface {
@@ -77,6 +83,11 @@ type Integer struct {
 	Value int64
 }
 
+// Set sets a new internal value
+func (i *Integer) Set(obj Object) {
+	i.Value = obj.(*Integer).Value
+}
+
 // Type returns the type of the object
 func (i *Integer) Type() Type { return INTEGER }
 
@@ -89,6 +100,11 @@ type String struct {
 	Value string
 }
 
+// Set sets a new internal value
+func (s *String) Set(obj Object) {
+	s.Value = obj.(*String).Value
+}
+
 // Type returns the type of the object
 func (s *String) Type() Type { return STRING }
 
@@ -99,6 +115,11 @@ func (s *String) Inspect() string { return s.Value }
 // holds an interval bool value
 type Boolean struct {
 	Value bool
+}
+
+// Set sets a new internal value
+func (b *Boolean) Set(obj Object) {
+	b.Value = obj.(*Boolean).Value
 }
 
 // Type returns the type of the object
@@ -135,6 +156,11 @@ func (rv *Return) Inspect() string { return rv.Value.Inspect() }
 // encountered stops evaulation of the program or body of a function.
 type Error struct {
 	Message string
+}
+
+// Set sets a new internal value
+func (e *Error) Set(obj Object) {
+	e.Message = obj.(*Error).Message
 }
 
 // Type returns the type of the object
@@ -222,6 +248,11 @@ type Array struct {
 	Elements []Object
 }
 
+// Set sets a new internal value
+func (ao *Array) Set(obj Object) {
+	ao.Elements = obj.(*Array).Elements
+}
+
 // Type returns the type of the object
 func (ao *Array) Type() Type { return ARRAY }
 
@@ -283,6 +314,11 @@ type HashPair struct {
 // Hash is a hash map and holds a map of HashKey to HashPair(s)
 type Hash struct {
 	Pairs map[HashKey]HashPair
+}
+
+// Set sets a new internal value
+func (h *Hash) Set(obj Object) {
+	h.Pairs = obj.(*Hash).Pairs
 }
 
 // Type returns the type of the object

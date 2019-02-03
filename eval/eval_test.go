@@ -191,10 +191,8 @@ func TestWhileExpressions(t *testing.T) {
 		{"while (false) { }", nil},
 		{"let n = 0; while (n < 10) { let n = n + 1 }; n", 10},
 		{"let n = 10; while (n > 0) { let n = n - 1 }; n", 0},
-		// FIXME: let is an expression statement and bind new values
-		//        there is currently no assignment expressions :/
-		{"let n = 0; while (n < 10) { let n = n + 1 }", nil},
-		{"let n = 10; while (n > 0) { let n = n - 1 }", nil},
+		{"let n = 0; while (n < 10) { n = n + 1 }", 10},
+		{"let n = 10; while (n > 0) { n = n - 1 }", 0},
 	}
 
 	for _, tt := range tests {
@@ -314,6 +312,26 @@ if (10 > 1) {
 			t.Errorf("wrong error message. expected=%q, got=%q",
 				tt.expectedMessage, errObj.Message)
 		}
+	}
+}
+
+func TestAssignmentStatements(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"let a = 0; a = 5;", 5},
+		{"let a = 0; a = 5; a;", 5},
+		{"let a = 0; a = 5 * 5;", 25},
+		{"let a = 0; a = 5 * 5; a;", 25},
+		{"let a = 0; a = 5; let b = 0; b = a;", 5},
+		{"let a = 0; a = 5; let b = 0; b = a; b;", 5},
+		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5;", 15},
+		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5; c;", 15},
+	}
+
+	for _, tt := range tests {
+		testIntegerObject(t, testEval(tt.input), tt.expected)
 	}
 }
 

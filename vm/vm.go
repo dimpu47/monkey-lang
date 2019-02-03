@@ -455,6 +455,17 @@ func (vm *VM) Run() error {
 				return err
 			}
 
+		case code.Assign:
+			ident := vm.pop()
+			val := vm.pop()
+
+			obj, ok := ident.(object.Mutable)
+			if !ok {
+				return fmt.Errorf("cannot assign to %s", ident.Type())
+			}
+
+			obj.Set(val)
+
 		case code.BindGlobal:
 			globalIndex := code.ReadUint16(ins[ip+1:])
 			vm.currentFrame().ip += 2
