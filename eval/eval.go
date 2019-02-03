@@ -55,9 +55,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.Return{Value: val}
 
 	case *ast.AssignmentStatement:
-		ident := evalIdentifier(node.Name, env)
-		if isError(ident) {
-			return ident
+		obj := evalIdentifier(node.Name, env)
+		if isError(obj) {
+			return obj
 		}
 
 		val := Eval(node.Value, env)
@@ -65,12 +65,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return val
 		}
 
-		obj, ok := ident.(object.Mutable)
-		if !ok {
-			return newError("cannot assign to %s", ident.Type())
-		}
-
-		obj.Set(val)
+		env.Set(node.Name.Value, val)
 
 		return val
 
@@ -80,8 +75,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return val
 		}
 
-		if mutable, ok := val.(object.Mutable); ok {
-			env.Set(node.Name.Value, mutable.Clone())
+		if immutable, ok := val.(object.Immutable); ok {
+			env.Set(node.Name.Value, immutable.Clone())
 		} else {
 			env.Set(node.Name.Value, val)
 		}

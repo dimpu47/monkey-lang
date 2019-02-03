@@ -62,6 +62,8 @@ type Opcode byte
 const (
 	LoadConstant Opcode = iota
 	LoadBuiltin
+	AssignGlobal
+	AssignLocal
 	LoadGlobal
 	BindGlobal
 	LoadLocal
@@ -70,7 +72,6 @@ const (
 	LoadTrue
 	LoadFalse
 	LoadNull
-	Assign
 	MakeArray
 	MakeHash
 	MakeClosure
@@ -96,6 +97,8 @@ const (
 var definitions = map[Opcode]*Definition{
 	LoadConstant: {"LoadConstant", []int{2}},
 	LoadBuiltin:  {"LoadBuiltin", []int{1}},
+	AssignGlobal: {"AssignGlobal", []int{2}},
+	AssignLocal:  {"AssignLocal", []int{1}},
 	LoadGlobal:   {"LoadGlobal", []int{2}},
 	BindGlobal:   {"BindGlobal", []int{2}},
 	LoadLocal:    {"LoadLocal", []int{1}},
@@ -104,7 +107,6 @@ var definitions = map[Opcode]*Definition{
 	LoadTrue:     {"LoadTrue", []int{}},
 	LoadFalse:    {"LoadFalse", []int{}},
 	LoadNull:     {"LoadNull", []int{}},
-	Assign:       {"Assign", []int{}},
 	MakeArray:    {"MakeArray", []int{2}},
 	MakeHash:     {"MakeHash", []int{2}},
 	MakeClosure:  {"MakeClosure", []int{2, 1}},

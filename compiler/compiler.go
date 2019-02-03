@@ -197,12 +197,10 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 		if symbol.Scope == GlobalScope {
-			c.emit(code.LoadGlobal, symbol.Index)
+			c.emit(code.AssignGlobal, symbol.Index)
 		} else {
-			c.emit(code.LoadLocal, symbol.Index)
+			c.emit(code.AssignLocal, symbol.Index)
 		}
-
-		c.emit(code.Assign)
 
 	case *ast.LetStatement:
 		var (

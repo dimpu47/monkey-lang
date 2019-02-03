@@ -283,7 +283,10 @@ func (vm *VM) executeIndexExpression(left, index object.Object) error {
 	case left.Type() == object.HASH:
 		return vm.executeHashIndex(left, index)
 	default:
-		return fmt.Errorf("index operator not supported: %s", left.Type())
+		return fmt.Errorf(
+			"index operator not supported: left=%s index=%s",
+			left.Type(), index.Type(),
+		)
 	}
 }
 
@@ -455,24 +458,25 @@ func (vm *VM) Run() error {
 				return err
 			}
 
-		case code.Assign:
-			ident := vm.pop()
-			val := vm.pop()
+		case code.AssignGlobal:
+			globalIndex := code.ReadUint16(ins[ip+1:])
+			vm.currentFrame().ip += 2
+			vm.globals[globalIndex] = vm.pop()
 
-			obj, ok := ident.(object.Mutable)
-			if !ok {
-				return fmt.Errorf("cannot assign to %s", ident.Type())
-			}
+		case code.AssignLocal:
+			localIndex := code.ReadUint8(ins[ip+1:])
+			vm.currentFrame().ip += 1
 
-			obj.Set(val)
+			frame := vm.currentFrame()
+			vm.stack[frame.basePointer+int(localIndex)] = vm.pop()
 
 		case code.BindGlobal:
 			globalIndex := code.ReadUint16(ins[ip+1:])
 			vm.currentFrame().ip += 2
 
 			ref := vm.pop()
-			if mutable, ok := ref.(object.Mutable); ok {
-				vm.globals[globalIndex] = mutable.Clone()
+			if immutable, ok := ref.(object.Immutable); ok {
+				vm.globals[globalIndex] = immutable.Clone()
 			} else {
 				vm.globals[globalIndex] = ref
 			}
@@ -493,8 +497,8 @@ func (vm *VM) Run() error {
 			frame := vm.currentFrame()
 
 			ref := vm.pop()
-			if mutable, ok := ref.(object.Mutable); ok {
-				vm.stack[frame.basePointer+int(localIndex)] = mutable.Clone()
+			if immutable, ok := ref.(object.Immutable); ok {
+				vm.stack[frame.basePointer+int(localIndex)] = immutable.Clone()
 			} else {
 				vm.stack[frame.basePointer+int(localIndex)] = ref
 			}

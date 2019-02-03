@@ -52,11 +52,10 @@ const (
 	HASH = "HASH"
 )
 
-// Mutable is the interface for all mutable objects which must implement
-// the Set() method which rebinds its internal value for assignment statements
-type Mutable interface {
+// Mutable is the interface for all immutable objects which must implement
+// the Clone() method used by binding names to values.
+type Immutable interface {
 	Clone() Object
-	Set(obj Object)
 }
 
 // Hashable is the interface for all hashable objects which must implement
@@ -89,11 +88,6 @@ func (i *Integer) Clone() Object {
 	return &Integer{Value: i.Value}
 }
 
-// Set sets a new internal value
-func (i *Integer) Set(obj Object) {
-	i.Value = obj.(*Integer).Value
-}
-
 // Type returns the type of the object
 func (i *Integer) Type() Type { return INTEGER }
 
@@ -111,11 +105,6 @@ func (s *String) Clone() Object {
 	return &String{Value: s.Value}
 }
 
-// Set sets a new internal value
-func (s *String) Set(obj Object) {
-	s.Value = obj.(*String).Value
-}
-
 // Type returns the type of the object
 func (s *String) Type() Type { return STRING }
 
@@ -131,11 +120,6 @@ type Boolean struct {
 // Clone creates a new copy
 func (b *Boolean) Clone() Object {
 	return &Boolean{Value: b.Value}
-}
-
-// Set sets a new internal value
-func (b *Boolean) Set(obj Object) {
-	b.Value = obj.(*Boolean).Value
 }
 
 // Type returns the type of the object
@@ -177,11 +161,6 @@ type Error struct {
 // Clone creates a new copy
 func (e *Error) Clone() Object {
 	return &Error{Message: e.Message}
-}
-
-// Set sets a new internal value
-func (e *Error) Set(obj Object) {
-	e.Message = obj.(*Error).Message
 }
 
 // Type returns the type of the object
@@ -269,18 +248,6 @@ type Array struct {
 	Elements []Object
 }
 
-// Clone creates a new copy
-func (a *Array) Clone() Object {
-	elements := make([]Object, len(a.Elements))
-	copy(elements, a.Elements)
-	return &Array{Elements: elements}
-}
-
-// Set sets a new internal value
-func (ao *Array) Set(obj Object) {
-	ao.Elements = obj.(*Array).Elements
-}
-
 // Type returns the type of the object
 func (ao *Array) Type() Type { return ARRAY }
 
@@ -342,20 +309,6 @@ type HashPair struct {
 // Hash is a hash map and holds a map of HashKey to HashPair(s)
 type Hash struct {
 	Pairs map[HashKey]HashPair
-}
-
-// Clone creates a new copy
-func (h *Hash) Clone() Object {
-	pairs := make(map[HashKey]HashPair)
-	for k, v := range h.Pairs {
-		pairs[k] = v
-	}
-	return &Hash{Pairs: pairs}
-}
-
-// Set sets a new internal value
-func (h *Hash) Set(obj Object) {
-	h.Pairs = obj.(*Hash).Pairs
 }
 
 // Type returns the type of the object

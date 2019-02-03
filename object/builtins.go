@@ -150,7 +150,11 @@ var Builtins = []struct {
 
 			newElements := make([]Object, length+1, length+1)
 			copy(newElements, arr.Elements)
-			newElements[length] = args[1]
+			if immutable, ok := args[1].(Immutable); ok {
+				newElements[length] = immutable.Clone()
+			} else {
+				newElements[length] = args[1]
+			}
 
 			return &Array{Elements: newElements}
 		},
