@@ -328,6 +328,7 @@ func TestAssignmentStatements(t *testing.T) {
 		{"let a = 0; a = 5; let b = 0; b = a; b;", 5},
 		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5;", 15},
 		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5; c;", 15},
+		{"let a = 5; let b = a; a = 0; b;", 5},
 	}
 
 	for _, tt := range tests {
@@ -588,6 +589,7 @@ func TestArrayIndexExpressions(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		t.Log(tt.input)
 		evaluated := testEval(tt.input)
 		integer, ok := tt.expected.(int)
 		if ok {

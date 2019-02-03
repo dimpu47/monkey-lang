@@ -469,7 +469,13 @@ func (vm *VM) Run() error {
 		case code.BindGlobal:
 			globalIndex := code.ReadUint16(ins[ip+1:])
 			vm.currentFrame().ip += 2
-			vm.globals[globalIndex] = vm.pop()
+
+			ref := vm.pop()
+			if mutable, ok := ref.(object.Mutable); ok {
+				vm.globals[globalIndex] = mutable.Clone()
+			} else {
+				vm.globals[globalIndex] = ref
+			}
 
 		case code.LoadGlobal:
 			globalIndex := code.ReadUint16(ins[ip+1:])
@@ -486,7 +492,12 @@ func (vm *VM) Run() error {
 
 			frame := vm.currentFrame()
 
-			vm.stack[frame.basePointer+int(localIndex)] = vm.pop()
+			ref := vm.pop()
+			if mutable, ok := ref.(object.Mutable); ok {
+				vm.stack[frame.basePointer+int(localIndex)] = mutable.Clone()
+			} else {
+				vm.stack[frame.basePointer+int(localIndex)] = ref
+			}
 
 		case code.LoadLocal:
 			localIndex := code.ReadUint8(ins[ip+1:])

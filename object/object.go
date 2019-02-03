@@ -55,6 +55,7 @@ const (
 // Mutable is the interface for all mutable objects which must implement
 // the Set() method which rebinds its internal value for assignment statements
 type Mutable interface {
+	Clone() Object
 	Set(obj Object)
 }
 
@@ -83,6 +84,11 @@ type Integer struct {
 	Value int64
 }
 
+// Clone creates a new copy
+func (i *Integer) Clone() Object {
+	return &Integer{Value: i.Value}
+}
+
 // Set sets a new internal value
 func (i *Integer) Set(obj Object) {
 	i.Value = obj.(*Integer).Value
@@ -100,6 +106,11 @@ type String struct {
 	Value string
 }
 
+// Clone creates a new copy
+func (s *String) Clone() Object {
+	return &String{Value: s.Value}
+}
+
 // Set sets a new internal value
 func (s *String) Set(obj Object) {
 	s.Value = obj.(*String).Value
@@ -115,6 +126,11 @@ func (s *String) Inspect() string { return s.Value }
 // holds an interval bool value
 type Boolean struct {
 	Value bool
+}
+
+// Clone creates a new copy
+func (b *Boolean) Clone() Object {
+	return &Boolean{Value: b.Value}
 }
 
 // Set sets a new internal value
@@ -156,6 +172,11 @@ func (rv *Return) Inspect() string { return rv.Value.Inspect() }
 // encountered stops evaulation of the program or body of a function.
 type Error struct {
 	Message string
+}
+
+// Clone creates a new copy
+func (e *Error) Clone() Object {
+	return &Error{Message: e.Message}
 }
 
 // Set sets a new internal value
@@ -248,6 +269,13 @@ type Array struct {
 	Elements []Object
 }
 
+// Clone creates a new copy
+func (a *Array) Clone() Object {
+	elements := make([]Object, len(a.Elements))
+	copy(elements, a.Elements)
+	return &Array{Elements: elements}
+}
+
 // Set sets a new internal value
 func (ao *Array) Set(obj Object) {
 	ao.Elements = obj.(*Array).Elements
@@ -314,6 +342,15 @@ type HashPair struct {
 // Hash is a hash map and holds a map of HashKey to HashPair(s)
 type Hash struct {
 	Pairs map[HashKey]HashPair
+}
+
+// Clone creates a new copy
+func (h *Hash) Clone() Object {
+	pairs := make(map[HashKey]HashPair)
+	for k, v := range h.Pairs {
+		pairs[k] = v
+	}
+	return &Hash{Pairs: pairs}
 }
 
 // Set sets a new internal value
