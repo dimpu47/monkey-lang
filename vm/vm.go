@@ -6,6 +6,8 @@ package vm
 
 import (
 	"fmt"
+	"log"
+	"strings"
 
 	"github.com/prologic/monkey-lang/code"
 	"github.com/prologic/monkey-lang/compiler"
@@ -46,6 +48,8 @@ func isTruthy(obj object.Object) bool {
 }
 
 type VM struct {
+	Debug bool
+
 	constants []object.Object
 
 	frames      []*Frame
@@ -435,6 +439,17 @@ func (vm *VM) Run() error {
 		ip = vm.currentFrame().ip
 		ins = vm.currentFrame().Instructions()
 		op = code.Opcode(ins[ip])
+
+		if vm.Debug {
+			log.Printf(
+				"%-20s %-20s\n",
+				strings.Split(ins[ip:].String(), "\n")[0],
+				fmt.Sprintf(
+					"[ip=%02d fp=%02d, sp=%02d]",
+					ip, vm.sp, vm.framesIndex-1,
+				),
+			)
+		}
 
 		switch op {
 

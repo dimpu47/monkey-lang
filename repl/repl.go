@@ -127,6 +127,7 @@ func (r *REPL) Exec(f io.Reader) (state *VMState) {
 	state.constants = code.Constants
 
 	machine := vm.NewWithGlobalsStore(code, state.globals)
+	machine.Debug = r.opts.Debug
 	err = machine.Run()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Woops! Executing bytecode failed:\n %s\n", err)
@@ -207,6 +208,7 @@ func (r *REPL) StartExecLoop(in io.Reader, out io.Writer, state *VMState) {
 		state.constants = code.Constants
 
 		machine := vm.NewWithGlobalsStore(code, state.globals)
+		machine.Debug = r.opts.Debug
 		err = machine.Run()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Woops! Executing bytecode failed:\n %s\n", err)
