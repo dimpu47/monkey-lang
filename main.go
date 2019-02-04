@@ -12,9 +12,11 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"strings"
 
 	"github.com/prologic/monkey-lang/compiler"
 	"github.com/prologic/monkey-lang/lexer"
+	"github.com/prologic/monkey-lang/object"
 	"github.com/prologic/monkey-lang/parser"
 	"github.com/prologic/monkey-lang/repl"
 )
@@ -40,6 +42,22 @@ func init() {
 
 	flag.BoolVar(&interactive, "i", false, "enable interactive mode")
 	flag.StringVar(&engine, "e", "vm", "engine to use (eval or vm)")
+}
+
+// Indent indents a block of text with an indent string
+func Indent(text, indent string) string {
+	if text[len(text)-1:] == "\n" {
+		result := ""
+		for _, j := range strings.Split(text[:len(text)-1], "\n") {
+			result += indent + j + "\n"
+		}
+		return result
+	}
+	result := ""
+	for _, j := range strings.Split(strings.TrimRight(text, "\n"), "\n") {
+		result += indent + j + "\n"
+	}
+	return result[:len(result)-1]
 }
 
 func main() {
@@ -84,7 +102,15 @@ func main() {
 		}
 
 		code := c.Bytecode()
-		fmt.Printf("%s\n", code.Instructions)
+		fmt.Printf("Main:\n%s\n", code.Instructions)
+
+		fmt.Print("Constants:\n")
+		for i, constant := range code.Constants {
+			fmt.Printf("%04d %s\n", i, constant.Inspect())
+			if fn, ok := constant.(*object.CompiledFunction); ok {
+				fmt.Printf("%s\n", Indent(fn.Instructions.String(), "     "))
+			}
+		}
 	} else {
 		opts := &repl.Options{
 			Debug:       debug,
