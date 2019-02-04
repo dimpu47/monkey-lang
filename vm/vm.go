@@ -228,6 +228,8 @@ func (vm *VM) executeIntegerComparison(
 		return vm.push(nativeBoolToBooleanObject(rightValue != leftValue))
 	case code.GreaterThan:
 		return vm.push(nativeBoolToBooleanObject(leftValue > rightValue))
+	case code.GreaterThanEqual:
+		return vm.push(nativeBoolToBooleanObject(leftValue >= rightValue))
 	default:
 		return fmt.Errorf("unknown operator: %d", op)
 	}
@@ -247,6 +249,8 @@ func (vm *VM) executeStringComparison(
 		return vm.push(nativeBoolToBooleanObject(rightValue != leftValue))
 	case code.GreaterThan:
 		return vm.push(nativeBoolToBooleanObject(leftValue > rightValue))
+	case code.GreaterThanEqual:
+		return vm.push(nativeBoolToBooleanObject(leftValue >= rightValue))
 	default:
 		return fmt.Errorf("unknown operator: %d", op)
 	}
@@ -600,7 +604,7 @@ func (vm *VM) Run() error {
 				return err
 			}
 
-		case code.Equal, code.NotEqual, code.GreaterThan:
+		case code.Equal, code.NotEqual, code.GreaterThan, code.GreaterThanEqual:
 			err := vm.executeComparison(op)
 			if err != nil {
 				return err

@@ -43,8 +43,13 @@ const (
 
 	// LT the less than comparision operator
 	LT = "<"
+	// LTE  the less than or equal comparision operator
+	LTE = "<="
+
 	// GT the greater than comparision operator
 	GT = ">"
+	// GTE the grather than or equal comparision operator
+	GTE = ">="
 
 	// EQ the equality operator
 	EQ = "=="

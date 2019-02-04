@@ -332,7 +332,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 	case *ast.InfixExpression:
-		if node.Operator == "<" {
+		if node.Operator == "<" || node.Operator == "<=" {
 			err := c.Compile(node.Right)
 			if err != nil {
 				return err
@@ -342,7 +342,11 @@ func (c *Compiler) Compile(node ast.Node) error {
 			if err != nil {
 				return err
 			}
-			c.emit(code.GreaterThan)
+			if node.Operator == "<=" {
+				c.emit(code.GreaterThanEqual)
+			} else {
+				c.emit(code.GreaterThan)
+			}
 			return nil
 		}
 
@@ -367,6 +371,8 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.emit(code.Div)
 		case ">":
 			c.emit(code.GreaterThan)
+		case ">=":
+			c.emit(code.GreaterThanEqual)
 		case "==":
 			c.emit(code.Equal)
 		case "!=":

@@ -262,6 +262,26 @@ func TestBooleanExpressions(t *testing.T) {
 			},
 		},
 		{
+			input:             "1 >= 2",
+			expectedConstants: []interface{}{1, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.GreaterThanEqual),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input:             "1 <= 2",
+			expectedConstants: []interface{}{2, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.GreaterThanEqual),
+				code.Make(code.Pop),
+			},
+		},
+		{
 			input:             "1 == 2",
 			expectedConstants: []interface{}{1, 2},
 			expectedInstructions: []code.Instructions{
