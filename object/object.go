@@ -52,7 +52,7 @@ const (
 	HASH = "HASH"
 )
 
-// Mutable is the interface for all immutable objects which must implement
+// Immutable is the interface for all immutable objects which must implement
 // the Clone() method used by binding names to values.
 type Immutable interface {
 	Clone() Object

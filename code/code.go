@@ -62,7 +62,9 @@ type Opcode byte
 const (
 	LoadConstant Opcode = iota
 	LoadBuiltin
+	// AssignGlobal ...
 	AssignGlobal
+	// AssignLocal ...
 	AssignLocal
 	LoadGlobal
 	BindGlobal
@@ -76,6 +78,7 @@ const (
 	MakeHash
 	MakeClosure
 	Pop
+	// Noop ...
 	Noop
 	Add
 	Sub

@@ -158,6 +158,8 @@ func (p *Parser) parseStatement() ast.Statement {
 	}
 
 	switch p.curToken.Type {
+	case token.COMMENT:
+		return p.parseComment()
 	case token.LET:
 		return p.parseLetStatement()
 	case token.RETURN:
@@ -165,6 +167,10 @@ func (p *Parser) parseStatement() ast.Statement {
 	default:
 		return p.parseExpressionStatement()
 	}
+}
+
+func (p *Parser) parseComment() ast.Statement {
+	return &ast.Comment{Token: p.curToken, Value: p.curToken.Literal}
 }
 
 func (p *Parser) parseAssignmentStatement() *ast.AssignmentStatement {

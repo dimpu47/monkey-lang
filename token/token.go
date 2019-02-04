@@ -10,6 +10,9 @@ const (
 	// EOF end of file
 	EOF = "EOF"
 
+	// COMMENT a line comment, e.g: # this is a comment
+	COMMENT = "COMMENT"
+
 	//
 	// Identifiers + literals
 	//

@@ -7,13 +7,15 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `let five = 5;
+	input := `#!./monkey-lang
+let five = 5;
 let ten = 10;
 
 let add = fn(x, y) {
   x + y;
 };
 
+# this is a comment
 let result = add(five, ten);
 !-/*5;
 5 < 10 > 5;
@@ -24,6 +26,7 @@ if (5 < 10) {
     return false;
 }
 
+// this is another comment
 10 == 10;
 10 != 9;
 "foobar"
@@ -36,6 +39,7 @@ if (5 < 10) {
 		expectedType    token.Type
 		expectedLiteral string
 	}{
+		{token.COMMENT, "!./monkey-lang"},
 		{token.LET, "let"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
@@ -62,6 +66,7 @@ if (5 < 10) {
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
+		{token.COMMENT, " this is a comment"},
 		{token.LET, "let"},
 		{token.IDENT, "result"},
 		{token.ASSIGN, "="},
@@ -101,6 +106,7 @@ if (5 < 10) {
 		{token.FALSE, "false"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
+		{token.COMMENT, " this is another comment"},
 		{token.INT, "10"},
 		{token.EQ, "=="},
 		{token.INT, "10"},

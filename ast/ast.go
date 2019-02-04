@@ -52,6 +52,27 @@ func (p *Program) String() string {
 	return out.String()
 }
 
+// Comment a comment
+type Comment struct {
+	Token token.Token // the token.COMMENT token
+	Value string
+}
+
+func (c *Comment) statementNode() {}
+
+// TokenLiteral prints the literal value of the token associated with this node
+func (c *Comment) TokenLiteral() string { return c.Token.Literal }
+
+// String returns a stringified version of the AST for debugging
+func (c *Comment) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(c.TokenLiteral() + " ")
+	out.WriteString(c.Value)
+
+	return out.String()
+}
+
 // AssignmentStatement the `=` statement represents the AST node that rebinds
 // an expression to an identifier (assigning a new value).
 type AssignmentStatement struct {

@@ -22,6 +22,7 @@ type Lexer struct {
 	position     int  // current position in input (points to current char)
 	readPosition int  // current reading position in input (after current char)
 	ch           byte // current char under examination
+	prevCh       byte // previous char read
 }
 
 func newToken(tokenType token.Type, ch byte) token.Token {
@@ -36,6 +37,7 @@ func New(input string) *Lexer {
 }
 
 func (l *Lexer) readChar() {
+	l.prevCh = l.ch
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
 	} else {
@@ -61,6 +63,9 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 
 	switch l.ch {
+	case '#':
+		tok.Type = token.COMMENT
+		tok.Literal = l.readLine()
 	case '=':
 		if l.peekChar() == '=' {
 			ch := l.ch
@@ -84,7 +89,13 @@ func (l *Lexer) NextToken() token.Token {
 			tok = newToken(token.BANG, l.ch)
 		}
 	case '/':
-		tok = newToken(token.SLASH, l.ch)
+		if l.peekChar() == '/' {
+			l.readChar() // skip over the '/'
+			tok.Type = token.COMMENT
+			tok.Literal = l.readLine()
+		} else {
+			tok = newToken(token.SLASH, l.ch)
+		}
 	case '*':
 		tok = newToken(token.ASTERISK, l.ch)
 	case '<':
@@ -149,6 +160,17 @@ func (l *Lexer) readNumber() string {
 	return l.input[position:l.position]
 }
 
+func (l *Lexer) readLine() string {
+	position := l.position + 1
+	for {
+		l.readChar()
+		if l.ch == '\r' || l.ch == '\n' || l.ch == 0 {
+			break
+		}
+	}
+	return l.input[position:l.position]
+}
+
 func (l *Lexer) readString() string {
 	position := l.position + 1
 	for {
@@ -161,7 +183,7 @@ func (l *Lexer) readString() string {
 }
 
 func (l *Lexer) skipWhitespace() {
-	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\r' || l.ch == '\n' {
 		l.readChar()
 	}
 }
