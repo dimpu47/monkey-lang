@@ -446,14 +446,14 @@ func (vm *VM) Run() error {
 
 		if vm.Debug {
 			log.Printf(
-				"%-20s %-20s\n",
+				"%-25s %-20s\n",
 				fmt.Sprintf(
 					"%04d %s", ip,
 					strings.Split(ins[ip:].String(), "\n")[0][4:],
 				),
 				fmt.Sprintf(
 					"[ip=%02d fp=%02d, sp=%02d]",
-					ip, vm.sp, vm.framesIndex-1,
+					ip, vm.framesIndex-1, vm.sp,
 				),
 			)
 		}
