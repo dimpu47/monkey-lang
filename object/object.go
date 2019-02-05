@@ -219,14 +219,17 @@ func (f *Function) Inspect() string {
 // a BuiltinFunction type that takes zero or more objects as arguments
 // and returns an object.
 type Builtin struct {
-	Fn BuiltinFunction
+	Name string
+	Fn   BuiltinFunction
 }
 
 // Type returns the type of the object
 func (b *Builtin) Type() Type { return BUILTIN }
 
 // Inspect returns a stringified version of the object for debugging
-func (b *Builtin) Inspect() string { return "builtin function" }
+func (b *Builtin) Inspect() string {
+	return fmt.Sprintf("<built-in function %s>", b.Name)
+}
 
 // Closure is the closure object type that holds a reference to a compiled
 // functions and its free variables

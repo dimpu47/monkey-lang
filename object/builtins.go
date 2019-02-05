@@ -14,7 +14,7 @@ var Builtins = []struct {
 }{
 	{
 		"len",
-		&Builtin{Fn: func(args ...Object) Object {
+		&Builtin{Name: "len", Fn: func(args ...Object) Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
 					len(args))
@@ -34,7 +34,7 @@ var Builtins = []struct {
 	},
 	{
 		"input",
-		&Builtin{Fn: func(args ...Object) Object {
+		&Builtin{Name: "input", Fn: func(args ...Object) Object {
 			if len(args) > 0 {
 				obj, ok := args[0].(*String)
 				if !ok {
@@ -57,7 +57,7 @@ var Builtins = []struct {
 	},
 	{
 		"print",
-		&Builtin{Fn: func(args ...Object) Object {
+		&Builtin{Name: "print", Fn: func(args ...Object) Object {
 			for _, arg := range args {
 				fmt.Println(arg.Inspect())
 			}
@@ -68,7 +68,7 @@ var Builtins = []struct {
 	},
 	{
 		"first",
-		&Builtin{Fn: func(args ...Object) Object {
+		&Builtin{Name: "first", Fn: func(args ...Object) Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
 					len(args))
@@ -89,7 +89,7 @@ var Builtins = []struct {
 	},
 	{
 		"last",
-		&Builtin{Fn: func(args ...Object) Object {
+		&Builtin{Name: "last", Fn: func(args ...Object) Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
 					len(args))
@@ -111,7 +111,7 @@ var Builtins = []struct {
 	},
 	{
 		"rest",
-		&Builtin{Fn: func(args ...Object) Object {
+		&Builtin{Name: "rest", Fn: func(args ...Object) Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
 					len(args))
@@ -135,7 +135,7 @@ var Builtins = []struct {
 	},
 	{
 		"push",
-		&Builtin{Fn: func(args ...Object) Object {
+		&Builtin{Name: "push", Fn: func(args ...Object) Object {
 			if len(args) != 2 {
 				return newError("wrong number of arguments. got=%d, want=2",
 					len(args))
@@ -162,7 +162,7 @@ var Builtins = []struct {
 	},
 	{
 		"pop",
-		&Builtin{Fn: func(args ...Object) Object {
+		&Builtin{Name: "pop", Fn: func(args ...Object) Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
 					len(args))
@@ -188,7 +188,7 @@ var Builtins = []struct {
 	},
 	{
 		"exit",
-		&Builtin{Fn: func(args ...Object) Object {
+		&Builtin{Name: "exit", Fn: func(args ...Object) Object {
 			if len(args) == 1 {
 				if args[0].Type() != INTEGER {
 					return newError("argument to `exit` must be INTEGER, got %s",
