@@ -145,9 +145,9 @@ func (c *Compiler) removeLastPop() {
 
 func (c *Compiler) replaceLastPopWithReturn() {
 	lastPos := c.scopes[c.scopeIndex].lastInstruction.Position
-	c.replaceInstruction(lastPos, code.Make(code.ReturnValue))
+	c.replaceInstruction(lastPos, code.Make(code.Return))
 
-	c.scopes[c.scopeIndex].lastInstruction.Opcode = code.ReturnValue
+	c.scopes[c.scopeIndex].lastInstruction.Opcode = code.Return
 }
 
 func (c *Compiler) replaceInstruction(pos int, newInstruction []byte) {
@@ -449,7 +449,8 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if c.lastInstructionIs(code.Pop) {
 			c.replaceLastPopWithReturn()
 		}
-		if !c.lastInstructionIs(code.ReturnValue) {
+		if !c.lastInstructionIs(code.Return) {
+			c.emit(code.LoadNull)
 			c.emit(code.Return)
 		}
 
@@ -491,7 +492,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 
-		c.emit(code.ReturnValue)
+		c.emit(code.Return)
 
 	case *ast.Boolean:
 		if node.Value {

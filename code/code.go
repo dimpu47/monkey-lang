@@ -131,7 +131,6 @@ var definitions = map[Opcode]*Definition{
 	Jump:             {"Jump", []int{2}},
 	Call:             {"Call", []int{1}},
 	Return:           {"Return", []int{}},
-	ReturnValue:      {"ReturnValue", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {

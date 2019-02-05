@@ -626,7 +626,7 @@ func TestFunctions(t *testing.T) {
 					code.Make(code.LoadConstant, 0),
 					code.Make(code.LoadConstant, 1),
 					code.Make(code.Add),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -643,7 +643,7 @@ func TestFunctions(t *testing.T) {
 					code.Make(code.LoadConstant, 0),
 					code.Make(code.LoadConstant, 1),
 					code.Make(code.Add),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -660,7 +660,7 @@ func TestFunctions(t *testing.T) {
 					code.Make(code.LoadConstant, 0),
 					code.Make(code.Pop),
 					code.Make(code.LoadConstant, 1),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -673,12 +673,13 @@ func TestFunctions(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
-func TestFunctionsWithoutReturnValue(t *testing.T) {
+func TestFunctionsWithoutReturn(t *testing.T) {
 	tests := []compilerTestCase{
 		{
 			input: `fn() { }`,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
+					code.Make(code.LoadNull),
 					code.Make(code.Return),
 				},
 			},
@@ -764,7 +765,7 @@ func TestFunctionCalls(t *testing.T) {
 				24,
 				[]code.Instructions{
 					code.Make(code.LoadConstant, 0), // The literal "24"
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -782,7 +783,7 @@ func TestFunctionCalls(t *testing.T) {
 				24,
 				[]code.Instructions{
 					code.Make(code.LoadConstant, 0), // The literal "24"
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -801,7 +802,7 @@ func TestFunctionCalls(t *testing.T) {
 			expectedConstants: []interface{}{
 				[]code.Instructions{
 					code.Make(code.LoadLocal, 0),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 				24,
 			},
@@ -826,7 +827,7 @@ func TestFunctionCalls(t *testing.T) {
 					code.Make(code.LoadLocal, 1),
 					code.Make(code.Pop),
 					code.Make(code.LoadLocal, 2),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 				24,
 				25,
@@ -861,6 +862,7 @@ func TestAssignmentStatementScopes(t *testing.T) {
 				[]code.Instructions{
 					code.Make(code.LoadConstant, 1),
 					code.Make(code.AssignGlobal, 0),
+					code.Make(code.LoadNull),
 					code.Make(code.Return),
 				},
 			},
@@ -883,6 +885,7 @@ func TestAssignmentStatementScopes(t *testing.T) {
 					code.Make(code.BindLocal, 0),
 					code.Make(code.LoadConstant, 1),
 					code.Make(code.AssignLocal, 0),
+					code.Make(code.LoadNull),
 					code.Make(code.Return),
 				},
 			},
@@ -907,7 +910,7 @@ func TestLetStatementScopes(t *testing.T) {
 				55,
 				[]code.Instructions{
 					code.Make(code.LoadGlobal, 0),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -930,7 +933,7 @@ func TestLetStatementScopes(t *testing.T) {
 					code.Make(code.LoadConstant, 0),
 					code.Make(code.BindLocal, 0),
 					code.Make(code.LoadLocal, 0),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -957,7 +960,7 @@ func TestLetStatementScopes(t *testing.T) {
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.LoadLocal, 1),
 					code.Make(code.Add),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -1015,7 +1018,7 @@ func TestBuiltins(t *testing.T) {
 					code.Make(code.LoadBuiltin, 0),
 					code.Make(code.MakeArray, 0),
 					code.Make(code.Call, 1),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -1043,12 +1046,12 @@ func TestClosures(t *testing.T) {
 					code.Make(code.LoadFree, 0),
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.Add),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 				[]code.Instructions{
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.MakeClosure, 0, 1),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -1073,18 +1076,18 @@ func TestClosures(t *testing.T) {
 					code.Make(code.Add),
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.Add),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 				[]code.Instructions{
 					code.Make(code.LoadFree, 0),
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.MakeClosure, 0, 2),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 				[]code.Instructions{
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.MakeClosure, 1, 1),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
@@ -1125,7 +1128,7 @@ func TestClosures(t *testing.T) {
 					code.Make(code.Add),
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.Add),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 				[]code.Instructions{
 					code.Make(code.LoadConstant, 2),
@@ -1133,14 +1136,14 @@ func TestClosures(t *testing.T) {
 					code.Make(code.LoadFree, 0),
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.MakeClosure, 4, 2),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 				[]code.Instructions{
 					code.Make(code.LoadConstant, 1),
 					code.Make(code.BindLocal, 0),
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.MakeClosure, 5, 1),
-					code.Make(code.ReturnValue),
+					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
