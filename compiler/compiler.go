@@ -251,6 +251,10 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 	case *ast.IfExpression:
+		if c.lastInstructionIs(code.Pop) {
+			c.removeLastPop()
+		}
+
 		err := c.Compile(node.Condition)
 		if err != nil {
 			return err

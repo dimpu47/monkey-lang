@@ -385,6 +385,44 @@ func TestConditionals(t *testing.T) {
 				code.Make(code.Pop),
 			},
 		},
+		{
+			input: `
+			let x = 0; if (true) { x = 1; }; if (false) { x = 2; }
+            `,
+			expectedConstants: []interface{}{0, 1, 2},
+			expectedInstructions: []code.Instructions{
+				// 0000
+				code.Make(code.LoadConstant, 0),
+				// 0003
+				code.Make(code.BindGlobal, 0),
+				// 0006
+				code.Make(code.LoadTrue),
+				// 0007
+				code.Make(code.JumpIfFalse, 19),
+				// 0010
+				code.Make(code.LoadConstant, 1),
+				// 0013
+				code.Make(code.AssignGlobal, 0),
+				// 0016
+				code.Make(code.Jump, 20),
+				// 0019
+				code.Make(code.LoadNull),
+				// 0020
+				code.Make(code.LoadFalse),
+				// 0021
+				code.Make(code.JumpIfFalse, 33),
+				// 0024
+				code.Make(code.LoadConstant, 2),
+				// 0027
+				code.Make(code.AssignGlobal, 0),
+				// 0030
+				code.Make(code.Jump, 34),
+				// 0033
+				code.Make(code.LoadNull),
+				// 0034
+				code.Make(code.Pop),
+			},
+		},
 	}
 
 	runCompilerTests(t, tests)
