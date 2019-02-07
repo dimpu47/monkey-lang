@@ -117,6 +117,7 @@ func (r *REPL) Exec(f io.Reader) (state *VMState) {
 	}
 
 	c := compiler.NewWithState(state.symbols, state.constants)
+	c.Debug = r.opts.Debug
 	err = c.Compile(program)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Woops! Compilation failed:\n %s\n", err)
@@ -198,6 +199,7 @@ func (r *REPL) StartExecLoop(in io.Reader, out io.Writer, state *VMState) {
 		}
 
 		c := compiler.NewWithState(state.symbols, state.constants)
+		c.Debug = r.opts.Debug
 		err := c.Compile(program)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Woops! Compilation failed:\n %s\n", err)

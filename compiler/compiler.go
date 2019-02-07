@@ -5,7 +5,9 @@ package compiler
 
 import (
 	"fmt"
+	"log"
 	"sort"
+	"strings"
 
 	"github.com/prologic/monkey-lang/ast"
 	"github.com/prologic/monkey-lang/code"
@@ -24,6 +26,9 @@ type Scope struct {
 }
 
 type Compiler struct {
+	Debug bool
+
+	l         int
 	constants []object.Object
 
 	scopes     []Scope
@@ -175,9 +180,17 @@ func (c *Compiler) addInstruction(ins []byte) int {
 }
 
 func (c *Compiler) Compile(node ast.Node) error {
+	if c.Debug {
+		log.Printf(
+			"%s Compiling %T: %s\n",
+			strings.Repeat(" ", c.l), node, node.String(),
+		)
+	}
+
 	switch node := node.(type) {
 
 	case *ast.Program:
+		c.l++
 		for _, s := range node.Statements {
 			err := c.Compile(s)
 			if err != nil {
@@ -191,7 +204,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return fmt.Errorf("undefined variable %s", node.Value)
 		}
 
+		c.l++
 		err := c.Compile(node.Value)
+		c.l--
 		if err != nil {
 			return err
 		}
@@ -213,7 +228,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 			symbol = c.symbolTable.Define(node.Name.Value)
 		}
 
+		c.l++
 		err := c.Compile(node.Value)
+		c.l--
 		if err != nil {
 			return err
 		}
@@ -233,7 +250,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 		c.loadSymbol(symbol)
 
 	case *ast.ExpressionStatement:
+		c.l++
 		err := c.Compile(node.Expression)
+		c.l--
 		if err != nil {
 			return err
 		}
@@ -243,19 +262,23 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 	case *ast.BlockStatement:
+		c.l++
 		for _, s := range node.Statements {
 			err := c.Compile(s)
 			if err != nil {
 				return err
 			}
 		}
+		c.l--
 
 	case *ast.IfExpression:
 		if c.lastInstructionIs(code.Pop) {
 			c.removeLastPop()
 		}
 
+		c.l++
 		err := c.Compile(node.Condition)
+		c.l--
 		if err != nil {
 			return err
 		}
@@ -263,7 +286,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 		// Emit an `JumpIfFalse` with a bogus value
 		jumpIfFalsePos := c.emit(code.JumpIfFalse, 0xFFFF)
 
+		c.l++
 		err = c.Compile(node.Consequence)
+		c.l--
 		if err != nil {
 			return err
 		}
@@ -281,7 +306,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if node.Alternative == nil {
 			c.emit(code.LoadNull)
 		} else {
+			c.l++
 			err := c.Compile(node.Alternative)
+			c.l--
 			if err != nil {
 				return err
 			}
@@ -297,7 +324,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 	case *ast.WhileExpression:
 		jumpConditionPos := len(c.currentInstructions())
 
+		c.l++
 		err := c.Compile(node.Condition)
+		c.l--
 		if err != nil {
 			return err
 		}
@@ -305,10 +334,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 		// Emit an `JumpIfFalse` with a bogus value
 		jumpIfFalsePos := c.emit(code.JumpIfFalse, 0xFFFF)
 
+		c.l++
 		err = c.Compile(node.Consequence)
 		if err != nil {
 			return err
 		}
+		c.l--
 
 		c.emit(code.Jump, jumpConditionPos)
 
@@ -321,7 +352,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 		c.changeOperand(jumpIfFalsePos, afterConsequencePos)
 
 	case *ast.PrefixExpression:
+		c.l++
 		err := c.Compile(node.Right)
+		c.l--
 		if err != nil {
 			return err
 		}
@@ -337,12 +370,16 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 	case *ast.InfixExpression:
 		if node.Operator == "<" || node.Operator == "<=" {
+			c.l++
 			err := c.Compile(node.Right)
+			c.l--
 			if err != nil {
 				return err
 			}
 
+			c.l++
 			err = c.Compile(node.Left)
+			c.l--
 			if err != nil {
 				return err
 			}
@@ -354,12 +391,16 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return nil
 		}
 
+		c.l++
 		err := c.Compile(node.Left)
+		c.l--
 		if err != nil {
 			return err
 		}
 
+		c.l++
 		err = c.Compile(node.Right)
+		c.l--
 		if err != nil {
 			return err
 		}
@@ -386,12 +427,16 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 	case *ast.IndexExpression:
+		c.l++
 		err := c.Compile(node.Left)
+		c.l--
 		if err != nil {
 			return err
 		}
 
+		c.l++
 		err = c.Compile(node.Index)
+		c.l--
 		if err != nil {
 			return err
 		}
@@ -408,11 +453,15 @@ func (c *Compiler) Compile(node ast.Node) error {
 		})
 
 		for _, k := range keys {
+			c.l++
 			err := c.Compile(k)
+			c.l--
 			if err != nil {
 				return err
 			}
+			c.l++
 			err = c.Compile(node.Pairs[k])
+			c.l--
 			if err != nil {
 				return err
 			}
@@ -422,7 +471,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 	case *ast.ArrayLiteral:
 		for _, el := range node.Elements {
+			c.l++
 			err := c.Compile(el)
+			c.l--
 			if err != nil {
 				return err
 			}
@@ -445,7 +496,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.symbolTable.Define(p.Value)
 		}
 
+		c.l++
 		err := c.Compile(node.Body)
+		c.l--
 		if err != nil {
 			return err
 		}
@@ -476,13 +529,17 @@ func (c *Compiler) Compile(node ast.Node) error {
 		c.emit(code.MakeClosure, fnIndex, len(freeSymbols))
 
 	case *ast.CallExpression:
+		c.l++
 		err := c.Compile(node.Function)
+		c.l--
 		if err != nil {
 			return err
 		}
 
 		for _, a := range node.Arguments {
+			c.l++
 			err := c.Compile(a)
+			c.l--
 			if err != nil {
 				return err
 			}
@@ -491,7 +548,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 		c.emit(code.Call, len(node.Arguments))
 
 	case *ast.ReturnStatement:
+		c.l++
 		err := c.Compile(node.ReturnValue)
+		c.l--
 		if err != nil {
 			return err
 		}
