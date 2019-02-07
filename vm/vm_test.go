@@ -59,6 +59,10 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 			t.Log(tt.input)
 			t.Fatalf("vm error: %s", err)
 		}
+		if vm.sp != 0 {
+			t.Log(tt.input)
+			t.Fatal("vm stack pointer non-zero")
+		}
 
 		stackElem := vm.LastPopped()
 
@@ -808,6 +812,10 @@ func TestExamples(t *testing.T) {
 		if err != nil {
 			t.Log(input)
 			t.Fatalf("vm error: %s", err)
+		}
+		if vm.sp != 0 {
+			t.Log(input)
+			t.Fatal("vm stack pointer non-zero")
 		}
 	}
 }
