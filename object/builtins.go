@@ -22,6 +22,7 @@ var Builtins = map[string]*Builtin{
 	"exit":  &Builtin{Name: "exit", Fn: Exit},
 }
 
+// BuiltinsIndex ...
 var BuiltinsIndex []*Builtin
 
 func init() {
@@ -58,6 +59,7 @@ func Len(args ...Object) Object {
 	}
 }
 
+// Input ...
 func Input(args ...Object) Object {
 	if len(args) > 0 {
 		obj, ok := args[0].(*String)
@@ -174,6 +176,7 @@ func Push(args ...Object) Object {
 	return &Array{Elements: newElements}
 }
 
+// Pop ...
 func Pop(args ...Object) Object {
 	if len(args) != 1 {
 		return newError("wrong number of arguments. got=%d, want=1",
