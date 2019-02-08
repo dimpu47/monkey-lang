@@ -3,7 +3,9 @@ package vm
 import (
 	"fmt"
 	"io/ioutil"
+	"path"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/prologic/monkey-lang/ast"
@@ -784,38 +786,84 @@ func TestRecursiveFibonacci(t *testing.T) {
 	runVmTests(t, tests)
 }
 
-func TestExamples(t *testing.T) {
-	matches, err := filepath.Glob("./examples/*.monkey")
+func TestIntegration(t *testing.T) {
+	matches, err := filepath.Glob("../testdata/*.monkey")
 	if err != nil {
 		t.Error(err)
 	}
 
 	for _, match := range matches {
-		b, err := ioutil.ReadFile(match)
-		if err != nil {
-			t.Error(err)
-		}
+		basename := path.Base(match)
+		name := strings.TrimSuffix(basename, filepath.Ext(basename))
 
-		input := string(b)
-		program := parse(input)
+		t.Run(name, func(t *testing.T) {
+			b, err := ioutil.ReadFile(match)
+			if err != nil {
+				t.Error(err)
+			}
 
-		c := compiler.New()
-		err = c.Compile(program)
-		if err != nil {
-			t.Log(input)
-			t.Fatalf("compiler error: %s", err)
-		}
+			input := string(b)
+			program := parse(input)
 
-		vm := New(c.Bytecode())
+			c := compiler.New()
+			err = c.Compile(program)
+			if err != nil {
+				t.Log(input)
+				t.Fatalf("compiler error: %s", err)
+			}
 
-		err = vm.Run()
-		if err != nil {
-			t.Log(input)
-			t.Fatalf("vm error: %s", err)
-		}
-		if vm.sp != 0 {
-			t.Log(input)
-			t.Fatal("vm stack pointer non-zero")
-		}
+			vm := New(c.Bytecode())
+
+			err = vm.Run()
+			if err != nil {
+				t.Log(input)
+				t.Fatalf("vm error: %s", err)
+			}
+			if vm.sp != 0 {
+				t.Log(input)
+				t.Fatal("vm stack pointer non-zero")
+			}
+		})
+	}
+}
+
+func TestExamples(t *testing.T) {
+	matches, err := filepath.Glob("../examples/*.monkey")
+	if err != nil {
+		t.Error(err)
+	}
+
+	for _, match := range matches {
+		basename := path.Base(match)
+		name := strings.TrimSuffix(basename, filepath.Ext(basename))
+
+		t.Run(name, func(t *testing.T) {
+			b, err := ioutil.ReadFile(match)
+			if err != nil {
+				t.Error(err)
+			}
+
+			input := string(b)
+			program := parse(input)
+
+			c := compiler.New()
+			err = c.Compile(program)
+			if err != nil {
+				t.Log(input)
+				t.Fatalf("compiler error: %s", err)
+			}
+
+			vm := New(c.Bytecode())
+
+			err = vm.Run()
+			if err != nil {
+				t.Log(input)
+				t.Fatalf("vm error: %s", err)
+			}
+			if vm.sp != 0 {
+				t.Log(input)
+				t.Fatal("vm stack pointer non-zero")
+			}
+		})
 	}
 }

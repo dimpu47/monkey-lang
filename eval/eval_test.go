@@ -593,7 +593,6 @@ func TestArrayIndexExpressions(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Log(tt.input)
 		evaluated := testEval(tt.input)
 		integer, ok := tt.expected.(int)
 		if ok {

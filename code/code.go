@@ -87,6 +87,7 @@ const (
 	Equal
 	NotEqual
 	GreaterThan
+	// GreaterThanEqual ...
 	GreaterThanEqual
 	Minus
 	Bang

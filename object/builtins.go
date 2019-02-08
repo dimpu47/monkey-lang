@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 )
 
+// Builtins ...
 var Builtins = map[string]*Builtin{
 	"len":   &Builtin{Name: "len", Fn: Len},
 	"input": &Builtin{Name: "input", Fn: Input},
@@ -39,6 +40,7 @@ func newError(format string, a ...interface{}) *Error {
 	return &Error{Message: fmt.Sprintf(format, a...)}
 }
 
+// Len ...
 func Len(args ...Object) Object {
 	if len(args) != 1 {
 		return newError("wrong number of arguments. got=%d, want=1",
@@ -77,6 +79,7 @@ func Input(args ...Object) Object {
 	return &String{Value: string(line)}
 }
 
+// Print ...
 func Print(args ...Object) Object {
 	for _, arg := range args {
 		fmt.Println(arg.Inspect())
@@ -85,6 +88,7 @@ func Print(args ...Object) Object {
 	return nil
 }
 
+// First ...
 func First(args ...Object) Object {
 	if len(args) != 1 {
 		return newError("wrong number of arguments. got=%d, want=1",
@@ -103,6 +107,7 @@ func First(args ...Object) Object {
 	return nil
 }
 
+// Last ...
 func Last(args ...Object) Object {
 	if len(args) != 1 {
 		return newError("wrong number of arguments. got=%d, want=1",
@@ -122,6 +127,7 @@ func Last(args ...Object) Object {
 	return nil
 }
 
+// Rest ...
 func Rest(args ...Object) Object {
 	if len(args) != 1 {
 		return newError("wrong number of arguments. got=%d, want=1",
@@ -143,6 +149,7 @@ func Rest(args ...Object) Object {
 	return nil
 }
 
+// Push ...
 func Push(args ...Object) Object {
 	if len(args) != 2 {
 		return newError("wrong number of arguments. got=%d, want=2",
@@ -190,6 +197,7 @@ func Pop(args ...Object) Object {
 	return element
 }
 
+// Exit ...
 func Exit(args ...Object) Object {
 	if len(args) == 1 {
 		if args[0].Type() != INTEGER {
