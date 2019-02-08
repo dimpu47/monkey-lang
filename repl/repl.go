@@ -51,8 +51,8 @@ type VMState struct {
 
 func NewVMState() *VMState {
 	symbolTable := compiler.NewSymbolTable()
-	for i, v := range object.Builtins {
-		symbolTable.DefineBuiltin(i, v.Name)
+	for i, builtin := range object.BuiltinsIndex {
+		symbolTable.DefineBuiltin(i, builtin.Name)
 	}
 
 	return &VMState{

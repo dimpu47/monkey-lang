@@ -464,9 +464,9 @@ func (vm *VM) Run() error {
 			builtinIndex := code.ReadUint8(ins[ip+1:])
 			vm.currentFrame().ip += 1
 
-			definition := object.Builtins[builtinIndex]
+			builtin := object.BuiltinsIndex[builtinIndex]
 
-			err := vm.push(definition.Builtin)
+			err := vm.push(builtin)
 			if err != nil {
 				return err
 			}

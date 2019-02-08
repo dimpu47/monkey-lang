@@ -46,8 +46,8 @@ func New() *Compiler {
 
 	symbolTable := NewSymbolTable()
 
-	for i, v := range object.Builtins {
-		symbolTable.DefineBuiltin(i, v.Name)
+	for i, builtin := range object.BuiltinsIndex {
+		symbolTable.DefineBuiltin(i, builtin.Name)
 	}
 
 	return &Compiler{
