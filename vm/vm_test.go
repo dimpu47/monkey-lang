@@ -268,6 +268,11 @@ func TestConditionals(t *testing.T) {
 		{"if (1 > 2) { 10 }", Null},
 		{"if (false) { 10 }", Null},
 		{"if ((if (false) { 10 })) { 10 } else { 20 }", 20},
+		{"if (true) { let a = 5; }", Null},
+		{"if (true) { 10; let a = 5; }", Null},
+		{"if (false) { 10 } else { let b = 5; }", Null},
+		{"if (false) { 10 } else { 10; let b = 5; }", Null},
+		{"if (true) { let a = 5; } else { 10 }", Null},
 		{"let x = 0; if (true) { x = 1; }; if (false) { x = 2; }; x", 1},
 	}
 
@@ -377,24 +382,24 @@ func TestCallingFunctionsWithoutArguments(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-        let fivePlusTen = fn() { 5 + 10; };
+        let fivePlusTen = fn() { return 5 + 10; };
         fivePlusTen();
         `,
 			expected: 15,
 		},
 		{
 			input: `
-        let one = fn() { 1; };
-        let two = fn() { 2; };
+        let one = fn() { return 1; };
+        let two = fn() { return 2; };
         one() + two()
         `,
 			expected: 3,
 		},
 		{
 			input: `
-        let a = fn() { 1 };
-        let b = fn() { a() + 1 };
-        let c = fn() { b() + 1 };
+        let a = fn() { return 1 };
+        let b = fn() { return a() + 1 };
+        let c = fn() { return b() + 1 };
         c();
         `,
 			expected: 3,
@@ -452,8 +457,8 @@ func TestFirstClassFunctions(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-        let returnsOne = fn() { 1; };
-        let returnsOneReturner = fn() { returnsOne; };
+        let returnsOne = fn() { return 1; };
+        let returnsOneReturner = fn() { return returnsOne; };
         returnsOneReturner()();
         `,
 			expected: 1,
@@ -461,8 +466,8 @@ func TestFirstClassFunctions(t *testing.T) {
 		{
 			input: `
         let returnsOneReturner = fn() {
-            let returnsOne = fn() { 1; };
-            returnsOne;
+            let returnsOne = fn() { return 1; };
+            return returnsOne;
         };
         returnsOneReturner()();
         `,
@@ -477,30 +482,30 @@ func TestCallingFunctionsWithBindings(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-        let one = fn() { let one = 1; one };
+        let one = fn() { let one = 1; return one };
         one();
         `,
 			expected: 1,
 		},
 		{
 			input: `
-        let oneAndTwo = fn() { let one = 1; let two = 2; one + two; };
+        let oneAndTwo = fn() { let one = 1; let two = 2; return one + two; };
         oneAndTwo();
         `,
 			expected: 3,
 		},
 		{
 			input: `
-        let oneAndTwo = fn() { let one = 1; let two = 2; one + two; };
-        let threeAndFour = fn() { let three = 3; let four = 4; three + four; };
+        let oneAndTwo = fn() { let one = 1; let two = 2; return one + two; };
+        let threeAndFour = fn() { let three = 3; let four = 4; return three + four; };
         oneAndTwo() + threeAndFour();
         `,
 			expected: 10,
 		},
 		{
 			input: `
-        let firstFoobar = fn() { let foobar = 50; foobar; };
-        let secondFoobar = fn() { let foobar = 100; foobar; };
+        let firstFoobar = fn() { let foobar = 50; return foobar; };
+        let secondFoobar = fn() { let foobar = 100; return foobar; };
         firstFoobar() + secondFoobar();
         `,
 			expected: 150,
@@ -510,11 +515,11 @@ func TestCallingFunctionsWithBindings(t *testing.T) {
         let globalSeed = 50;
         let minusOne = fn() {
             let num = 1;
-            globalSeed - num;
+            return globalSeed - num;
         }
         let minusTwo = fn() {
             let num = 2;
-            globalSeed - num;
+            return globalSeed - num;
         }
         minusOne() + minusTwo();
         `,
@@ -529,14 +534,14 @@ func TestCallingFunctionsWithArgumentsAndBindings(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-        let identity = fn(a) { a; };
+        let identity = fn(a) { return a; };
         identity(4);
         `,
 			expected: 4,
 		},
 		{
 			input: `
-        let sum = fn(a, b) { a + b; };
+        let sum = fn(a, b) { return a + b; };
         sum(1, 2);
         `,
 			expected: 3,
@@ -545,7 +550,7 @@ func TestCallingFunctionsWithArgumentsAndBindings(t *testing.T) {
 			input: `
         let sum = fn(a, b) {
             let c = a + b;
-            c;
+            return c;
         };
         sum(1, 2);
         `,
@@ -555,7 +560,7 @@ func TestCallingFunctionsWithArgumentsAndBindings(t *testing.T) {
 			input: `
         let sum = fn(a, b) {
             let c = a + b;
-            c;
+            return c;
         };
         sum(1, 2) + sum(3, 4);`,
 			expected: 10,
@@ -564,10 +569,10 @@ func TestCallingFunctionsWithArgumentsAndBindings(t *testing.T) {
 			input: `
         let sum = fn(a, b) {
             let c = a + b;
-            c;
+            return c;
         };
         let outer = fn() {
-            sum(1, 2) + sum(3, 4);
+            return sum(1, 2) + sum(3, 4);
         };
         outer();
         `,
@@ -579,11 +584,11 @@ func TestCallingFunctionsWithArgumentsAndBindings(t *testing.T) {
 
         let sum = fn(a, b) {
             let c = a + b;
-            c + globalNum;
+            return c + globalNum;
         };
 
         let outer = fn() {
-            sum(1, 2) + sum(3, 4) + globalNum;
+            return sum(1, 2) + sum(3, 4) + globalNum;
         };
         outer() + globalNum;
         `,
@@ -597,15 +602,15 @@ func TestCallingFunctionsWithArgumentsAndBindings(t *testing.T) {
 func TestCallingFunctionsWithWrongArguments(t *testing.T) {
 	tests := []vmTestCase{
 		{
-			input:    `fn() { 1; }(1);`,
+			input:    `fn() { return 1; }(1);`,
 			expected: `wrong number of arguments: want=0, got=1`,
 		},
 		{
-			input:    `fn(a) { a; }();`,
+			input:    `fn(a) { return a; }();`,
 			expected: `wrong number of arguments: want=1, got=0`,
 		},
 		{
-			input:    `fn(a, b) { a + b; }(1);`,
+			input:    `fn(a, b) { return a + b; }(1);`,
 			expected: `wrong number of arguments: want=2, got=1`,
 		},
 	}
@@ -688,7 +693,7 @@ func TestClosures(t *testing.T) {
 		{
 			input: `
 		let newClosure = fn(a) {
-			fn() { a; };
+			return fn() { return a; };
 		};
 		let closure = newClosure(99);
 		closure();
@@ -698,7 +703,7 @@ func TestClosures(t *testing.T) {
 		{
 			input: `
 		let newAdder = fn(a, b) {
-			fn(c) { a + b + c };
+			return fn(c) { return a + b + c };
 		};
 		let adder = newAdder(1, 2);
 		adder(8);
@@ -709,7 +714,7 @@ func TestClosures(t *testing.T) {
 			input: `
 		let newAdder = fn(a, b) {
 			let c = a + b;
-			fn(d) { c + d };
+			return fn(d) { return c + d };
 		};
 		let adder = newAdder(1, 2);
 		adder(8);
@@ -720,9 +725,9 @@ func TestClosures(t *testing.T) {
 			input: `
 		let newAdderOuter = fn(a, b) {
 			let c = a + b;
-			fn(d) {
+			return fn(d) {
 				let e = d + c;
-				fn(f) { e + f; };
+				return fn(f) { return e + f; };
 			};
 		};
 		let newAdderInner = newAdderOuter(1, 2)
@@ -735,8 +740,8 @@ func TestClosures(t *testing.T) {
 			input: `
 		let a = 1;
 		let newAdderOuter = fn(b) {
-			fn(c) {
-				fn(d) { a + b + c + d };
+			return fn(c) {
+				return fn(d) { return a + b + c + d };
 			};
 		};
 		let newAdderInner = newAdderOuter(2)
@@ -748,9 +753,9 @@ func TestClosures(t *testing.T) {
 		{
 			input: `
 		let newClosure = fn(a, b) {
-			let one = fn() { a; };
-			let two = fn() { b; };
-			fn() { one() + two(); };
+			let one = fn() { return a; };
+			let two = fn() { return b; };
+			return fn() { return one() + two(); };
 		};
 		let closure = newClosure(9, 90);
 		closure();
@@ -773,7 +778,7 @@ func TestRecursiveFibonacci(t *testing.T) {
                 if (x == 1) {
                     return 1;
                 } else {
-                    fibonacci(x - 1) + fibonacci(x - 2);
+                    return fibonacci(x - 1) + fibonacci(x - 2);
                 }
             }
         };

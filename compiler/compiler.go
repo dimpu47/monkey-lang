@@ -257,9 +257,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 
-		if !c.lastInstructionIs(code.Noop) {
-			c.emit(code.Pop)
-		}
+		c.emit(code.Pop)
 
 	case *ast.BlockStatement:
 		c.l++
@@ -271,11 +269,15 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 		c.l--
 
-	case *ast.IfExpression:
 		if c.lastInstructionIs(code.Pop) {
 			c.removeLastPop()
+		} else {
+			if !c.lastInstructionIs(code.Return) {
+				c.emit(code.LoadNull)
+			}
 		}
 
+	case *ast.IfExpression:
 		c.l++
 		err := c.Compile(node.Condition)
 		c.l--
@@ -341,14 +343,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 		c.l--
 
+		// Pop off the LoadNull(s) from ast.BlockStatement(s)
+		c.emit(code.Pop)
+
 		c.emit(code.Jump, jumpConditionPos)
 
-		// XXX: wtf?!
-		// XXX: THis is required so the last Pop doesn't blow up the VM
-		// XXX: when the stack pointer is already 0 -- This seems to be
-		// XXX: because after the while (...) { ... } AST is compiled
-		// XXX: the ast.ExpressionStatement node emits a final Pop
-		afterConsequencePos := c.emit(code.Noop)
+		afterConsequencePos := c.emit(code.LoadNull)
 		c.changeOperand(jumpIfFalsePos, afterConsequencePos)
 
 	case *ast.PrefixExpression:
@@ -506,8 +506,14 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if c.lastInstructionIs(code.Pop) {
 			c.replaceLastPopWithReturn()
 		}
+
+		// If the function doesn't end with a return statement add one with a
+		// `return null;` and also handle the edge-case of empty functions.
 		if !c.lastInstructionIs(code.Return) {
-			c.emit(code.LoadNull)
+			// empty function body (LoadNull from BlockStatement)
+			if !c.lastInstructionIs(code.LoadNull) {
+				c.emit(code.LoadNull)
+			}
 			c.emit(code.Return)
 		}
 

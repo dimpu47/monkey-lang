@@ -373,15 +373,15 @@ func TestConditionals(t *testing.T) {
 				code.Make(code.JumpIfFalse, 10),
 				// 0004
 				code.Make(code.LoadConstant, 0),
-				// 0007
+				// 0008
 				code.Make(code.Jump, 13),
-				// 0010
+				// 0011
 				code.Make(code.LoadConstant, 1),
-				// 0013
-				code.Make(code.Pop),
 				// 0014
+				code.Make(code.Pop),
+				// 0015
 				code.Make(code.LoadConstant, 2),
-				// 0017
+				// 0018
 				code.Make(code.Pop),
 			},
 		},
@@ -398,28 +398,34 @@ func TestConditionals(t *testing.T) {
 				// 0006
 				code.Make(code.LoadTrue),
 				// 0007
-				code.Make(code.JumpIfFalse, 19),
+				code.Make(code.JumpIfFalse, 20),
 				// 0010
 				code.Make(code.LoadConstant, 1),
 				// 0013
 				code.Make(code.AssignGlobal, 0),
 				// 0016
-				code.Make(code.Jump, 20),
-				// 0019
 				code.Make(code.LoadNull),
+				// 0017
+				code.Make(code.Jump, 21),
 				// 0020
-				code.Make(code.LoadFalse),
-				// 0021
-				code.Make(code.JumpIfFalse, 33),
-				// 0024
-				code.Make(code.LoadConstant, 2),
-				// 0027
-				code.Make(code.AssignGlobal, 0),
-				// 0030
-				code.Make(code.Jump, 34),
-				// 0033
 				code.Make(code.LoadNull),
-				// 0034
+				// 0021
+				code.Make(code.Pop),
+				// 0022
+				code.Make(code.LoadFalse),
+				// 0023
+				code.Make(code.JumpIfFalse, 36),
+				// 0025
+				code.Make(code.LoadConstant, 2),
+				// 0029
+				code.Make(code.AssignGlobal, 0),
+				// 0032
+				code.Make(code.LoadNull),
+				// 0033
+				code.Make(code.Jump, 37),
+				// 0036
+				code.Make(code.LoadNull),
+				// 0037
 				code.Make(code.Pop),
 			},
 		},
@@ -447,7 +453,9 @@ func TestIteration(t *testing.T) {
 				// 0008
 				code.Make(code.Jump, 0),
 				// 0011
-				code.Make(code.Noop),
+				code.Make(code.LoadNull),
+				// 0012
+				code.Make(code.Pop),
 			},
 		},
 	}
@@ -673,24 +681,7 @@ func TestFunctions(t *testing.T) {
 			},
 		},
 		{
-			input: `fn() { 5 + 10 }`,
-			expectedConstants: []interface{}{
-				5,
-				10,
-				[]code.Instructions{
-					code.Make(code.LoadConstant, 0),
-					code.Make(code.LoadConstant, 1),
-					code.Make(code.Add),
-					code.Make(code.Return),
-				},
-			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.MakeClosure, 2, 0),
-				code.Make(code.Pop),
-			},
-		},
-		{
-			input: `fn() { 1; 2 }`,
+			input: `fn() { 1; return 2 }`,
 			expectedConstants: []interface{}{
 				1,
 				2,
@@ -798,7 +789,7 @@ func TestCompilerScopes(t *testing.T) {
 func TestFunctionCalls(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input: `fn() { 24 }();`,
+			input: `fn() { return 24 }();`,
 			expectedConstants: []interface{}{
 				24,
 				[]code.Instructions{
@@ -814,7 +805,7 @@ func TestFunctionCalls(t *testing.T) {
 		},
 		{
 			input: `
-            let noArg = fn() { 24 };
+            let noArg = fn() { return 24 };
             noArg();
             `,
 			expectedConstants: []interface{}{
@@ -834,7 +825,7 @@ func TestFunctionCalls(t *testing.T) {
 		},
 		{
 			input: `
-            let oneArg = fn(a) { a };
+            let oneArg = fn(a) { return a };
             oneArg(24);
             `,
 			expectedConstants: []interface{}{
@@ -855,7 +846,7 @@ func TestFunctionCalls(t *testing.T) {
 		},
 		{
 			input: `
-            let manyArg = fn(a, b, c) { a; b; c };
+            let manyArg = fn(a, b, c) { a; b; return c };
             manyArg(24, 25, 26);
             `,
 			expectedConstants: []interface{}{
@@ -942,7 +933,7 @@ func TestLetStatementScopes(t *testing.T) {
 		{
 			input: `
             let num = 55;
-            fn() { num }
+            fn() { return num }
             `,
 			expectedConstants: []interface{}{
 				55,
@@ -962,7 +953,7 @@ func TestLetStatementScopes(t *testing.T) {
 			input: `
             fn() {
                 let num = 55;
-                num
+                return num
             }
             `,
 			expectedConstants: []interface{}{
@@ -984,7 +975,7 @@ func TestLetStatementScopes(t *testing.T) {
             fn() {
                 let a = 55;
                 let b = 77;
-                a + b
+                return a + b
             }
             `,
 			expectedConstants: []interface{}{
@@ -1074,8 +1065,8 @@ func TestClosures(t *testing.T) {
 		{
 			input: `
             fn(a) {
-                fn(b) {
-                    a + b
+                return fn(b) {
+                    return a + b
                 }
             }
             `,
@@ -1100,9 +1091,9 @@ func TestClosures(t *testing.T) {
 		{
 			input: `
             fn(a) {
-                fn(b) {
-                    fn(c) {
-                        a + b + c
+                return fn(b) {
+                    return fn(c) {
+                        return a + b + c
                     }
                 }
             };
@@ -1140,13 +1131,13 @@ func TestClosures(t *testing.T) {
             fn() {
                 let a = 66;
 
-                fn() {
+                return fn() {
                     let b = 77;
 
-                    fn() {
+                    return fn() {
                         let c = 88;
 
-                        global + a + b + c;
+                        return global + a + b + c;
                     }
                 }
             }

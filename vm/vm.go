@@ -681,12 +681,7 @@ func (vm *VM) Run() error {
 			vm.currentFrame().ip = pos - 1
 
 		case code.Pop:
-			/// XXX: Is this a hack?
-			// This makes things like this work:
-			// >> let x = 1; if (x == 1) { x = 2 }
-			if vm.sp > 0 {
-				vm.pop()
-			}
+			vm.pop()
 
 		}
 
