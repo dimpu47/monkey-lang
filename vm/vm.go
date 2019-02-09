@@ -386,6 +386,19 @@ func (vm *VM) callClosure(cl *object.Closure, numArgs int) error {
 			cl.Fn.NumParameters, numArgs)
 	}
 
+	// Optimize tail calls and avoid creating a new frame
+	if cl.Fn == vm.currentFrame().cl.Fn {
+		nextOp := vm.currentFrame().NextOp()
+		if nextOp == code.Return {
+			for p := 0; p < numArgs; p++ {
+				vm.stack[vm.currentFrame().basePointer+p] = vm.stack[vm.sp-numArgs+p]
+			}
+			vm.sp -= numArgs + 1
+			vm.currentFrame().ip = -1 // reset IP to beginning of the frame
+			return nil
+		}
+	}
+
 	frame := NewFrame(cl, vm.sp-numArgs)
 	vm.pushFrame(frame)
 
@@ -668,7 +681,12 @@ func (vm *VM) Run() error {
 			vm.currentFrame().ip = pos - 1
 
 		case code.Pop:
-			vm.pop()
+			/// XXX: Is this a hack?
+			// This makes things like this work:
+			// >> let x = 1; if (x == 1) { x = 2 }
+			if vm.sp > 0 {
+				vm.pop()
+			}
 
 		}
 

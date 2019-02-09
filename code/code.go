@@ -59,6 +59,14 @@ func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
 
 type Opcode byte
 
+func (o Opcode) String() string {
+	def, err := Lookup(byte(o))
+	if err != nil {
+		return ""
+	}
+	return def.Name
+}
+
 const (
 	LoadConstant Opcode = iota
 	LoadBuiltin
