@@ -671,6 +671,14 @@ func (vm *VM) Run() error {
 			vm.pop()
 
 		}
+
+		if vm.Debug {
+			log.Printf(
+				"%-25s [ip=%02d fp=%02d, sp=%02d]",
+				"", ip, vm.framesIndex-1, vm.sp,
+			)
+		}
+
 	}
 
 	return nil

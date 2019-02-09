@@ -182,7 +182,7 @@ func (c *Compiler) addInstruction(ins []byte) int {
 func (c *Compiler) Compile(node ast.Node) error {
 	if c.Debug {
 		log.Printf(
-			"%s Compiling %T: %s\n",
+			"%sCompiling %T: %s\n",
 			strings.Repeat(" ", c.l), node, node.String(),
 		)
 	}
