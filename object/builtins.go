@@ -11,15 +11,16 @@ import (
 
 // Builtins ...
 var Builtins = map[string]*Builtin{
-	"len":   &Builtin{Name: "len", Fn: Len},
-	"input": &Builtin{Name: "input", Fn: Input},
-	"print": &Builtin{Name: "print", Fn: Print},
-	"first": &Builtin{Name: "first", Fn: First},
-	"last":  &Builtin{Name: "last", Fn: Last},
-	"rest":  &Builtin{Name: "rest", Fn: Rest},
-	"push":  &Builtin{Name: "push", Fn: Push},
-	"pop":   &Builtin{Name: "pop", Fn: Pop},
-	"exit":  &Builtin{Name: "exit", Fn: Exit},
+	"len":    &Builtin{Name: "len", Fn: Len},
+	"input":  &Builtin{Name: "input", Fn: Input},
+	"print":  &Builtin{Name: "print", Fn: Print},
+	"first":  &Builtin{Name: "first", Fn: First},
+	"last":   &Builtin{Name: "last", Fn: Last},
+	"rest":   &Builtin{Name: "rest", Fn: Rest},
+	"push":   &Builtin{Name: "push", Fn: Push},
+	"pop":    &Builtin{Name: "pop", Fn: Pop},
+	"exit":   &Builtin{Name: "exit", Fn: Exit},
+	"assert": &Builtin{Name: "assert", Fn: Assert},
 }
 
 // BuiltinsIndex ...
@@ -211,5 +212,28 @@ func Exit(args ...Object) Object {
 	} else {
 		os.Exit(0)
 	}
+	return nil
+}
+
+// Assert ...
+func Assert(args ...Object) Object {
+	if len(args) != 2 {
+		return newError("wrong number of arguments. got=%d, want=2",
+			len(args))
+	}
+	if args[0].Type() != BOOLEAN {
+		return newError("argument #1 to `assert` must be BOOLEAN, got %s",
+			args[0].Type())
+	}
+	if args[1].Type() != STRING {
+		return newError("argument #2 to `assert` must be STRING, got %s",
+			args[0].Type())
+	}
+
+	if !args[0].(*Boolean).Value {
+		fmt.Printf("Assertion Error: %s", args[1].(*String).Value)
+		os.Exit(1)
+	}
+
 	return nil
 }

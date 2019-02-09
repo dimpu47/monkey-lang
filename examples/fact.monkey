@@ -5,4 +5,4 @@ let fact = fn(n) {
   return n * fact(n - 1)
 }
 
-print(fact(5))
+assert(fact(5) == 120, "fact(5) != 120")
