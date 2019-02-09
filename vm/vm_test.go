@@ -901,3 +901,81 @@ func TestExamples(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkFibonacci(b *testing.B) {
+	tests := map[string]string{
+		"iterative": `
+		let fib = fn(n) {
+		   if (n < 3) {
+			 return 1
+		   }
+		   let a = 1
+		   let b = 1
+		   let c = 0
+		   let i = 0
+		   while (i < n - 2) {
+			 c = a + b
+			 b = a
+			 a = c
+			 i = i + 1
+		   }
+		   return a
+		}
+
+		fib(35)
+		`,
+		"recursive": `
+		let fib = fn(x) {
+		  if (x == 0) {
+			return 0
+		  }
+		  if (x == 1) {
+			return 1
+		  }
+		  return fib(x-1) + fib(x-2)
+		}
+
+		fib(35)
+		`,
+		"tail-recursive": `
+		let fib = fn(n, a, b) {
+		  if (n == 0) {
+			return a
+		  }
+		  if (n == 1) {
+			return b
+		  }
+		  return fib(n - 1, b, a + b)
+		}
+
+		fib(35, 0, 1)
+		`,
+	}
+
+	for name, input := range tests {
+		b.Run(name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				program := parse(input)
+
+				c := compiler.New()
+				err := c.Compile(program)
+				if err != nil {
+					b.Log(input)
+					b.Fatalf("compiler error: %s", err)
+				}
+
+				vm := New(c.Bytecode())
+
+				err = vm.Run()
+				if err != nil {
+					b.Log(input)
+					b.Fatalf("vm error: %s", err)
+				}
+				if vm.sp != 0 {
+					b.Log(input)
+					b.Fatal("vm stack pointer non-zero")
+				}
+			}
+		})
+	}
+}
