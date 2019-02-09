@@ -786,6 +786,40 @@ func TestRecursiveFibonacci(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestTailCalls(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+			let fact = fn(n, a) {
+			  if (n == 0) {
+				return a
+			  }
+			  return fact(n - 1, a * n)
+			}
+
+			fact(5, 1)
+        	`,
+			expected: 120,
+		},
+
+		// without tail recursion optimization this will cause a stack overflow
+		{
+			input: `
+			let iter = fn(n, max) {
+				if (n == max) {
+					return n
+				}
+				return iter(n + 1, max)
+			}
+			iter(0, 9999)
+			`,
+			expected: 9999,
+		},
+	}
+
+	runVmTests(t, tests)
+}
+
 func TestIntegration(t *testing.T) {
 	matches, err := filepath.Glob("../testdata/*.monkey")
 	if err != nil {
