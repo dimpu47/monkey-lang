@@ -17,12 +17,12 @@ printBookName(book);
 
 let fibonacci = fn(x) {
   if (x == 0) {
-    0
+    return 0
   } else {
     if (x == 1) {
       return 1;
     } else {
-      fibonacci(x - 1) + fibonacci(x - 2);
+      return fibonacci(x - 1) + fibonacci(x - 2);
     }
   }
 };
@@ -30,13 +30,13 @@ let fibonacci = fn(x) {
 let map = fn(arr, f) {
   let iter = fn(arr, accumulated) {
     if (len(arr) == 0) {
-      accumulated
+      return accumulated
     } else {
-      iter(rest(arr), push(accumulated, f(first(arr))));
+      return iter(rest(arr), push(accumulated, f(first(arr))));
     }
   };
 
-  iter(arr, []);
+  return iter(arr, []);
 };
 
 let numbers = [1, 1 + 1, 4 - 1, 2 * 2, 2 + 3, 12 / 2];
