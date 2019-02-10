@@ -226,6 +226,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 		symbol, ok = c.symbolTable.Resolve(node.Name.Value)
 		if !ok {
 			symbol = c.symbolTable.Define(node.Name.Value)
+		} else {
+			// Local shadowing of previously defined "free" variable in a
+			// function now begin rehound to a locally scopped variable.
+			if symbol.Scope == FreeScope {
+				symbol = c.symbolTable.Define(node.Name.Value)
+			}
 		}
 
 		c.l++
@@ -491,6 +497,19 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 	case *ast.FunctionLiteral:
 		c.enterScope()
+
+		if node.Name != "" {
+			symbol, ok := c.symbolTable.Resolve(node.Name)
+			if !ok {
+				return fmt.Errorf("undefined variable %s", node.Name)
+			}
+
+			// Redefine the symbol for the name assign to this closure as a
+			// "free" variable so MakeClosure <idx> <nfree> has the correct
+			// number of free variables (including self)
+			symbol = c.symbolTable.DefineFree(symbol)
+			c.emit(code.SetSelf, symbol.Index)
+		}
 
 		for _, p := range node.Parameters {
 			c.symbolTable.Define(p.Value)

@@ -5,6 +5,7 @@ package ast
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 
 	"github.com/prologic/monkey-lang/token"
@@ -379,6 +380,7 @@ func (we *WhileExpression) String() string {
 // formal parameters and boy of the function as a block statement
 type FunctionLiteral struct {
 	Token      token.Token // The 'fn' token
+	Name       string
 	Parameters []*Identifier
 	Body       *BlockStatement
 }
@@ -397,7 +399,7 @@ func (fl *FunctionLiteral) String() string {
 		params = append(params, p.String())
 	}
 
-	out.WriteString(fl.TokenLiteral())
+	out.WriteString(fmt.Sprintf("%s %s", fl.TokenLiteral(), fl.Name))
 	out.WriteString("(")
 	out.WriteString(strings.Join(params, ", "))
 	out.WriteString(") ")

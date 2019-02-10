@@ -376,7 +376,10 @@ func (vm *VM) executeCall(numArgs int) error {
 	case *object.Builtin:
 		return vm.callBuiltin(callee, numArgs)
 	default:
-		return fmt.Errorf("calling non-closure and non-builtin")
+		return fmt.Errorf(
+			"calling non-closure and non-builtin: %T %v",
+			callee, callee,
+		)
 	}
 }
 
@@ -558,6 +561,13 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+
+		case code.SetSelf:
+			freeIndex := code.ReadUint8(ins[ip+1:])
+			vm.currentFrame().ip += 1
+
+			currentClosure := vm.currentFrame().cl
+			currentClosure.Free[freeIndex] = currentClosure
 
 		case code.LoadTrue:
 			err := vm.push(True)

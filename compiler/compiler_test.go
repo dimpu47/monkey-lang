@@ -819,12 +819,14 @@ func TestFunctionCalls(t *testing.T) {
 			expectedConstants: []interface{}{
 				24,
 				[]code.Instructions{
+					code.Make(code.SetSelf, 0),
 					code.Make(code.LoadConstant, 0), // The literal "24"
 					code.Make(code.Return),
 				},
 			},
 			expectedInstructions: []code.Instructions{
-				code.Make(code.MakeClosure, 1, 0), // The compiled function
+				code.Make(code.LoadGlobal, 0),
+				code.Make(code.MakeClosure, 1, 1), // The compiled function
 				code.Make(code.BindGlobal, 0),
 				code.Make(code.LoadGlobal, 0),
 				code.Make(code.Call, 0),
@@ -838,13 +840,15 @@ func TestFunctionCalls(t *testing.T) {
             `,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
+					code.Make(code.SetSelf, 0),
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.Return),
 				},
 				24,
 			},
 			expectedInstructions: []code.Instructions{
-				code.Make(code.MakeClosure, 0, 0),
+				code.Make(code.LoadGlobal, 0),
+				code.Make(code.MakeClosure, 0, 1),
 				code.Make(code.BindGlobal, 0),
 				code.Make(code.LoadGlobal, 0),
 				code.Make(code.LoadConstant, 1),
@@ -859,6 +863,7 @@ func TestFunctionCalls(t *testing.T) {
             `,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
+					code.Make(code.SetSelf, 0),
 					code.Make(code.LoadLocal, 0),
 					code.Make(code.Pop),
 					code.Make(code.LoadLocal, 1),
@@ -871,7 +876,8 @@ func TestFunctionCalls(t *testing.T) {
 				26,
 			},
 			expectedInstructions: []code.Instructions{
-				code.Make(code.MakeClosure, 0, 0),
+				code.Make(code.LoadGlobal, 0),
+				code.Make(code.MakeClosure, 0, 1),
 				code.Make(code.BindGlobal, 0),
 				code.Make(code.LoadGlobal, 0),
 				code.Make(code.LoadConstant, 1),

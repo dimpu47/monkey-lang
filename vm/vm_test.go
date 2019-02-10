@@ -24,8 +24,8 @@ func parse(input string) *ast.Program {
 func testIntegerObject(expected int64, actual object.Object) error {
 	result, ok := actual.(*object.Integer)
 	if !ok {
-		return fmt.Errorf("object is not Integer. got=%T (%+v)",
-			actual, actual)
+		return fmt.Errorf("object is not Integer. got=%T (%+v) want=%d",
+			actual, actual, expected)
 	}
 
 	if result.Value != expected {
@@ -483,47 +483,47 @@ func TestCallingFunctionsWithBindings(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input: `
-        let one = fn() { let one = 1; return one };
-        one();
-        `,
+			let one = fn() { let one = 1; return one };
+			one();
+			`,
 			expected: 1,
 		},
 		{
 			input: `
-        let oneAndTwo = fn() { let one = 1; let two = 2; return one + two; };
-        oneAndTwo();
-        `,
+			let oneAndTwo = fn() { let one = 1; let two = 2; return one + two; };
+			oneAndTwo();
+			`,
 			expected: 3,
 		},
 		{
 			input: `
-        let oneAndTwo = fn() { let one = 1; let two = 2; return one + two; };
-        let threeAndFour = fn() { let three = 3; let four = 4; return three + four; };
-        oneAndTwo() + threeAndFour();
-        `,
+			let oneAndTwo = fn() { let one = 1; let two = 2; return one + two; };
+			let threeAndFour = fn() { let three = 3; let four = 4; return three + four; };
+			oneAndTwo() + threeAndFour();
+			`,
 			expected: 10,
 		},
 		{
 			input: `
-        let firstFoobar = fn() { let foobar = 50; return foobar; };
-        let secondFoobar = fn() { let foobar = 100; return foobar; };
-        firstFoobar() + secondFoobar();
-        `,
+			let firstFoobar = fn() { let foobar = 50; return foobar; };
+			let secondFoobar = fn() { let foobar = 100; return foobar; };
+			firstFoobar() + secondFoobar();
+			`,
 			expected: 150,
 		},
 		{
 			input: `
-        let globalSeed = 50;
-        let minusOne = fn() {
-            let num = 1;
-            return globalSeed - num;
-        }
-        let minusTwo = fn() {
-            let num = 2;
-            return globalSeed - num;
-        }
-        minusOne() + minusTwo();
-        `,
+			let globalSeed = 50;
+			let minusOne = fn() {
+				let num = 1;
+				return globalSeed - num;
+			}
+			let minusTwo = fn() {
+				let num = 2;
+				return globalSeed - num;
+			}
+			minusOne() + minusTwo();
+			`,
 			expected: 97,
 		},
 	}
@@ -820,6 +820,101 @@ func TestTailCalls(t *testing.T) {
 			iter(0, 9999)
 			`,
 			expected: 9999,
+		},
+	}
+
+	runVmTests(t, tests)
+}
+
+func TestCallingFunctionsInFunctions(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+			let double = fn(x) { return x * 2 };
+			double(5);
+			`,
+			expected: 10,
+		},
+		{
+			input: `
+			let double        = fn(x) { return x * 2 };
+			let double_double = fn(x) { return 2 * double(x); };
+			double_double(5);
+			`,
+			expected: 20,
+		},
+		{
+			input: `
+			let double        = fn(x) { return x * 2 };
+			let wrappedDouble = fn(x) { return double(x); };
+			wrappedDouble(5);
+			`,
+			expected: 10,
+		},
+		{
+			input: `
+			let wrappedDouble = fn() {
+				let double = fn(x) { return x * 2 };
+				return double(5);
+			};
+			wrappedDouble();
+			`,
+			expected: 10,
+		},
+	}
+
+	runVmTests(t, tests)
+}
+
+func TestCallingRecursiveFunctionsInFunctions(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			// This works
+			input: `
+			let inner = fn(x) {
+				if (x == 0) {
+					return 0;
+				} else {
+					return inner(x - 1);
+				}
+			};
+			inner(1);
+			`,
+			expected: 0,
+		},
+		{
+			// This also works
+			input: `
+			let inner = fn(x) {
+				if (x == 0) {
+					return 1;
+				} else {
+					return inner(x - 1);
+				}
+			};
+			let wrapper = fn() {
+				return inner(1);
+			};
+			wrapper();
+			`,
+			expected: 1,
+		},
+		{
+			// This does _NOT_ work
+			input: `
+			let wrapper = fn() {
+				let inner = fn(x) {
+					if (x == 0) {
+						return 2;
+					} else {
+						return inner(x - 1);
+					}
+				};
+				return inner(1);
+			};
+			wrapper();
+			`,
+			expected: 2,
 		},
 	}
 

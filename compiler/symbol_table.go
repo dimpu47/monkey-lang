@@ -40,7 +40,7 @@ func NewEnclosedSymbolTable(outer *SymbolTable) *SymbolTable {
 	}
 }
 
-func (s *SymbolTable) defineFree(original Symbol) Symbol {
+func (s *SymbolTable) DefineFree(original Symbol) Symbol {
 	s.FreeSymbols = append(s.FreeSymbols, original)
 
 	symbol := Symbol{Name: original.Name, Index: len(s.FreeSymbols) - 1}
@@ -80,7 +80,7 @@ func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
 		if obj.Scope == GlobalScope || obj.Scope == BuiltinScope {
 			return obj, ok
 		}
-		free := s.defineFree(obj)
+		free := s.DefineFree(obj)
 		return free, true
 	}
 	return obj, ok
