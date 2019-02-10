@@ -129,6 +129,11 @@ func TestEvalBooleanExpression(t *testing.T) {
 	}
 }
 
+func TestNullExpression(t *testing.T) {
+	evaluated := testEval("null")
+	testNullObject(t, evaluated)
+}
+
 func testBooleanObject(t *testing.T, obj object.Object, expected bool) bool {
 	result, ok := obj.(*object.Boolean)
 	if !ok {

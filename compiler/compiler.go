@@ -563,6 +563,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 		c.emit(code.Return)
 
+	case *ast.Null:
+		c.emit(code.LoadNull)
+
 	case *ast.Boolean:
 		if node.Value {
 			c.emit(code.LoadTrue)

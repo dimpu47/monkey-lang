@@ -242,6 +242,14 @@ func TestBooleanExpressions(t *testing.T) {
 			},
 		},
 		{
+			input:             "null",
+			expectedConstants: []interface{}{},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadNull),
+				code.Make(code.Pop),
+			},
+		},
+		{
 			input:             "1 > 2",
 			expectedConstants: []interface{}{1, 2},
 			expectedInstructions: []code.Instructions{

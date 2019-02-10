@@ -92,6 +92,8 @@ const (
 	TRUE = "TRUE"
 	// FALSE the `false` keyword (false)
 	FALSE = "FALSE"
+	// NULL the `null` keyword (null)
+	NULL = "NULL"
 	// IF the `if` keyword (if)
 	IF = "IF"
 	// ELSE the `else` keyword (else)
@@ -107,6 +109,7 @@ var keywords = map[string]Type{
 	"let":    LET,
 	"true":   TRUE,
 	"false":  FALSE,
+	"null":   NULL,
 	"if":     IF,
 	"else":   ELSE,
 	"return": RETURN,

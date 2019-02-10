@@ -212,6 +212,19 @@ func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 // String returns a stringified version of the AST for debugging
 func (i *Identifier) String() string { return i.Value }
 
+// Null represents a null value
+type Null struct {
+	Token token.Token
+}
+
+func (n *Null) expressionNode() {}
+
+// TokenLiteral prints the literal value of the token associated with this node
+func (n *Null) TokenLiteral() string { return n.Token.Literal }
+
+// String returns a stringified version of the AST for debugging
+func (n *Null) String() string { return n.Token.Literal }
+
 // Boolean represents a boolean value and holds the underlying boolean value
 type Boolean struct {
 	Token token.Token

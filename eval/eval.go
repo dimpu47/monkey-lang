@@ -88,6 +88,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.String{Value: node.Value}
 	case *ast.Boolean:
 		return fromNativeBoolean(node.Value)
+	case *ast.Null:
+		return NULL
 
 	case *ast.PrefixExpression:
 		right := Eval(node.Right, env)
