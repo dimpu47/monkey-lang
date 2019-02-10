@@ -5,6 +5,8 @@ package lexer
 // parsing by the parser.
 
 import (
+	"strings"
+
 	"github.com/prologic/monkey-lang/token"
 )
 
@@ -184,14 +186,22 @@ func (l *Lexer) readLine() string {
 }
 
 func (l *Lexer) readString() string {
-	position := l.position + 1
+	b := &strings.Builder{}
 	for {
 		l.readChar()
-		if l.ch == '"' || l.ch == 0 {
-			break
+
+		// Support some basic escapes like \"
+		if l.ch == '\\' && l.peekChar() == '"' {
+			l.readChar()
+		} else {
+			if l.ch == '"' || l.ch == 0 {
+				break
+			}
 		}
+
+		b.WriteByte(l.ch)
 	}
-	return l.input[position:l.position]
+	return b.String()
 }
 
 func (l *Lexer) skipWhitespace() {
