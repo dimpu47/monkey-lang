@@ -54,21 +54,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		return &object.Return{Value: val}
 
-	case *ast.AssignmentStatement:
-		obj := evalIdentifier(node.Name, env)
-		if isError(obj) {
-			return obj
-		}
-
-		val := Eval(node.Value, env)
-		if isError(val) {
-			return val
-		}
-
-		env.Set(node.Name.Value, val)
-
-		return val
-
 	case *ast.LetStatement:
 		val := Eval(node.Value, env)
 		if isError(val) {
@@ -142,6 +127,55 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return elements[0]
 		}
 		return &object.Array{Elements: elements}
+
+	case *ast.AssignmentExpression:
+		left := Eval(node.Left, env)
+		if isError(left) {
+			return left
+		}
+
+		value := Eval(node.Value, env)
+		if isError(value) {
+			return value
+		}
+
+		if ident, ok := node.Left.(*ast.Identifier); ok {
+			env.Set(ident.Value, value)
+		} else if ie, ok := node.Left.(*ast.IndexExpression); ok {
+			obj := Eval(ie.Left, env)
+			if isError(obj) {
+				return obj
+			}
+
+			if array, ok := obj.(*object.Array); ok {
+				index := Eval(ie.Index, env)
+				if isError(index) {
+					return index
+				}
+				if idx, ok := index.(*object.Integer); ok {
+					array.Elements[idx.Value] = value
+				} else {
+					return newError("cannot index array with %#v", index)
+				}
+			} else if hash, ok := obj.(*object.Hash); ok {
+				key := Eval(ie.Index, env)
+				if isError(key) {
+					return key
+				}
+				if hashKey, ok := key.(object.Hashable); ok {
+					hashed := hashKey.HashKey()
+					hash.Pairs[hashed] = object.HashPair{Key: key, Value: value}
+				} else {
+					return newError("cannot index hash with %T", key)
+				}
+			} else {
+				return newError("object type %T does not support item assignment", obj)
+			}
+		} else {
+			return newError("expected identifier or index expression got=%T", left)
+		}
+
+		return NULL
 
 	case *ast.IndexExpression:
 		left := Eval(node.Left, env)
@@ -448,6 +482,19 @@ func unwrapReturnValue(obj object.Object) object.Object {
 	}
 
 	return obj
+}
+
+func evalIndexAssignmentExpression(left, index, value object.Object) object.Object {
+	switch {
+	case left.Type() == object.STRING && index.Type() == object.INTEGER:
+		return evalStringIndexExpression(left, index)
+	case left.Type() == object.ARRAY && index.Type() == object.INTEGER:
+		return evalArrayIndexExpression(left, index)
+	case left.Type() == object.HASH:
+		return evalHashIndexExpression(left, index)
+	default:
+		return newError("index operator not supported: %s", left.Type())
+	}
 }
 
 func evalIndexExpression(left, index object.Object) object.Object {

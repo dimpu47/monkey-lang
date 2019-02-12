@@ -202,8 +202,12 @@ func TestWhileExpressions(t *testing.T) {
 		{"while (false) { }", nil},
 		{"let n = 0; while (n < 10) { let n = n + 1 }; n", 10},
 		{"let n = 10; while (n > 0) { let n = n - 1 }; n", 0},
-		{"let n = 0; while (n < 10) { n = n + 1 }", 10},
-		{"let n = 10; while (n > 0) { n = n - 1 }", 0},
+		{"let n = 0; while (n < 10) { let n = n + 1 }", nil},
+		{"let n = 10; while (n > 0) { let n = n - 1 }", nil},
+		{"let n = 0; while (n < 10) { n = n + 1 }; n", 10},
+		{"let n = 10; while (n > 0) { n = n - 1 }; n", 0},
+		{"let n = 0; while (n < 10) { n = n + 1 }", nil},
+		{"let n = 10; while (n > 0) { n = n - 1 }", nil},
 	}
 
 	for _, tt := range tests {
@@ -326,24 +330,45 @@ if (10 > 1) {
 	}
 }
 
-func TestAssignmentStatements(t *testing.T) {
+func TestIndexAssignmentStatements(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected int64
 	}{
-		{"let a = 0; a = 5;", 5},
+		{"let xs  = [1, 2, 3]; xs[1] = 4; xs[1];", 4},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testIntegerObject(t, evaluated, tt.expected)
+	}
+}
+
+func TestAssignmentExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{"let a = 0; a = 5;", nil},
 		{"let a = 0; a = 5; a;", 5},
-		{"let a = 0; a = 5 * 5;", 25},
+		{"let a = 0; a = 5 * 5;", nil},
 		{"let a = 0; a = 5 * 5; a;", 25},
-		{"let a = 0; a = 5; let b = 0; b = a;", 5},
+		{"let a = 0; a = 5; let b = 0; b = a;", nil},
 		{"let a = 0; a = 5; let b = 0; b = a; b;", 5},
-		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5;", 15},
+		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5;", nil},
 		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5; c;", 15},
+		{"let a = 5; let b = a; a = 0;", nil},
 		{"let a = 5; let b = a; a = 0; b;", 5},
 	}
 
 	for _, tt := range tests {
-		testIntegerObject(t, testEval(tt.input), tt.expected)
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
 	}
 }
 

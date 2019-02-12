@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/prologic/monkey-lang/ast"
 	"github.com/prologic/monkey-lang/code"
 	"github.com/prologic/monkey-lang/lexer"
@@ -82,6 +84,28 @@ func testConstants(
 	return nil
 }
 
+func testConstants2(t *testing.T, expected []interface{}, actual []object.Object) {
+	assert := assert.New(t)
+
+	assert.Equal(len(expected), len(actual))
+
+	for i, constant := range expected {
+		switch constant := constant.(type) {
+
+		case []code.Instructions:
+			fn, ok := actual[i].(*object.CompiledFunction)
+			assert.True(ok)
+			assert.Equal(constant, fn.Instructions.String())
+
+		case string:
+			assert.Equal(constant, actual[i].(*object.String).Value)
+
+		case int:
+			assert.Equal(int64(constant), actual[i].(*object.Integer).Value)
+		}
+	}
+}
+
 func testStringObject(expected string, actual object.Object) error {
 	result, ok := actual.(*object.String)
 	if !ok {
@@ -128,6 +152,12 @@ type compilerTestCase struct {
 	expectedInstructions []code.Instructions
 }
 
+type compilerTestCase2 struct {
+	input        string
+	constants    []interface{}
+	instructions string
+}
+
 func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 	t.Helper()
 
@@ -154,6 +184,25 @@ func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 			t.Log(tt.input)
 			t.Fatalf("testConstants failed: %s", err)
 		}
+	}
+}
+
+func runCompilerTests2(t *testing.T, tests []compilerTestCase2) {
+	t.Helper()
+
+	assert := assert.New(t)
+
+	for _, tt := range tests {
+		program := parse(tt.input)
+
+		compiler := New()
+		err := compiler.Compile(program)
+		assert.NoError(err)
+
+		bytecode := compiler.Bytecode()
+		assert.Equal(tt.instructions, bytecode.Instructions.String())
+
+		testConstants2(t, tt.constants, bytecode.Constants)
 	}
 }
 
@@ -406,34 +455,30 @@ func TestConditionals(t *testing.T) {
 				// 0006
 				code.Make(code.LoadTrue),
 				// 0007
-				code.Make(code.JumpIfFalse, 20),
+				code.Make(code.JumpIfFalse, 19),
 				// 0010
 				code.Make(code.LoadConstant, 1),
 				// 0013
 				code.Make(code.AssignGlobal, 0),
-				// 0016
+				// 0018
+				code.Make(code.Jump, 20),
+				// 0019
 				code.Make(code.LoadNull),
-				// 0017
-				code.Make(code.Jump, 21),
 				// 0020
-				code.Make(code.LoadNull),
-				// 0021
 				code.Make(code.Pop),
-				// 0022
+				// 0021
 				code.Make(code.LoadFalse),
-				// 0023
-				code.Make(code.JumpIfFalse, 36),
-				// 0025
+				// 0022
+				code.Make(code.JumpIfFalse, 34),
+				// 0024
 				code.Make(code.LoadConstant, 2),
-				// 0029
+				// 0028
 				code.Make(code.AssignGlobal, 0),
 				// 0032
+				code.Make(code.Jump, 35),
+				// 0035
 				code.Make(code.LoadNull),
-				// 0033
-				code.Make(code.Jump, 37),
 				// 0036
-				code.Make(code.LoadNull),
-				// 0037
 				code.Make(code.Pop),
 			},
 		},
@@ -646,7 +691,7 @@ func TestIndexExpressions(t *testing.T) {
 				code.Make(code.LoadConstant, 3),
 				code.Make(code.LoadConstant, 4),
 				code.Make(code.Add),
-				code.Make(code.Index),
+				code.Make(code.GetItem),
 				code.Make(code.Pop),
 			},
 		},
@@ -660,7 +705,7 @@ func TestIndexExpressions(t *testing.T) {
 				code.Make(code.LoadConstant, 2),
 				code.Make(code.LoadConstant, 3),
 				code.Make(code.Sub),
-				code.Make(code.Index),
+				code.Make(code.GetItem),
 				code.Make(code.Pop),
 			},
 		},
@@ -890,6 +935,21 @@ func TestFunctionCalls(t *testing.T) {
 	}
 
 	runCompilerTests(t, tests)
+}
+
+func TestAssignmentExpressions(t *testing.T) {
+	tests := []compilerTestCase2{
+		{
+			input: `
+			let x = 1
+			x = 2
+			`,
+			constants:    []interface{}{1, 2},
+			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 LoadConstant 1\n0009 AssignGlobal 0\n0012 Pop\n",
+		},
+	}
+
+	runCompilerTests2(t, tests)
 }
 
 func TestAssignmentStatementScopes(t *testing.T) {

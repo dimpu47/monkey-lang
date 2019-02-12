@@ -285,6 +285,10 @@ func TestConditionals(t *testing.T) {
 func TestIterations(t *testing.T) {
 	tests := []vmTestCase{
 		{"while (false) { }", nil},
+		{"let n = 0; while (n < 10) { let n = n + 1 }; n", 10},
+		{"let n = 10; while (n > 0) { let n = n - 1 }; n", 0},
+		{"let n = 0; while (n < 10) { let n = n + 1 }", nil},
+		{"let n = 10; while (n > 0) { let n = n - 1 }", nil},
 		{"let n = 0; while (n < 10) { n = n + 1 }; n", 10},
 		{"let n = 10; while (n > 0) { n = n - 1 }; n", 0},
 		{"let n = 0; while (n < 10) { n = n + 1 }", nil},
@@ -294,9 +298,27 @@ func TestIterations(t *testing.T) {
 	runVmTests(t, tests)
 }
 
-func TestAssignmentStatements(t *testing.T) {
+func TestIndexAssignmentStatements(t *testing.T) {
 	tests := []vmTestCase{
-		{"let one = 0; one = 1", 1},
+		{"let xs  = [1, 2, 3]; xs[1] = 4; xs[1];", 4},
+	}
+
+	runVmTests(t, tests)
+}
+
+func TestAssignmentExpressions(t *testing.T) {
+	tests := []vmTestCase{
+		{"let a = 0; a = 5;", nil},
+		{"let a = 0; a = 5; a;", 5},
+		{"let a = 0; a = 5 * 5;", nil},
+		{"let a = 0; a = 5 * 5; a;", 25},
+		{"let a = 0; a = 5; let b = 0; b = a;", nil},
+		{"let a = 0; a = 5; let b = 0; b = a; b;", 5},
+		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5;", nil},
+		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5; c;", 15},
+		{"let a = 5; let b = a; a = 0;", nil},
+		{"let a = 5; let b = a; a = 0; b;", 5},
+		{"let one = 0; one = 1", nil},
 		{"let one = 0; one = 1; one", 1},
 		{"let one = 0; one = 1; let two = 0; two = 2; one + two", 3},
 		{"let one = 0; one = 1; let two = 0; two = one + one; one + two", 3},

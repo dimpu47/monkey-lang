@@ -12,6 +12,7 @@ import (
 const (
 	_ int = iota
 	LOWEST
+	ASSIGN      // =
 	EQUALS      // ==
 	LESSGREATER // > or <
 	SUM         // +
@@ -23,6 +24,7 @@ const (
 )
 
 var precedences = map[token.Type]int{
+	token.ASSIGN:   ASSIGN,
 	token.EQ:       EQUALS,
 	token.NEQ:      EQUALS,
 	token.LT:       LESSGREATER,
@@ -92,6 +94,8 @@ func New(l *lexer.Lexer) *Parser {
 
 	p.registerPrefix(token.LBRACE, p.parseHashLiteral)
 
+	p.registerInfix(token.ASSIGN, p.parseAssignmentExpression)
+
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()
 	p.nextToken()
@@ -158,10 +162,6 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 func (p *Parser) parseStatement() ast.Statement {
-	if p.peekToken.Type == token.ASSIGN {
-		return p.parseAssignmentStatement()
-	}
-
 	switch p.curToken.Type {
 	case token.COMMENT:
 		return p.parseComment()
@@ -176,22 +176,6 @@ func (p *Parser) parseStatement() ast.Statement {
 
 func (p *Parser) parseComment() ast.Statement {
 	return &ast.Comment{Token: p.curToken, Value: p.curToken.Literal}
-}
-
-func (p *Parser) parseAssignmentStatement() *ast.AssignmentStatement {
-	stmt := &ast.AssignmentStatement{Token: p.peekToken}
-	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-
-	p.nextToken()
-	p.nextToken()
-
-	stmt.Value = p.parseExpression(LOWEST)
-
-	if p.peekTokenIs(token.SEMICOLON) {
-		p.nextToken()
-	}
-
-	return stmt
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
@@ -532,6 +516,24 @@ func (p *Parser) parseExpressionList(end token.Type) []ast.Expression {
 	}
 
 	return list
+}
+
+func (p *Parser) parseAssignmentExpression(exp ast.Expression) ast.Expression {
+	switch node := exp.(type) {
+	case *ast.Identifier, *ast.IndexExpression:
+	default:
+		msg := fmt.Sprintf("expected identifier or index expression on left but got %T %#v", node, exp)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	ae := &ast.AssignmentExpression{Token: p.curToken, Left: exp}
+
+	p.nextToken()
+
+	ae.Value = p.parseExpression(LOWEST)
+
+	return ae
 }
 
 func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {

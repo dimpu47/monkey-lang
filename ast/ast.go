@@ -74,32 +74,6 @@ func (c *Comment) String() string {
 	return out.String()
 }
 
-// AssignmentStatement the `=` statement represents the AST node that rebinds
-// an expression to an identifier (assigning a new value).
-type AssignmentStatement struct {
-	Token token.Token // the token.ASSIGN token
-	Name  *Identifier
-	Value Expression
-}
-
-func (as *AssignmentStatement) statementNode() {}
-
-// TokenLiteral prints the literal value of the token associated with this node
-func (as *AssignmentStatement) TokenLiteral() string { return as.Token.Literal }
-
-// String returns a stringified version of the AST for debugging
-func (as *AssignmentStatement) String() string {
-	var out bytes.Buffer
-
-	out.WriteString(as.Name.String())
-	out.WriteString(as.TokenLiteral() + " ")
-	out.WriteString(as.Value.String())
-
-	out.WriteString(";")
-
-	return out.String()
-}
-
 // LetStatement the `let` statement represents the AST node that binds an
 // expression to an identifier
 type LetStatement struct {
@@ -461,6 +435,30 @@ func (al *ArrayLiteral) String() string {
 	out.WriteString("[")
 	out.WriteString(strings.Join(elements, ", "))
 	out.WriteString("]")
+
+	return out.String()
+}
+
+// AssignmentExpression represents an assignment expression of the form:
+// x = 1 or xs[1] = 2
+type AssignmentExpression struct {
+	Token token.Token // The = token
+	Left  Expression
+	Value Expression
+}
+
+func (ae *AssignmentExpression) expressionNode() {}
+
+// TokenLiteral prints the literal value of the token associated with this node
+func (ae *AssignmentExpression) TokenLiteral() string { return ae.Token.Literal }
+
+// String returns a stringified version of the AST for debugging
+func (ae *AssignmentExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ae.Left.String())
+	out.WriteString(ae.TokenLiteral())
+	out.WriteString(ae.Value.String())
 
 	return out.String()
 }

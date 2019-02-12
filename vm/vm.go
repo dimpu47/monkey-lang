@@ -282,14 +282,30 @@ func (vm *VM) executeMinusOperator() error {
 	return vm.push(&object.Integer{Value: -value})
 }
 
-func (vm *VM) executeIndexExpression(left, index object.Object) error {
+func (vm *VM) executeSetItem(left, index, value object.Object) error {
+	switch {
+	case left.Type() == object.ARRAY && index.Type() == object.INTEGER:
+		return vm.executeArraySetItem(left, index, value)
+	case left.Type() == object.HASH:
+		return vm.executeHashSetItem(left, index, value)
+	default:
+		return fmt.Errorf(
+			"set item operation not supported: left=%s index=%s",
+			left.Type(), index.Type(),
+		)
+	}
+}
+
+func (vm *VM) executeGetItem(left, index object.Object) error {
 	switch {
 	case left.Type() == object.STRING && index.Type() == object.INTEGER:
+		return vm.executeStringGetItem(left, index)
+	case left.Type() == object.STRING && index.Type() == object.STRING:
 		return vm.executeStringIndex(left, index)
 	case left.Type() == object.ARRAY && index.Type() == object.INTEGER:
-		return vm.executeArrayIndex(left, index)
+		return vm.executeArrayGetItem(left, index)
 	case left.Type() == object.HASH:
-		return vm.executeHashIndex(left, index)
+		return vm.executeHashGetItem(left, index)
 	default:
 		return fmt.Errorf(
 			"index operator not supported: left=%s index=%s",
@@ -298,7 +314,7 @@ func (vm *VM) executeIndexExpression(left, index object.Object) error {
 	}
 }
 
-func (vm *VM) executeStringIndex(str, index object.Object) error {
+func (vm *VM) executeStringGetItem(str, index object.Object) error {
 	stringObject := str.(*object.String)
 	i := index.(*object.Integer).Value
 	max := int64(len(stringObject.Value) - 1)
@@ -310,7 +326,18 @@ func (vm *VM) executeStringIndex(str, index object.Object) error {
 	return vm.push(&object.String{Value: string(stringObject.Value[i])})
 }
 
-func (vm *VM) executeArrayIndex(array, index object.Object) error {
+func (vm *VM) executeStringIndex(str, index object.Object) error {
+	stringObject := str.(*object.String)
+	substr := index.(*object.String).Value
+
+	return vm.push(
+		&object.Integer{
+			Value: int64(strings.Index(stringObject.Value, substr)),
+		},
+	)
+}
+
+func (vm *VM) executeArrayGetItem(array, index object.Object) error {
 	arrayObject := array.(*object.Array)
 	i := index.(*object.Integer).Value
 	max := int64(len(arrayObject.Elements) - 1)
@@ -322,7 +349,20 @@ func (vm *VM) executeArrayIndex(array, index object.Object) error {
 	return vm.push(arrayObject.Elements[i])
 }
 
-func (vm *VM) executeHashIndex(hash, index object.Object) error {
+func (vm *VM) executeArraySetItem(array, index, value object.Object) error {
+	arrayObject := array.(*object.Array)
+	i := index.(*object.Integer).Value
+	max := int64(len(arrayObject.Elements) - 1)
+
+	if i < 0 || i > max {
+		return fmt.Errorf("index out of bounds: %d", i)
+	}
+
+	arrayObject.Elements[i] = value
+	return vm.push(Null)
+}
+
+func (vm *VM) executeHashGetItem(hash, index object.Object) error {
 	hashObject := hash.(*object.Hash)
 
 	key, ok := index.(object.Hashable)
@@ -336,6 +376,20 @@ func (vm *VM) executeHashIndex(hash, index object.Object) error {
 	}
 
 	return vm.push(pair.Value)
+}
+
+func (vm *VM) executeHashSetItem(hash, index, value object.Object) error {
+	hashObject := hash.(*object.Hash)
+
+	key, ok := index.(object.Hashable)
+	if !ok {
+		return fmt.Errorf("unusable as hash key: %s", index.Type())
+	}
+
+	hashed := key.HashKey()
+	hashObject.Pairs[hashed] = object.HashPair{Key: index, Value: value}
+
+	return vm.push(Null)
 }
 
 func (vm *VM) buildArray(startIndex, endIndex int) object.Object {
@@ -501,12 +555,22 @@ func (vm *VM) Run() error {
 			vm.currentFrame().ip += 2
 			vm.globals[globalIndex] = vm.pop()
 
+			err := vm.push(Null)
+			if err != nil {
+				return err
+			}
+
 		case code.AssignLocal:
 			localIndex := code.ReadUint8(ins[ip+1:])
 			vm.currentFrame().ip += 1
 
 			frame := vm.currentFrame()
 			vm.stack[frame.basePointer+int(localIndex)] = vm.pop()
+
+			err := vm.push(Null)
+			if err != nil {
+				return err
+			}
 
 		case code.BindGlobal:
 			globalIndex := code.ReadUint16(ins[ip+1:])
@@ -642,11 +706,21 @@ func (vm *VM) Run() error {
 				return err
 			}
 
-		case code.Index:
+		case code.SetItem:
+			value := vm.pop()
 			index := vm.pop()
 			left := vm.pop()
 
-			err := vm.executeIndexExpression(left, index)
+			err := vm.executeSetItem(left, index, value)
+			if err != nil {
+				return err
+			}
+
+		case code.GetItem:
+			index := vm.pop()
+			left := vm.pop()
+
+			err := vm.executeGetItem(left, index)
 			if err != nil {
 				return err
 			}

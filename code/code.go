@@ -83,6 +83,8 @@ const (
 	LoadTrue
 	LoadFalse
 	LoadNull
+	GetItem
+	SetItem
 	MakeArray
 	MakeHash
 	MakeClosure
@@ -100,7 +102,6 @@ const (
 	GreaterThanEqual
 	Minus
 	Bang
-	Index
 	JumpIfFalse
 	Jump
 	Call
@@ -122,6 +123,8 @@ var definitions = map[Opcode]*Definition{
 	LoadTrue:         {"LoadTrue", []int{}},
 	LoadFalse:        {"LoadFalse", []int{}},
 	LoadNull:         {"LoadNull", []int{}},
+	GetItem:          {"GetItem", []int{}},
+	SetItem:          {"SetItem", []int{}},
 	MakeArray:        {"MakeArray", []int{2}},
 	MakeHash:         {"MakeHash", []int{2}},
 	MakeClosure:      {"MakeClosure", []int{2, 1}},
@@ -137,7 +140,6 @@ var definitions = map[Opcode]*Definition{
 	GreaterThanEqual: {"GreaterThanEqual", []int{}},
 	Minus:            {"Minus", []int{}},
 	Bang:             {"Bang", []int{}},
-	Index:            {"Index", []int{}},
 	JumpIfFalse:      {"JumpIfFalse", []int{2}},
 	Jump:             {"Jump", []int{2}},
 	Call:             {"Call", []int{1}},

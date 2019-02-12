@@ -198,23 +198,50 @@ func (c *Compiler) Compile(node ast.Node) error {
 			}
 		}
 
-	case *ast.AssignmentStatement:
-		symbol, ok := c.symbolTable.Resolve(node.Name.Value)
-		if !ok {
-			return fmt.Errorf("undefined variable %s", node.Value)
-		}
+	case *ast.AssignmentExpression:
+		if ident, ok := node.Left.(*ast.Identifier); ok {
+			symbol, ok := c.symbolTable.Resolve(ident.Value)
+			if !ok {
+				return fmt.Errorf("undefined variable %s", ident.Value)
+			}
 
-		c.l++
-		err := c.Compile(node.Value)
-		c.l--
-		if err != nil {
-			return err
-		}
+			c.l++
+			err := c.Compile(node.Value)
+			c.l--
+			if err != nil {
+				return err
+			}
 
-		if symbol.Scope == GlobalScope {
-			c.emit(code.AssignGlobal, symbol.Index)
+			if symbol.Scope == GlobalScope {
+				c.emit(code.AssignGlobal, symbol.Index)
+			} else {
+				c.emit(code.AssignLocal, symbol.Index)
+			}
+		} else if ie, ok := node.Left.(*ast.IndexExpression); ok {
+			c.l++
+			err := c.Compile(ie.Left)
+			c.l--
+			if err != nil {
+				return err
+			}
+
+			c.l++
+			err = c.Compile(ie.Index)
+			c.l--
+			if err != nil {
+				return err
+			}
+
+			c.l++
+			err = c.Compile(node.Value)
+			c.l--
+			if err != nil {
+				return err
+			}
+
+			c.emit(code.SetItem)
 		} else {
-			c.emit(code.AssignLocal, symbol.Index)
+			return fmt.Errorf("expected identifier or index expression got=%s", node.Left)
 		}
 
 	case *ast.LetStatement:
@@ -447,7 +474,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 
-		c.emit(code.Index)
+		c.emit(code.GetItem)
 
 	case *ast.HashLiteral:
 		keys := []ast.Expression{}
