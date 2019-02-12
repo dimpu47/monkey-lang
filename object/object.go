@@ -74,6 +74,7 @@ type Type string
 // `Type()` and `Inspect()` functions
 type Object interface {
 	Type() Type
+	String() string
 	Inspect() string
 }
 
@@ -81,6 +82,10 @@ type Object interface {
 // an internal int64 value
 type Integer struct {
 	Value int64
+}
+
+func (i *Integer) String() string {
+	return i.Inspect()
 }
 
 // Clone creates a new copy
@@ -100,6 +105,10 @@ type String struct {
 	Value string
 }
 
+func (s *String) String() string {
+	return s.Value
+}
+
 // Clone creates a new copy
 func (s *String) Clone() Object {
 	return &String{Value: s.Value}
@@ -109,12 +118,16 @@ func (s *String) Clone() Object {
 func (s *String) Type() Type { return STRING }
 
 // Inspect returns a stringified version of the object for debugging
-func (s *String) Inspect() string { return s.Value }
+func (s *String) Inspect() string { return fmt.Sprintf("%#v", s.Value) }
 
 // Boolean is the boolean type and used to represent boolean literals and
 // holds an interval bool value
 type Boolean struct {
 	Value bool
+}
+
+func (b *Boolean) String() string {
+	return b.Inspect()
 }
 
 // Clone creates a new copy
@@ -131,6 +144,10 @@ func (b *Boolean) Inspect() string { return fmt.Sprintf("%t", b.Value) }
 // Null is the null type and used to represent the absence of a value
 type Null struct{}
 
+func (n *Null) String() string {
+	return n.Inspect()
+}
+
 // Type returns the type of the object
 func (n *Null) Type() Type { return NULL }
 
@@ -145,6 +162,10 @@ type Return struct {
 	Value Object
 }
 
+func (rv *Return) String() string {
+	return rv.Inspect()
+}
+
 // Type returns the type of the object
 func (rv *Return) Type() Type { return RETURN }
 
@@ -156,6 +177,10 @@ func (rv *Return) Inspect() string { return rv.Value.Inspect() }
 // encountered stops evaulation of the program or body of a function.
 type Error struct {
 	Message string
+}
+
+func (e *Error) String() string {
+	return e.Message
 }
 
 // Clone creates a new copy
@@ -177,6 +202,10 @@ type CompiledFunction struct {
 	NumParameters int
 }
 
+func (cf *CompiledFunction) String() string {
+	return cf.Inspect()
+}
+
 // Type returns the type of the object
 func (cf *CompiledFunction) Type() Type { return COMPILED_FUNCTION }
 
@@ -191,6 +220,10 @@ type Function struct {
 	Parameters []*ast.Identifier
 	Body       *ast.BlockStatement
 	Env        *Environment
+}
+
+func (f *Function) String() string {
+	return f.Inspect()
 }
 
 // Type returns the type of the object
@@ -223,6 +256,10 @@ type Builtin struct {
 	Fn   BuiltinFunction
 }
 
+func (b *Builtin) String() string {
+	return b.Inspect()
+}
+
 // Type returns the type of the object
 func (b *Builtin) Type() Type { return BUILTIN }
 
@@ -238,6 +275,10 @@ type Closure struct {
 	Free []Object
 }
 
+func (c *Closure) String() string {
+	return c.Inspect()
+}
+
 // Type returns the type of the object
 func (c *Closure) Type() Type { return CLOSURE }
 
@@ -249,6 +290,10 @@ func (c *Closure) Inspect() string {
 // Array is the array literal type that holds a slice of Object(s)
 type Array struct {
 	Elements []Object
+}
+
+func (ao *Array) String() string {
+	return ao.Inspect()
 }
 
 // Type returns the type of the object
@@ -312,6 +357,10 @@ type HashPair struct {
 // Hash is a hash map and holds a map of HashKey to HashPair(s)
 type Hash struct {
 	Pairs map[HashKey]HashPair
+}
+
+func (h *Hash) String() string {
+	return h.Inspect()
 }
 
 // Type returns the type of the object

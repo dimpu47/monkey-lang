@@ -166,8 +166,10 @@ func (r *REPL) StartEvalLoop(in io.Reader, out io.Writer, env *object.Environmen
 
 		obj := eval.Eval(program, env)
 		if obj != nil {
-			io.WriteString(out, obj.Inspect())
-			io.WriteString(out, "\n")
+			if _, ok := obj.(*object.Null); !ok {
+				io.WriteString(out, obj.Inspect())
+				io.WriteString(out, "\n")
+			}
 		}
 	}
 }
@@ -217,9 +219,11 @@ func (r *REPL) StartExecLoop(in io.Reader, out io.Writer, state *VMState) {
 			return
 		}
 
-		stackTop := machine.LastPopped()
-		io.WriteString(out, stackTop.Inspect())
-		io.WriteString(out, "\n")
+		obj := machine.LastPopped()
+		if _, ok := obj.(*object.Null); !ok {
+			io.WriteString(out, obj.Inspect())
+			io.WriteString(out, "\n")
+		}
 	}
 }
 
