@@ -148,3 +148,48 @@ if (5 < 10) {
 		}
 	}
 }
+
+func TestStringEscapes(t *testing.T) {
+	input := `#!./monkey-lang
+let a = "\"foo\""
+let b = "\x00\x0a\x7f"
+let c = "\r\n\t"
+`
+
+	tests := []struct {
+		expectedType    token.Type
+		expectedLiteral string
+	}{
+		{token.COMMENT, "!./monkey-lang"},
+		{token.LET, "let"},
+		{token.IDENT, "a"},
+		{token.ASSIGN, "="},
+		{token.STRING, "\"foo\""},
+		{token.LET, "let"},
+		{token.IDENT, "b"},
+		{token.ASSIGN, "="},
+		{token.STRING, "\x00\n\u007f"},
+		{token.LET, "let"},
+		{token.IDENT, "c"},
+		{token.ASSIGN, "="},
+		{token.STRING, "\r\n\t"},
+		{token.EOF, ""},
+	}
+
+	lexer := New(input)
+
+	for i, test := range tests {
+		token := lexer.NextToken()
+
+		if token.Type != test.expectedType {
+			t.Fatalf("tests[%d] - token type wrong. expected=%q, got=%q",
+				i, test.expectedType, token.Type)
+		}
+
+		if token.Literal != test.expectedLiteral {
+			t.Fatalf("tests[%d] - literal wrong. expected=%q, got=%q",
+				i, test.expectedLiteral, token.Literal)
+		}
+	}
+
+}

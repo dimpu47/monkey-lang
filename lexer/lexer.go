@@ -5,6 +5,7 @@ package lexer
 // parsing by the parser.
 
 import (
+	"encoding/hex"
 	"strings"
 
 	"github.com/prologic/monkey-lang/token"
@@ -138,8 +139,13 @@ func (l *Lexer) NextToken() token.Token {
 		tok.Literal = ""
 		tok.Type = token.EOF
 	case '"':
-		tok.Type = token.STRING
-		tok.Literal = l.readString()
+		str, err := l.readString()
+		if err != nil {
+			tok = newToken(token.ILLEGAL, l.prevCh)
+		} else {
+			tok.Type = token.STRING
+			tok.Literal = str
+		}
 	default:
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
@@ -155,6 +161,7 @@ func (l *Lexer) NextToken() token.Token {
 	}
 
 	l.readChar()
+
 	return tok
 }
 
@@ -185,14 +192,41 @@ func (l *Lexer) readLine() string {
 	return l.input[position:l.position]
 }
 
-func (l *Lexer) readString() string {
+func (l *Lexer) readString() (string, error) {
 	b := &strings.Builder{}
 	for {
 		l.readChar()
 
 		// Support some basic escapes like \"
-		if l.ch == '\\' && l.peekChar() == '"' {
+		if l.ch == '\\' {
+			switch l.peekChar() {
+			case '"':
+				b.WriteByte('"')
+			case 'n':
+				b.WriteByte('\n')
+			case 'r':
+				b.WriteByte('\r')
+			case 't':
+				b.WriteByte('\t')
+			case '\\':
+				b.WriteByte('\\')
+			case 'x':
+				// Skip over the the '\\', 'x' and the next two bytes (hex)
+				l.readChar()
+				l.readChar()
+				l.readChar()
+				src := string([]byte{l.prevCh, l.ch})
+				dst, err := hex.DecodeString(src)
+				if err != nil {
+					return "", err
+				}
+				b.Write(dst)
+				continue
+			}
+
+			// Skip over the '\\' and the matched single escape char
 			l.readChar()
+			continue
 		} else {
 			if l.ch == '"' || l.ch == 0 {
 				break
@@ -201,7 +235,8 @@ func (l *Lexer) readString() string {
 
 		b.WriteByte(l.ch)
 	}
-	return b.String()
+
+	return b.String(), nil
 }
 
 func (l *Lexer) skipWhitespace() {
