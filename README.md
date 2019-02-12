@@ -10,12 +10,24 @@ Monkey programming language interpreter designed in [_Writing An Interpreter In 
 A step-by-step walk-through where each commit is a fully working part.
 Read the book and follow along with the commit history.
 
+## Status
+
+> Currently working on a [self-host](https://github.com/prologic/monkey-lang/tree/self-host)
+> branch where I'm improving and modifying the original Monkey-lang implementation
+> to support writing Monkey in itself (*ala self-hosting*). So far I've managed to write a
+> [Brainfuck](https://github.com/prologic/monkey-lang/blob/self-host/examples/bf.monkey)
+> interpreter in Monkey with only a small number of improvements.
+
 ## Read and Follow
 
 > Read the books and follow along with the following commit history.
 (*This also happens to be the elapsed days I took to read both books!*)
 
 See: [Reading Guide](./ReadingGuide.md)
+
+> Please note that whilst reading the awesome books I slihtly modified this
+> version of Monkey-lang in some places. FOr example I opted to have a single
+> `RETURN` Opcode.
 
 ## Usage
 
