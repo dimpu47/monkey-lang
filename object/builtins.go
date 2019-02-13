@@ -17,6 +17,9 @@ var Builtins = map[string]*Builtin{
 	"pop":    &Builtin{Name: "pop", Fn: Pop},
 	"exit":   &Builtin{Name: "exit", Fn: Exit},
 	"assert": &Builtin{Name: "assert", Fn: Assert},
+	"bool":   &Builtin{Name: "bool", Fn: Bool},
+	"int":    &Builtin{Name: "int", Fn: Int},
+	"str":    &Builtin{Name: "str", Fn: Str},
 }
 
 // BuiltinsIndex ...
