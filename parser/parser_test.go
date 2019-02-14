@@ -414,6 +414,10 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 			"add(a * b[2], b[1], 2 * [1, 2][1])",
 			"add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))",
 		},
+		{
+			"d.foo * d.bar",
+			"((d[foo]) * (d[bar]))",
+		},
 	}
 
 	for _, tt := range tests {
@@ -1125,6 +1129,40 @@ func TestParsingArrayLiterals(t *testing.T) {
 	testIntegerLiteral(t, array.Elements[0], 1)
 	testInfixExpression(t, array.Elements[1], 2, "*", 2)
 	testInfixExpression(t, array.Elements[2], 3, "+", 3)
+}
+
+func TestParsingSelectorExpressions(t *testing.T) {
+	input := "myHash.foo"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	t.Logf("stmt: %#v", stmt)
+
+	exp, ok := stmt.Expression.(*ast.IndexExpression)
+	if !ok {
+		t.Fatalf("exp not *ast.IndexExpression. got=%T", stmt.Expression)
+	}
+
+	ident, ok := exp.Left.(*ast.Identifier)
+	if !ok {
+		t.Fatalf("exp.Left not *ast.Identifier. got=%T", stmt.Expression)
+	}
+
+	if !testIdentifier(t, ident, "myHash") {
+		return
+	}
+
+	index, ok := exp.Index.(*ast.StringLiteral)
+	if !ok {
+		t.Fatalf("exp.Index not *ast.StringLiteral. got=%T", stmt.Expression)
+	}
+
+	if index.Value != "foo" {
+		t.Fatalf("index.Value != \"foo\"")
+	}
 }
 
 func TestParsingIndexExpressions(t *testing.T) {

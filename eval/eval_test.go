@@ -699,6 +699,36 @@ func TestHashLiterals(t *testing.T) {
 	}
 }
 
+func TestHashSelectorExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			`{"foo": 5}.foo`,
+			5,
+		},
+		{
+			`{"foo": 5}.bar`,
+			nil,
+		},
+		{
+			`{}.foo`,
+			nil,
+		},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
+}
+
 func TestHashIndexExpressions(t *testing.T) {
 	tests := []struct {
 		input    string

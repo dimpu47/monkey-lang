@@ -381,6 +381,16 @@ func TestHashLiterals(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestSelectorExpressions(t *testing.T) {
+	tests := []vmTestCase{
+		{`{"foo": 5}.foo`, 5},
+		{`{"foo": 5}.bar`, nil},
+		{`{}.foo`, nil},
+	}
+
+	runVmTests(t, tests)
+}
+
 func TestIndexExpressions(t *testing.T) {
 	tests := []vmTestCase{
 		{"[1, 2, 3][1]", 2},

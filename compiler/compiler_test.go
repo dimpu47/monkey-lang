@@ -678,6 +678,25 @@ func TestHashLiterals(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestSelectorExpressions(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input:             `{"foo": 1}.foo`,
+			expectedConstants: []interface{}{"foo", 1, "foo"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.MakeHash, 2),
+				code.Make(code.LoadConstant, 2),
+				code.Make(code.GetItem),
+				code.Make(code.Pop),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func TestIndexExpressions(t *testing.T) {
 	tests := []compilerTestCase{
 		{

@@ -33,7 +33,7 @@ if (5 < 10) {
 "foo bar"
 [1, 2]
 {"foo": "bar"}
-"foo \"bar\""
+d.foo
 `
 
 	tests := []struct {
@@ -128,7 +128,9 @@ if (5 < 10) {
 		{token.COLON, ":"},
 		{token.STRING, "bar"},
 		{token.RBRACE, "}"},
-		{token.STRING, "foo \"bar\""},
+		{token.IDENT, "d"},
+		{token.DOT, "."},
+		{token.IDENT, "foo"},
 		{token.EOF, ""},
 	}
 
