@@ -165,6 +165,9 @@ one way of breaking out of a loop early inside a function.
 
 ### Functions and Closures
 
+You can define named or anonymous functions, including functions inside
+functions that reference outer variables (*closures*).
+
 ```sh
 >> multiply := fn(x, y) { x * y }
 >> multiply(50 / 2, 1 * 2)
@@ -181,12 +184,29 @@ one way of breaking out of a loop early inside a function.
 8
 ```
 
+**NOTE:** You cannot have a "bare return" -- it requires a return value.
+          So if you don't want to return anything
+          (*functions always return at least `null` anyway*),
+          just say `return null`.
+
 ### Recursive Functions
+
+Monkey also supports recursive functions including recursive functions defined
+in the scope of another function (*self-recursion*).
 
 ```#!sh
 >> wrapper := fn() { inner := fn(x) { if (x == 0) { return 2 } else { return inner(x - 1) } } return inner(1) }
 >> wrapper()
 2
+```
+
+Monkey also does tail
+call optimization and turns recursive tail-calls into iteration.
+
+```#!sh
+>> fib := fn(n, a, b) { if (n == 0) { return a } if (n == 1) { return b } return fib(n - 1, b, a + b) }
+>> fib(35, 0, 1)
+9227465
 ```
 
 ### Strings
@@ -224,28 +244,154 @@ yes, a boolean
 correct, an integer
 ```
 
+### Assignment Expressions
+
+Assignment can assign to a name, an array element by index, or a hash value by key.
+When assigning to a name (variable), it always assigns to the scope the variable was defined .
+
+To help with object-oriented programming, `obj.foo = bar` is syntactic sugar for `obj["foo"] = bar`. They're exactly equivalent.
+
+```
+i := 1
+func mutate() {
+    i = 2
+    print(i)
+}
+print(i)
+mutate()
+print(i)
+// 1
+// 2
+// 2
+
+map = {"a": 1}
+func mutate() {
+    map.a = 2
+    print(map.a)
+}
+print(map.a)
+mutate()
+print(map.a)
+// 1
+// 2
+// 2
+
+lst := [0, 1, 2]
+lst[1] = "one"
+print(lst)
+// [0, "one", 2]
+
+map = {"a": 1, "b": 2}
+map["a"] = 3
+map.c = 4
+print(map)
+// {"a": 3, "b": 2, "c": 4}
+```
+
+### Binary and unary operators
+
+Monkey supports pretty standard binary and unary operators.
+Here they are with their precedence, from highest to lowest
+(*operators of the same precedence evaluate left to right*):
+
+Operators      | Description
+-------------- | -----------
+`[] obj.keu`   | Subscript
+`-`            | Unary minus
+`* / %`        | Multiplication, Division, Modulo
+`+ -`          | Addition, Subtraction
+`< <= > >= in` | Comparison
+`== !=`        | Equality
+`!`            | Logical not
+`&`            | Logical and (short-circuit)
+<code>&#124;</code> | Logical or (short-circuit)
+
+Several of the operators are overloaded. Here are the types they can operate on:
+
+Operator   | Types           | Action
+---------- | --------------- | ------
+`[]`       | `str[int]`      | fetch nth byte of str (0-based)
+`[]`       | `array[int]`    | fetch nth element of array (0-based)
+`[]`       | `hash[str]`     | fetch hash value by key str
+`-`        | `int`           | negate int
+`*`        | `int * int`     | multiply ints
+`*`        | `str * int`     | repeat str n times (**TBD**)
+`*`        | `int * str`     | repeat str n times (**TBD**)
+`*`        | `array * int`   | repeat array n times, give new array (**TBD**)
+`*`        | `int * array`   | repeat array n times, give new array (**TBD**)
+`/`        | `int / int`     | divide ints, truncated
+`%`        | `int % int`     | divide ints, give remainder
+`+`        | `int + int`     | add ints
+`+`        | `str + str`     | concatenate strs, give new string
+`+`        | `array + array` | concatenate arrays, give new array (**TBD**)
+`+`        | `hash + hash`   | merge hashes into new hash, keys in right hash win (**TBD**)
+`-`        | `int - int`     | subtract ints
+`<`        | `int < int`     | true iff left < right
+`<`        | `str < str`     | true iff left < right (lexicographical)
+`<`        | `array < array` | true iff left < right (lexicographical, recursive)
+`<= > >=`  | same as `<`     | similar to `<`
+`in`       | `str in str`    | true iff left is substr of right
+`in`       | `any in array`  | true iff one of array elements == left (**TBD**)
+`in`       | `str in hash`   | true iff key in hash (**TBD**)
+`==`       | `any == any`    | deep equality (always false if different type)
+`!=`       | `any != any`    | same as `not ==`
+`!`        | `not bool`      | inverse of bool
+`&&`       | `bool and bool` | true iff both true, right not evaluated if left false
+<code>&#124;&#124;</code> | `bool or bool`  | true iff either true, right not evaluated if left true
+
 ### Builtin functions
 
-```sh
->> len("hello")
-5
->> len("∑")
-1
->> myArray := ["one", "two", "three"]
->> len(myArray)
-3
->> first(myArray)
-one
->> rest(myArray)
-[two, three]
->> last(myArray)
-three
->> push(myArray, "four")
-[one, two, three, four]
->> puts("Hello World")
-Hello World
-nil
-```
+- `len(iterable)`
+  Returns the length of the iterable (`str`, `array` or `hash`).
+- `input([prompt])`
+  Reads a line from standard input optionally printing `prompt`.
+- `print(value...)`
+  Prints the `value`(s) to standard output followed by a newline.
+- `first(array)`
+  Returns the first element of the `array`.
+- `last(array)`
+  Returns the last element of the `array`.
+- `rest(array)`
+  Returns a new array with the first element of `array` removed.
+- `push(array, value)`
+  Returns a new array with `value` pushed onto the end of `array`.
+- `pop(array)`
+  Returns the last value of the `array` or `null` if empty.
+- `exit([status])`
+  Exits the program immediately with the optional `status` or `0`.
+- `assert(expr, [msg])`
+  Exits the program immediately with a non-zero status if `expr` is `false`
+  optionally displaying `msg` to standard error.
+- `bool(value)`
+  Converts `value` to a `bool`. If `value` is `bool` returns the value directly.
+  Returns `true` for non-zero `int`(s), `false` otherwise. Returns `true` for
+  non-empty `str`, `array` and `hash` values. Returns `true` for all other
+  values except `null` which always returns `false`.
+- `int(value)`
+  Converts decimal `value` `str` to `int`. If `value` is invalid returns `null.
+  If `value` is an `int` returns its value directly.
+- `str(value)`
+  Returns the string representation of `value`: `null` for null,
+  `true` or `false` for `bool`, decimal for `int` (eg: `1234`),
+  the string itself for `str` (not quoted),
+  the Monkey representation for array and hash (eg: `[1, 2]` and `{"a": 1}`
+  with keys sorted), and something like `<fn name(...) at 0x...>` for functions..
+
+Coming soon... 
+
+- `args()`
+  Returns an array of command-line options passed to the program.
+- `find(haystack, needle)
+  Returns the index of `needle` `str` in `haystack` `str`,
+  or the index of `needle` element in `haystack` array.
+  Returns -1 if not found. (**TBD**)
+- `join(list, sep)` concatenates strs in list to form a single str, with the separator str between each element.
+- `lower(str)` returns a lowercased version of str.
+- `read([filename])` reads standard input or the given file and returns the contents as a str.
+- `sort(list[, func])` sorts the list in place using a stable sort, and returns nil. Elements in the list must be orderable with `<` (int, str, or list of those). If a key function is provided, it must take the element as an argument and return an orderable value to use as the sort key.
+- `split(str[, sep])` splits the str using given separator, and returns the parts (excluding the separator) as a list. If sep is not given or nil, it splits on whitespace.
+- `type(value)` returns a str denoting the type of value: `nil`, `bool`, `int`, `str`, `list`, `map`, or `func`.
+- `upper(str)` returns an uppercased version of str.
 
 ### Objects
 
