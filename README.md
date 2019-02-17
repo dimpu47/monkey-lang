@@ -69,6 +69,41 @@ Usage: monkey-lang [options] [<filename>]
 
 > See also: [examples](./examples)
 
+### Programs
+
+A Monkey program is simply zero or more statements. Statements don't actually
+have to be separated by newlines, only by whitespace. The following is a valid
+program (*but you'd probably use newlines in the`if` block in real life*):
+
+```
+s := "world"
+print("Hello, " + s)
+if (s != "") { t := "The end" print(t) }
+// Hello, world
+// The end
+```
+
+Between tokens, whitespace and comments
+(*lines starting with `//` or `#` through to the end of a line*)
+are ignored.
+
+### Types
+
+Monkey has the following data types: `null`, `bool`, `int`, `str`, `array`,
+`hash`, and `fn`. The `int` type is a signed 64-bit integer, strings are
+immutable arrays of bytes, arrays are growable arrays
+(*use the `append()` builtin*), and hashes are unordered hash maps.
+Trailing commas are **NOT** allowed after the last element in an array or hash:
+
+Type      | Syntax                                    | Comments
+--------- | ----------------------------------------- | -----------------------
+null      | `null`                                    |
+bool      | `true false`                              |
+int       | `0 42 1234 -5`                            | `-5` is actually `5` with unary `-`
+str       | `"" "foo" "\"quotes\" and a\nline break"` | Escapes: `\" \\ \t \r \n \t \xXX`
+array     | `[] [1, 2] [1, 2, 3]`                     |
+hash      | `{} {"a": 1} {"a": 1, "b": 2}`            |
+
 ### Variable Bindings
 
 ```#!sh
