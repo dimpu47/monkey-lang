@@ -42,6 +42,8 @@ const (
 	ASTERISK = "*"
 	// SLASH the division operator
 	SLASH = "/"
+	// PERCENT the modulo operator
+	PERCENT = "%"
 
 	// LT the less than comparision operator
 	LT = "<"

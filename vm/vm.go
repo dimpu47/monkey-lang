@@ -184,6 +184,8 @@ func (vm *VM) executeBinaryIntegerOperation(
 		result = leftValue * rightValue
 	case code.Div:
 		result = leftValue / rightValue
+	case code.Mod:
+		result = leftValue % rightValue
 	default:
 		return fmt.Errorf("unknown integer operator: %d", op)
 	}
@@ -698,7 +700,7 @@ func (vm *VM) Run() error {
 				return err
 			}
 
-		case code.Add, code.Sub, code.Mul, code.Div:
+		case code.Add, code.Sub, code.Mul, code.Div, code.Mod:
 			err := vm.executeBinaryOperation(op)
 			if err != nil {
 				return err
