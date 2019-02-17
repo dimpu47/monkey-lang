@@ -121,12 +121,28 @@ hash      | `{} {"a": 1} {"a": 1, "b": 2}`            |
 
 ### Conditional Expressions
 
+Monkey supports `if` and `else`:
+
 ```sh
 >> a := 10
 >> b := a * 2
 >> c := if (b > a) { 99 } else { 100 }
 >> c
 99
+```
+
+Monkey also supports `else if`:
+
+```#!sh
+>> test := fn(n) { if (n % 15 == 0) { return "FizzBuzz" } else if (n % 5 == 0) { return "Buzz" } else if (n % 3 == 0) { return "Fizz" } else { return str(n) } }
+>> test(1)
+"1"
+>> test(3)
+"Fizz"
+>> test(5)
+"Buzz"
+>> test(15)
+"FizzBuzz"
 ```
 
 ### Functions and Closures
