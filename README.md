@@ -145,6 +145,24 @@ Monkey also supports `else if`:
 "FizzBuzz"
 ```
 
+### While Loops
+
+Monkey supports only one looping construct, the `while` loop:
+
+```#!sh
+i := 3
+while (i > 0) {
+    print(i)
+    i = i - 1
+}
+// 3
+// 2
+// 1
+```
+
+Monkey does not have `break` or `continue`, but you can `return <value>` as
+one way of breaking out of a loop early inside a function.
+
 ### Functions and Closures
 
 ```sh
