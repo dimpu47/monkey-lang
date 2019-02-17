@@ -45,6 +45,21 @@ const (
 	// PERCENT the modulo operator
 	PERCENT = "%"
 
+	//
+	// Bitwise / Logical operators
+	//
+
+	// Bitwise AND
+	AND = "&" // && Logical AND
+	// Bitwise OR
+	OR = "|" // || Logical OR
+	// Bitwise XOR
+	XOR = "^"
+
+	//
+	// Comparision operators
+	//
+
 	// LT the less than comparision operator
 	LT = "<"
 	// LTE  the less than or equal comparision operator

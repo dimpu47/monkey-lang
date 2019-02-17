@@ -302,9 +302,9 @@ Operators      | Description
 `+ -`          | Addition, Subtraction
 `< <= > >= in` | Comparison
 `== !=`        | Equality
-`!`            | Logical not
-`&`            | Logical and (short-circuit)
-<code>&#124;</code> | Logical or (short-circuit)
+`!`            | Bitwise not / Logical not
+`&`            | Bitwise and
+<code>&#124;</code> | Bitwise or
 
 Several of the operators are overloaded. Here are the types they can operate on:
 

@@ -103,6 +103,12 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.ASTERISK, l.ch)
 	case '%':
 		tok = newToken(token.PERCENT, l.ch)
+	case '&':
+		tok = newToken(token.AND, l.ch)
+	case '|':
+		tok = newToken(token.OR, l.ch)
+	case '^':
+		tok = newToken(token.XOR, l.ch)
 	case '<':
 		if l.peekChar() == '=' {
 			l.readChar()

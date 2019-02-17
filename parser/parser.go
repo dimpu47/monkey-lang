@@ -15,6 +15,9 @@ const (
 	ASSIGN      // := or =
 	EQUALS      // ==
 	LESSGREATER // > or <
+	OR          // |
+	XOR         // ^
+	AND         // &
 	SUM         // + or -
 	PRODUCT     // * / or %
 	PREFIX      // -X or !X
@@ -32,6 +35,9 @@ var precedences = map[token.Type]int{
 	token.GT:       LESSGREATER,
 	token.LTE:      LESSGREATER,
 	token.GTE:      LESSGREATER,
+	token.OR:       OR,
+	token.XOR:      XOR,
+	token.AND:      AND,
 	token.PLUS:     SUM,
 	token.MINUS:    SUM,
 	token.SLASH:    PRODUCT,
@@ -84,6 +90,9 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.SLASH, p.parseInfixExpression)
 	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
 	p.registerInfix(token.PERCENT, p.parseInfixExpression)
+	p.registerInfix(token.OR, p.parseInfixExpression)
+	p.registerInfix(token.XOR, p.parseInfixExpression)
+	p.registerInfix(token.AND, p.parseInfixExpression)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
 	p.registerInfix(token.NEQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)

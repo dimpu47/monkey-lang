@@ -450,6 +450,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.emit(code.Div)
 		case "%":
 			c.emit(code.Mod)
+		case "|":
+			c.emit(code.BitwiseOR)
+		case "^":
+			c.emit(code.BitwiseXOR)
+		case "&":
+			c.emit(code.BitwiseAND)
 		case ">":
 			c.emit(code.GreaterThan)
 		case ">=":
