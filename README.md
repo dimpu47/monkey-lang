@@ -61,11 +61,11 @@ Usage: monkey-lang [options] [<filename>]  -d	enable debug mode
 ### Variable bindings and arithmetic expressions
 
 ```sh
->> let a = 10;
->> let b = a * 2;
+>> a := 10;
+>> b := a * 2;
 >> (a + b) / 2 - 3;
 12
->> let c = 2.5;
+>> c := 2.5;
 >> b + c
 22.5
 ```
@@ -73,9 +73,9 @@ Usage: monkey-lang [options] [<filename>]  -d	enable debug mode
 ### If expressions
 
 ```sh
->> let a = 10;
->> let b = a * 2;
->> let c = if (b > a) { 99 } else { 100 };
+>> a := 10;
+>> b := a * 2;
+>> c := if (b > a) { 99 } else { 100 };
 >> c
 99
 ```
@@ -83,17 +83,17 @@ Usage: monkey-lang [options] [<filename>]  -d	enable debug mode
 ### Functions and closures
 
 ```sh
->> let multiply = fn(x, y) { x * y };
+>> multiply := fn(x, y) { x * y };
 >> multiply(50 / 2, 1 * 2)
 50
 >> fn(x) { x + 10 }(10)
 20
->> let newAdder = fn(x) { fn(y) { x + y }; };
->> let addTwo = newAdder(2);
+>> newAdder := fn(x) { fn(y) { x + y }; };
+>> addTwo := newAdder(2);
 >> addTwo(3);
 5
->> let sub = fn(a, b) { a - b };
->> let applyFunc = fn(a, b, func) { func(a, b) };
+>> sub := fn(a, b) { a - b };
+>> applyFunc := fn(a, b, func) { func(a, b) };
 >> applyFunc(10, 2, sub);
 8
 ```
@@ -101,8 +101,8 @@ Usage: monkey-lang [options] [<filename>]  -d	enable debug mode
 ### Strings
 
 ```sh
->> let makeGreeter = fn(greeting) { fn(name) { greeting + " " + name + "!" } };
->> let hello = makeGreeter("Hello");
+>> makeGreeter := fn(greeting) { fn(name) { greeting + " " + name + "!" } };
+>> hello := makeGreeter("Hello");
 >> hello("skatsuta");
 Hello skatsuta!
 ```
@@ -110,7 +110,7 @@ Hello skatsuta!
 ### Arrays
 
 ```sh
->> let myArray = ["Thorsten", "Ball", 28, fn(x) { x * x }];
+>> myArray := ["Thorsten", "Ball", 28, fn(x) { x * x }];
 >> myArray[0]
 Thorsten
 >> myArray[4 - 2]
@@ -122,7 +122,7 @@ Thorsten
 ### Hashes
 
 ```sh
->> let myHash = {"name": "Jimmy", "age": 72, true: "yes, a boolean", 99: "correct, an integer"};
+>> myHash := {"name": "Jimmy", "age": 72, true: "yes, a boolean", 99: "correct, an integer"};
 >> myHash["name"]
 Jimmy
 >> myHash["age"]
@@ -140,7 +140,7 @@ correct, an integer
 5
 >> len("∑");
 1
->> let myArray = ["one", "two", "three"];
+>> myArray := ["one", "two", "three"];
 >> len(myArray)
 3
 >> first(myArray)

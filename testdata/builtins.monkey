@@ -1,4 +1,4 @@
-let xs = [1, 2, 3]
+xs := [1, 2, 3]
 len(xs)
 
 first(xs)
@@ -9,5 +9,5 @@ pop(xs)
 
 len("foo")
 
-let x = input()
+x := input()
 print(x)

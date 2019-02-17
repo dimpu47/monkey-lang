@@ -13,12 +13,13 @@ syntax case match
 
 syntax keyword xType true false null
 
-syntax keyword xKeyword let fn if else return while
+syntax keyword xKeyword fn if else return while
 
 syntax keyword xFunction len input print first last rest push pop exit assert
 
 syntax keyword xOperator == != < > !
-syntax keyword xOperator + - * / =
+syntax keyword xOperator + - * /
+syntax keyword xOperator := =
 
 syntax region xString start=/"/ skip=/\\./ end=/"/
 

@@ -8,15 +8,15 @@ import (
 
 func TestNextToken(t *testing.T) {
 	input := `#!./monkey-lang
-let five = 5;
-let ten = 10;
+five := 5;
+ten := 10;
 
-let add = fn(x, y) {
+add := fn(x, y) {
   x + y;
 };
 
 # this is a comment
-let result = add(five, ten);
+result := add(five, ten);
 !-/*5;
 5 < 10 > 5;
 
@@ -41,19 +41,16 @@ d.foo
 		expectedLiteral string
 	}{
 		{token.COMMENT, "!./monkey-lang"},
-		{token.LET, "let"},
 		{token.IDENT, "five"},
-		{token.ASSIGN, "="},
+		{token.BIND, ":="},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
 		{token.IDENT, "ten"},
-		{token.ASSIGN, "="},
+		{token.BIND, ":="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
 		{token.IDENT, "add"},
-		{token.ASSIGN, "="},
+		{token.BIND, ":="},
 		{token.FUNCTION, "fn"},
 		{token.LPAREN, "("},
 		{token.IDENT, "x"},
@@ -68,9 +65,8 @@ d.foo
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
 		{token.COMMENT, " this is a comment"},
-		{token.LET, "let"},
 		{token.IDENT, "result"},
-		{token.ASSIGN, "="},
+		{token.BIND, ":="},
 		{token.IDENT, "add"},
 		{token.LPAREN, "("},
 		{token.IDENT, "five"},
@@ -153,9 +149,9 @@ d.foo
 
 func TestStringEscapes(t *testing.T) {
 	input := `#!./monkey-lang
-let a = "\"foo\""
-let b = "\x00\x0a\x7f"
-let c = "\r\n\t"
+a := "\"foo\""
+b := "\x00\x0a\x7f"
+c := "\r\n\t"
 `
 
 	tests := []struct {
@@ -163,17 +159,14 @@ let c = "\r\n\t"
 		expectedLiteral string
 	}{
 		{token.COMMENT, "!./monkey-lang"},
-		{token.LET, "let"},
 		{token.IDENT, "a"},
-		{token.ASSIGN, "="},
+		{token.BIND, ":="},
 		{token.STRING, "\"foo\""},
-		{token.LET, "let"},
 		{token.IDENT, "b"},
-		{token.ASSIGN, "="},
+		{token.BIND, ":="},
 		{token.STRING, "\x00\n\u007f"},
-		{token.LET, "let"},
 		{token.IDENT, "c"},
-		{token.ASSIGN, "="},
+		{token.BIND, ":="},
 		{token.STRING, "\r\n\t"},
 		{token.EOF, ""},
 	}

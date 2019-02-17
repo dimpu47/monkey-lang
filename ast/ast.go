@@ -74,36 +74,6 @@ func (c *Comment) String() string {
 	return out.String()
 }
 
-// LetStatement the `let` statement represents the AST node that binds an
-// expression to an identifier
-type LetStatement struct {
-	Token token.Token // the token.LET token
-	Name  *Identifier
-	Value Expression
-}
-
-func (ls *LetStatement) statementNode() {}
-
-// TokenLiteral prints the literal value of the token associated with this node
-func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
-
-// String returns a stringified version of the AST for debugging
-func (ls *LetStatement) String() string {
-	var out bytes.Buffer
-
-	out.WriteString(ls.TokenLiteral() + " ")
-	out.WriteString(ls.Name.String())
-	out.WriteString(" = ")
-
-	if ls.Value != nil {
-		out.WriteString(ls.Value.String())
-	}
-
-	out.WriteString(";")
-
-	return out.String()
-}
-
 // ReturnStatement represenets the `return` statement node
 type ReturnStatement struct {
 	Token       token.Token // the 'return' token
@@ -435,6 +405,30 @@ func (al *ArrayLiteral) String() string {
 	out.WriteString("[")
 	out.WriteString(strings.Join(elements, ", "))
 	out.WriteString("]")
+
+	return out.String()
+}
+
+// BindExpression represents a binding expression of the form:
+// x := 1
+type BindExpression struct {
+	Token token.Token // The := token
+	Left  Expression
+	Value Expression
+}
+
+func (be *BindExpression) expressionNode() {}
+
+// TokenLiteral prints the literal value of the token associated with this node
+func (be *BindExpression) TokenLiteral() string { return be.Token.Literal }
+
+// String returns a stringified version of the AST for debugging
+func (be *BindExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(be.Left.String())
+	out.WriteString(be.TokenLiteral())
+	out.WriteString(be.Value.String())
 
 	return out.String()
 }

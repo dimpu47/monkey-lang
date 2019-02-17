@@ -1,4 +1,4 @@
-let fact = fn(n) {
+fact := fn(n) {
   if (n == 0) {
     return 1
   }

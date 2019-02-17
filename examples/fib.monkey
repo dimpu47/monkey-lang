@@ -1,4 +1,4 @@
-let fib = fn(x) {
+fib := fn(x) {
   if (x == 0) {
     return 0
   }

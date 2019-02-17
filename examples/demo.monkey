@@ -1,21 +1,21 @@
-let name = "Monkey";
-let age = 1;
-let inspirations = ["Scheme", "Lisp", "JavaScript", "Clojure"];
-let book = {
+name := "Monkey";
+age := 1;
+inspirations := ["Scheme", "Lisp", "JavaScript", "Clojure"];
+book := {
   "title": "Writing A Compiler In Go",
   "author": "Thorsten Ball",
   "prequel": "Writing An Interpreter In Go"
 };
 
-let printBookName = fn(book) {
-    let title = book["title"];
-    let author = book["author"];
+printBookName := fn(book) {
+    title := book["title"];
+    author := book["author"];
     print(author + " - " + title);
 };
 
 printBookName(book);
 
-let fibonacci = fn(x) {
+fibonacci := fn(x) {
   if (x == 0) {
     return 0
   } else {
@@ -27,8 +27,8 @@ let fibonacci = fn(x) {
   }
 };
 
-let map = fn(arr, f) {
-  let iter = fn(arr, accumulated) {
+map := fn(arr, f) {
+  iter := fn(arr, accumulated) {
     if (len(arr) == 0) {
       return accumulated
     } else {
@@ -39,5 +39,5 @@ let map = fn(arr, f) {
   return iter(arr, []);
 };
 
-let numbers = [1, 1 + 1, 4 - 1, 2 * 2, 2 + 3, 12 / 2];
+numbers := [1, 1 + 1, 4 - 1, 2 * 2, 2 + 3, 12 / 2];
 map(numbers, fibonacci);

@@ -583,6 +583,11 @@ func (vm *VM) Run() error {
 				vm.globals[globalIndex] = ref
 			}
 
+			err := vm.push(Null)
+			if err != nil {
+				return err
+			}
+
 		case code.LoadGlobal:
 			globalIndex := code.ReadUint16(ins[ip+1:])
 			vm.currentFrame().ip += 2
@@ -603,6 +608,11 @@ func (vm *VM) Run() error {
 				vm.stack[frame.basePointer+int(localIndex)] = immutable.Clone()
 			} else {
 				vm.stack[frame.basePointer+int(localIndex)] = ref
+			}
+
+			err := vm.push(Null)
+			if err != nil {
+				return err
 			}
 
 		case code.LoadLocal:

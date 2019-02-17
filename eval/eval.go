@@ -54,18 +54,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		return &object.Return{Value: val}
 
-	case *ast.LetStatement:
-		val := Eval(node.Value, env)
-		if isError(val) {
-			return val
-		}
-
-		if immutable, ok := val.(object.Immutable); ok {
-			env.Set(node.Name.Value, immutable.Clone())
-		} else {
-			env.Set(node.Name.Value, val)
-		}
-
 	// Expressions
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
@@ -127,6 +115,23 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return elements[0]
 		}
 		return &object.Array{Elements: elements}
+
+	case *ast.BindExpression:
+		value := Eval(node.Value, env)
+		if isError(value) {
+			return value
+		}
+
+		if ident, ok := node.Left.(*ast.Identifier); ok {
+			if immutable, ok := value.(object.Immutable); ok {
+				env.Set(ident.Value, immutable.Clone())
+			} else {
+				env.Set(ident.Value, value)
+			}
+
+			return NULL
+		}
+		return newError("expected identifier on left got=%T", node.Left)
 
 	case *ast.AssignmentExpression:
 		left := Eval(node.Left, env)

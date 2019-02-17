@@ -12,7 +12,7 @@ import (
 const (
 	_ int = iota
 	LOWEST
-	ASSIGN      // =
+	ASSIGN      // := or =
 	EQUALS      // ==
 	LESSGREATER // > or <
 	SUM         // +
@@ -24,6 +24,7 @@ const (
 )
 
 var precedences = map[token.Type]int{
+	token.BIND:     ASSIGN,
 	token.ASSIGN:   ASSIGN,
 	token.EQ:       EQUALS,
 	token.NEQ:      EQUALS,
@@ -95,6 +96,7 @@ func New(l *lexer.Lexer) *Parser {
 
 	p.registerPrefix(token.LBRACE, p.parseHashLiteral)
 
+	p.registerInfix(token.BIND, p.parseBindExpression)
 	p.registerInfix(token.ASSIGN, p.parseAssignmentExpression)
 	p.registerInfix(token.DOT, p.parseSelectorExpression)
 
@@ -167,8 +169,6 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.COMMENT:
 		return p.parseComment()
-	case token.LET:
-		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
@@ -178,34 +178,6 @@ func (p *Parser) parseStatement() ast.Statement {
 
 func (p *Parser) parseComment() ast.Statement {
 	return &ast.Comment{Token: p.curToken, Value: p.curToken.Literal}
-}
-
-func (p *Parser) parseLetStatement() *ast.LetStatement {
-	stmt := &ast.LetStatement{Token: p.curToken}
-
-	if !p.expectPeek(token.IDENT) {
-		return nil
-	}
-
-	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-
-	if !p.expectPeek(token.ASSIGN) {
-		return nil
-	}
-
-	p.nextToken()
-
-	stmt.Value = p.parseExpression(LOWEST)
-
-	if fl, ok := stmt.Value.(*ast.FunctionLiteral); ok {
-		fl.Name = stmt.Name.Value
-	}
-
-	if p.peekTokenIs(token.SEMICOLON) {
-		p.nextToken()
-	}
-
-	return stmt
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
@@ -524,6 +496,32 @@ func (p *Parser) parseSelectorExpression(exp ast.Expression) ast.Expression {
 	p.expectPeek(token.IDENT)
 	index := &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
 	return &ast.IndexExpression{Left: exp, Index: index}
+}
+
+func (p *Parser) parseBindExpression(exp ast.Expression) ast.Expression {
+	switch node := exp.(type) {
+	case *ast.Identifier:
+	default:
+		msg := fmt.Sprintf("expected identifier expression on left but got %T %#v", node, exp)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	be := &ast.BindExpression{Token: p.curToken, Left: exp}
+
+	p.nextToken()
+
+	be.Value = p.parseExpression(LOWEST)
+
+	// Correctly bind the function literal to its name so that self-recursive
+	// functions work. This is used by the compiler to emit LoadSelf so a ref
+	// to the current function is available.
+	if fl, ok := be.Value.(*ast.FunctionLiteral); ok {
+		ident := be.Left.(*ast.Identifier)
+		fl.Name = ident.Value
+	}
+
+	return be
 }
 
 func (p *Parser) parseAssignmentExpression(exp ast.Expression) ast.Expression {

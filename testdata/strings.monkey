@@ -1,2 +1,2 @@
-let s = "hello"
+s := "hello"
 s + " " + "world"

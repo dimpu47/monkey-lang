@@ -200,14 +200,14 @@ func TestWhileExpressions(t *testing.T) {
 		expected interface{}
 	}{
 		{"while (false) { }", nil},
-		{"let n = 0; while (n < 10) { let n = n + 1 }; n", 10},
-		{"let n = 10; while (n > 0) { let n = n - 1 }; n", 0},
-		{"let n = 0; while (n < 10) { let n = n + 1 }", nil},
-		{"let n = 10; while (n > 0) { let n = n - 1 }", nil},
-		{"let n = 0; while (n < 10) { n = n + 1 }; n", 10},
-		{"let n = 10; while (n > 0) { n = n - 1 }; n", 0},
-		{"let n = 0; while (n < 10) { n = n + 1 }", nil},
-		{"let n = 10; while (n > 0) { n = n - 1 }", nil},
+		{"n := 0; while (n < 10) { n := n + 1 }; n", 10},
+		{"n := 10; while (n > 0) { n := n - 1 }; n", 0},
+		{"n := 0; while (n < 10) { n := n + 1 }", nil},
+		{"n := 10; while (n > 0) { n := n - 1 }", nil},
+		{"n := 0; while (n < 10) { n = n + 1 }; n", 10},
+		{"n := 10; while (n > 0) { n = n - 1 }; n", 0},
+		{"n := 0; while (n < 10) { n = n + 1 }", nil},
+		{"n := 10; while (n > 0) { n = n - 1 }", nil},
 	}
 
 	for _, tt := range tests {
@@ -335,7 +335,7 @@ func TestIndexAssignmentStatements(t *testing.T) {
 		input    string
 		expected int64
 	}{
-		{"let xs  = [1, 2, 3]; xs[1] = 4; xs[1];", 4},
+		{"xs := [1, 2, 3]; xs[1] = 4; xs[1];", 4},
 	}
 
 	for _, tt := range tests {
@@ -349,16 +349,16 @@ func TestAssignmentExpressions(t *testing.T) {
 		input    string
 		expected interface{}
 	}{
-		{"let a = 0; a = 5;", nil},
-		{"let a = 0; a = 5; a;", 5},
-		{"let a = 0; a = 5 * 5;", nil},
-		{"let a = 0; a = 5 * 5; a;", 25},
-		{"let a = 0; a = 5; let b = 0; b = a;", nil},
-		{"let a = 0; a = 5; let b = 0; b = a; b;", 5},
-		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5;", nil},
-		{"let a = 0; a = 5; let b = 0; b = a; let c = 0; c = a + b + 5; c;", 15},
-		{"let a = 5; let b = a; a = 0;", nil},
-		{"let a = 5; let b = a; a = 0; b;", 5},
+		{"a := 0; a = 5;", nil},
+		{"a := 0; a = 5; a;", 5},
+		{"a := 0; a = 5 * 5;", nil},
+		{"a := 0; a = 5 * 5; a;", 25},
+		{"a := 0; a = 5; b := 0; b = a;", nil},
+		{"a := 0; a = 5; b := 0; b = a; b;", 5},
+		{"a := 0; a = 5; b := 0; b = a; c := 0; c = a + b + 5;", nil},
+		{"a := 0; a = 5; b := 0; b = a; c := 0; c = a + b + 5; c;", 15},
+		{"a := 5; b := a; a = 0;", nil},
+		{"a := 5; b := a; a = 0; b;", 5},
 	}
 
 	for _, tt := range tests {
@@ -372,15 +372,15 @@ func TestAssignmentExpressions(t *testing.T) {
 	}
 }
 
-func TestLetStatements(t *testing.T) {
+func TestBindExpressions(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected int64
 	}{
-		{"let a = 5; a;", 5},
-		{"let a = 5 * 5; a;", 25},
-		{"let a = 5; let b = a; b;", 5},
-		{"let a = 5; let b = a; let c = a + b + 5; c;", 15},
+		{"a := 5; a;", 5},
+		{"a := 5 * 5; a;", 25},
+		{"a := 5; b := a; b;", 5},
+		{"a := 5; b := a; c := a + b + 5; c;", 15},
 	}
 
 	for _, tt := range tests {
@@ -418,11 +418,11 @@ func TestFunctionApplication(t *testing.T) {
 		input    string
 		expected int64
 	}{
-		{"let identity = fn(x) { x; }; identity(5);", 5},
-		{"let identity = fn(x) { return x; }; identity(5);", 5},
-		{"let double = fn(x) { x * 2; }; double(5);", 10},
-		{"let add = fn(x, y) { x + y; }; add(5, 5);", 10},
-		{"let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
+		{"identity := fn(x) { x; }; identity(5);", 5},
+		{"identity := fn(x) { return x; }; identity(5);", 5},
+		{"double := fn(x) { x * 2; }; double(5);", 10},
+		{"add := fn(x, y) { x + y; }; add(5, 5);", 10},
+		{"add := fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
 		{"fn(x) { x; }(5)", 5},
 	}
 
@@ -433,12 +433,14 @@ func TestFunctionApplication(t *testing.T) {
 
 func TestClosures(t *testing.T) {
 	input := `
-let newAdder = fn(x) {
-  fn(y) { x + y };
-};
+	newAdder := fn(x) {
+	  fn(y) { x + y };
+	};
 
-let addTwo = newAdder(2);
-addTwo(2);`
+	addTwo := newAdder(2);
+	addTwo(2);
+	`
+
 	testIntegerObject(t, testEval(input), 4)
 }
 
@@ -474,7 +476,7 @@ func TestStringIndexExpressions(t *testing.T) {
 			"c",
 		},
 		{
-			`let i = 0; "abc"[i];`,
+			`i := 0; "abc"[i];`,
 			"a",
 		},
 		{
@@ -482,7 +484,7 @@ func TestStringIndexExpressions(t *testing.T) {
 			"c",
 		},
 		{
-			`let myString = "abc"; myString[0] + myString[1] + myString[2];`,
+			`myString := "abc"; myString[0] + myString[1] + myString[2];`,
 			"abc",
 		},
 		{
@@ -619,7 +621,7 @@ func TestArrayIndexExpressions(t *testing.T) {
 			3,
 		},
 		{
-			"let i = 0; [1][i];",
+			"i := 0; [1][i];",
 			1,
 		},
 		{
@@ -627,15 +629,15 @@ func TestArrayIndexExpressions(t *testing.T) {
 			3,
 		},
 		{
-			"let myArray = [1, 2, 3]; myArray[2];",
+			"myArray := [1, 2, 3]; myArray[2];",
 			3,
 		},
 		{
-			"let myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];",
+			"myArray := [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];",
 			6,
 		},
 		{
-			"let myArray = [1, 2, 3]; let i = myArray[0]; myArray[i]",
+			"myArray := [1, 2, 3]; i := myArray[0]; myArray[i]",
 			2,
 		},
 		{
@@ -660,7 +662,7 @@ func TestArrayIndexExpressions(t *testing.T) {
 }
 
 func TestHashLiterals(t *testing.T) {
-	input := `let two = "two";
+	input := `two := "two";
     {
         "one": 10 - 9,
         two: 1 + 1,
@@ -743,7 +745,7 @@ func TestHashIndexExpressions(t *testing.T) {
 			nil,
 		},
 		{
-			`let key = "foo"; {"foo": 5}[key]`,
+			`key := "foo"; {"foo": 5}[key]`,
 			5,
 		},
 		{

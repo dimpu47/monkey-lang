@@ -28,6 +28,8 @@ const (
 	// Operators
 	//
 
+	// BIND the bind operator
+	BIND = ":="
 	// ASSIGN the assignment operator
 	ASSIGN = "="
 	// PLUS the addition operator
@@ -88,8 +90,6 @@ const (
 
 	// FUNCTION the `fn` keyword (function)
 	FUNCTION = "FUNCTION"
-	// LET the `let` keyword (let)
-	LET = "LET"
 	// TRUE the `true` keyword (true)
 	TRUE = "TRUE"
 	// FALSE the `false` keyword (false)
@@ -108,7 +108,6 @@ const (
 
 var keywords = map[string]Type{
 	"fn":     FUNCTION,
-	"let":    LET,
 	"true":   TRUE,
 	"false":  FALSE,
 	"null":   NULL,

@@ -19,7 +19,7 @@ func TestComments(t *testing.T) {
 		{"#!monkey", "!monkey"},
 		{"# foo", " foo"},
 		{"  # foo", " foo"},
-		{"  // let x = 1", " let x = 1"},
+		{"  // x := 1", " x := 1"},
 	}
 
 	for _, tt := range tests {
@@ -64,15 +64,16 @@ func TestAssignmentExpressions(t *testing.T) {
 	}
 }
 
-func TestLetStatements(t *testing.T) {
+func TestBindExpressions(t *testing.T) {
+	assert := assert.New(t)
+
 	tests := []struct {
-		input              string
-		expectedIdentifier string
-		expectedValue      interface{}
+		input    string
+		expected string
 	}{
-		{"let x = 5;", "x", 5},
-		{"let y = true;", "y", true},
-		{"let foobar = y;", "foobar", "y"},
+		{"x := 5;", "x:=5"},
+		{"y := true;", "y:=true"},
+		{"foobar := y;", "foobar:=y"},
 	}
 
 	for _, tt := range tests {
@@ -81,20 +82,7 @@ func TestLetStatements(t *testing.T) {
 		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
-		if len(program.Statements) != 1 {
-			t.Fatalf("program.Statements does not contain 1 statements. got=%d",
-				len(program.Statements))
-		}
-
-		stmt := program.Statements[0]
-		if !testLetStatement(t, stmt, tt.expectedIdentifier) {
-			return
-		}
-
-		val := stmt.(*ast.LetStatement).Value
-		if !testLiteralExpression(t, val, tt.expectedValue) {
-			return
-		}
+		assert.Equal(tt.expected, program.String())
 	}
 }
 
@@ -773,37 +761,16 @@ func TestFunctionLiteralParsing(t *testing.T) {
 }
 
 func TestFunctionDefinitionParsing(t *testing.T) {
-	input := `let add = fn(x, y) { x + y; }`
+	assert := assert.New(t)
+
+	input := `add := fn(x, y) { x + y; }`
 
 	l := lexer.New(input)
 	p := New(l)
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
 
-	if len(program.Statements) != 1 {
-		t.Fatalf("program.Body does not contain %d statements. got=%d\n",
-			1, len(program.Statements))
-	}
-
-	stmt, ok := program.Statements[0].(*ast.LetStatement)
-	if !ok {
-		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
-			program.Statements[0])
-	}
-
-	function, ok := stmt.Value.(*ast.FunctionLiteral)
-	if !ok {
-		t.Fatalf("stmt.Value is not ast.FunctionLiteral. got=%T",
-			stmt.Value)
-	}
-
-	if function.Name != "add" {
-		t.Fatalf("function literal name wrong. want 'add', got=%q\n",
-			function.Name)
-	}
-
-	testLiteralExpression(t, function.Parameters[0], "x")
-	testLiteralExpression(t, function.Parameters[1], "y")
+	assert.Equal("add:=fn add(x, y) (x + y)", program.String())
 }
 
 func TestFunctionParameterParsing(t *testing.T) {
@@ -937,32 +904,6 @@ func testComment(t *testing.T, s ast.Statement, expected string) bool {
 
 	if comment.Value != expected {
 		t.Errorf("comment.Value not '%s'. got=%s", expected, comment.Value)
-		return false
-	}
-
-	return true
-}
-
-func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
-	if s.TokenLiteral() != "let" {
-		t.Errorf("s.TokenLiteral not 'let'. got=%q", s.TokenLiteral())
-		return false
-	}
-
-	letStmt, ok := s.(*ast.LetStatement)
-	if !ok {
-		t.Errorf("s not *ast.LetStatement. got=%T", s)
-		return false
-	}
-
-	if letStmt.Name.Value != name {
-		t.Errorf("letStmt.Name.Value not '%s'. got=%s", name, letStmt.Name.Value)
-		return false
-	}
-
-	if letStmt.Name.TokenLiteral() != name {
-		t.Errorf("letStmt.Name.TokenLiteral() not '%s'. got=%s",
-			name, letStmt.Name.TokenLiteral())
 		return false
 	}
 

@@ -198,6 +198,37 @@ func (c *Compiler) Compile(node ast.Node) error {
 			}
 		}
 
+	case *ast.BindExpression:
+		var symbol Symbol
+
+		if ident, ok := node.Left.(*ast.Identifier); ok {
+			symbol, ok = c.symbolTable.Resolve(ident.Value)
+			if !ok {
+				symbol = c.symbolTable.Define(ident.Value)
+			} else {
+				// Local shadowing of previously defined "free" variable in a
+				// function now begin rehound to a locally scopped variable.
+				if symbol.Scope == FreeScope {
+					symbol = c.symbolTable.Define(ident.Value)
+				}
+			}
+
+			c.l++
+			err := c.Compile(node.Value)
+			c.l--
+			if err != nil {
+				return err
+			}
+
+			if symbol.Scope == GlobalScope {
+				c.emit(code.BindGlobal, symbol.Index)
+			} else {
+				c.emit(code.BindLocal, symbol.Index)
+			}
+		} else {
+			return fmt.Errorf("expected identifier got=%s", node.Left)
+		}
+
 	case *ast.AssignmentExpression:
 		if ident, ok := node.Left.(*ast.Identifier); ok {
 			symbol, ok := c.symbolTable.Resolve(ident.Value)
@@ -242,36 +273,6 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.emit(code.SetItem)
 		} else {
 			return fmt.Errorf("expected identifier or index expression got=%s", node.Left)
-		}
-
-	case *ast.LetStatement:
-		var (
-			ok     bool
-			symbol Symbol
-		)
-
-		symbol, ok = c.symbolTable.Resolve(node.Name.Value)
-		if !ok {
-			symbol = c.symbolTable.Define(node.Name.Value)
-		} else {
-			// Local shadowing of previously defined "free" variable in a
-			// function now begin rehound to a locally scopped variable.
-			if symbol.Scope == FreeScope {
-				symbol = c.symbolTable.Define(node.Name.Value)
-			}
-		}
-
-		c.l++
-		err := c.Compile(node.Value)
-		c.l--
-		if err != nil {
-			return err
-		}
-
-		if symbol.Scope == GlobalScope {
-			c.emit(code.BindGlobal, symbol.Index)
-		} else {
-			c.emit(code.BindLocal, symbol.Index)
 		}
 
 	case *ast.Identifier:

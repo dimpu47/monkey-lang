@@ -1,4 +1,4 @@
-let fib = fn(n, a, b) {
+fib := fn(n, a, b) {
   if (n == 0) {
     return a
   }

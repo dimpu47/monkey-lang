@@ -13,6 +13,8 @@ import (
 	"github.com/prologic/monkey-lang/parser"
 )
 
+type Instructions string
+
 func parse(input string) *ast.Program {
 	l := lexer.New(input)
 	p := parser.New(l)
@@ -92,14 +94,13 @@ func testConstants2(t *testing.T, expected []interface{}, actual []object.Object
 	for i, constant := range expected {
 		switch constant := constant.(type) {
 
-		case []code.Instructions:
-			fn, ok := actual[i].(*object.CompiledFunction)
-			assert.True(ok)
-			assert.Equal(constant, fn.Instructions.String())
-
+		case Instructions:
+			assert.Equal(
+				string(constant),
+				actual[i].(*object.CompiledFunction).Instructions.String(),
+			)
 		case string:
 			assert.Equal(constant, actual[i].(*object.String).Value)
-
 		case int:
 			assert.Equal(int64(constant), actual[i].(*object.Integer).Value)
 		}
@@ -393,98 +394,31 @@ func TestBooleanExpressions(t *testing.T) {
 }
 
 func TestConditionals(t *testing.T) {
-	tests := []compilerTestCase{
+	tests := []compilerTestCase2{
 		{
 			input: `
             if (true) { 10 }; 3333;
             `,
-			expectedConstants: []interface{}{10, 3333},
-			expectedInstructions: []code.Instructions{
-				// 0000
-				code.Make(code.LoadTrue),
-				// 0001
-				code.Make(code.JumpIfFalse, 10),
-				// 0004
-				code.Make(code.LoadConstant, 0),
-				// 0007
-				code.Make(code.Jump, 11),
-				// 0010
-				code.Make(code.LoadNull),
-				// 0011
-				code.Make(code.Pop),
-				// 0012
-				code.Make(code.LoadConstant, 1),
-				// 0015
-				code.Make(code.Pop),
-			},
+			constants:    []interface{}{10, 3333},
+			instructions: "0000 LoadTrue\n0001 JumpIfFalse 10\n0004 LoadConstant 0\n0007 Jump 11\n0010 LoadNull\n0011 Pop\n0012 LoadConstant 1\n0015 Pop\n",
 		},
 		{
 			input: `
             if (true) { 10 } else { 20 }; 3333;
             `,
-			expectedConstants: []interface{}{10, 20, 3333},
-			expectedInstructions: []code.Instructions{
-				// 0000
-				code.Make(code.LoadTrue),
-				// 0001
-				code.Make(code.JumpIfFalse, 10),
-				// 0004
-				code.Make(code.LoadConstant, 0),
-				// 0008
-				code.Make(code.Jump, 13),
-				// 0011
-				code.Make(code.LoadConstant, 1),
-				// 0014
-				code.Make(code.Pop),
-				// 0015
-				code.Make(code.LoadConstant, 2),
-				// 0018
-				code.Make(code.Pop),
-			},
+			constants:    []interface{}{10, 20, 3333},
+			instructions: "0000 LoadTrue\n0001 JumpIfFalse 10\n0004 LoadConstant 0\n0007 Jump 13\n0010 LoadConstant 1\n0013 Pop\n0014 LoadConstant 2\n0017 Pop\n",
 		},
 		{
 			input: `
-			let x = 0; if (true) { x = 1; }; if (false) { x = 2; }
+			x := 0; if (true) { x = 1; }; if (false) { x = 2; }
             `,
-			expectedConstants: []interface{}{0, 1, 2},
-			expectedInstructions: []code.Instructions{
-				// 0000
-				code.Make(code.LoadConstant, 0),
-				// 0003
-				code.Make(code.BindGlobal, 0),
-				// 0006
-				code.Make(code.LoadTrue),
-				// 0007
-				code.Make(code.JumpIfFalse, 19),
-				// 0010
-				code.Make(code.LoadConstant, 1),
-				// 0013
-				code.Make(code.AssignGlobal, 0),
-				// 0018
-				code.Make(code.Jump, 20),
-				// 0019
-				code.Make(code.LoadNull),
-				// 0020
-				code.Make(code.Pop),
-				// 0021
-				code.Make(code.LoadFalse),
-				// 0022
-				code.Make(code.JumpIfFalse, 34),
-				// 0024
-				code.Make(code.LoadConstant, 2),
-				// 0028
-				code.Make(code.AssignGlobal, 0),
-				// 0032
-				code.Make(code.Jump, 35),
-				// 0035
-				code.Make(code.LoadNull),
-				// 0036
-				code.Make(code.Pop),
-			},
+			constants:    []interface{}{0, 1, 2},
+			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 Pop\n0007 LoadTrue\n0008 JumpIfFalse 20\n0011 LoadConstant 1\n0014 AssignGlobal 0\n0017 Jump 21\n0020 LoadNull\n0021 Pop\n0022 LoadFalse\n0023 JumpIfFalse 35\n0026 LoadConstant 2\n0029 AssignGlobal 0\n0032 Jump 36\n0035 LoadNull\n0036 Pop\n",
 		},
 	}
 
-	runCompilerTests(t, tests)
+	runCompilerTests2(t, tests)
 }
 
 func TestIteration(t *testing.T) {
@@ -516,53 +450,36 @@ func TestIteration(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
-func TestGlobalLetStatements(t *testing.T) {
-	tests := []compilerTestCase{
+func TestGlobalBindExpressions(t *testing.T) {
+	tests := []compilerTestCase2{
 		{
 			input: `
-            let one = 1;
-            let two = 2;
+			one := 1;
+			two := 2;
             `,
-			expectedConstants: []interface{}{1, 2},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadConstant, 0),
-				code.Make(code.BindGlobal, 0),
-				code.Make(code.LoadConstant, 1),
-				code.Make(code.BindGlobal, 1),
-			},
+			constants:    []interface{}{1, 2},
+			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 Pop\n0007 LoadConstant 1\n0010 BindGlobal 1\n0013 Pop\n",
 		},
 		{
 			input: `
-            let one = 1;
+			one := 1;
             one;
             `,
-			expectedConstants: []interface{}{1},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadConstant, 0),
-				code.Make(code.BindGlobal, 0),
-				code.Make(code.LoadGlobal, 0),
-				code.Make(code.Pop),
-			},
+			constants:    []interface{}{1},
+			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 Pop\n0007 LoadGlobal 0\n0010 Pop\n",
 		},
 		{
 			input: `
-            let one = 1;
-            let two = one;
+			one := 1;
+			two := one;
             two;
             `,
-			expectedConstants: []interface{}{1},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadConstant, 0),
-				code.Make(code.BindGlobal, 0),
-				code.Make(code.LoadGlobal, 0),
-				code.Make(code.BindGlobal, 1),
-				code.Make(code.LoadGlobal, 1),
-				code.Make(code.Pop),
-			},
+			constants:    []interface{}{1},
+			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 Pop\n0007 LoadGlobal 0\n0010 BindGlobal 1\n0013 Pop\n0014 LoadGlobal 1\n0017 Pop\n",
 		},
 	}
 
-	runCompilerTests(t, tests)
+	runCompilerTests2(t, tests)
 }
 
 func TestStringExpressions(t *testing.T) {
@@ -859,112 +776,64 @@ func TestCompilerScopes(t *testing.T) {
 }
 
 func TestFunctionCalls(t *testing.T) {
-	tests := []compilerTestCase{
+	tests := []compilerTestCase2{
 		{
 			input: `fn() { return 24 }();`,
-			expectedConstants: []interface{}{
+			constants: []interface{}{
 				24,
-				[]code.Instructions{
-					code.Make(code.LoadConstant, 0), // The literal "24"
-					code.Make(code.Return),
-				},
+				Instructions("0000 LoadConstant 0\n0003 Return\n"),
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.MakeClosure, 1, 0), // The compiled function
-				code.Make(code.Call, 0),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 MakeClosure 1 0\n0004 Call 0\n0006 Pop\n",
 		},
 		{
 			input: `
-            let noArg = fn() { return 24 };
+			noArg := fn() { return 24 };
             noArg();
             `,
-			expectedConstants: []interface{}{
+			constants: []interface{}{
 				24,
-				[]code.Instructions{
-					code.Make(code.SetSelf, 0),
-					code.Make(code.LoadConstant, 0), // The literal "24"
-					code.Make(code.Return),
-				},
+				Instructions("0000 SetSelf 0\n0002 LoadConstant 0\n0005 Return\n"),
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadGlobal, 0),
-				code.Make(code.MakeClosure, 1, 1), // The compiled function
-				code.Make(code.BindGlobal, 0),
-				code.Make(code.LoadGlobal, 0),
-				code.Make(code.Call, 0),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 LoadGlobal 0\n0003 MakeClosure 1 1\n0007 BindGlobal 0\n0010 Pop\n0011 LoadGlobal 0\n0014 Call 0\n0016 Pop\n",
 		},
 		{
 			input: `
-            let oneArg = fn(a) { return a };
+			oneArg := fn(a) { return a };
             oneArg(24);
             `,
-			expectedConstants: []interface{}{
-				[]code.Instructions{
-					code.Make(code.SetSelf, 0),
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.Return),
-				},
+			constants: []interface{}{
+				Instructions("0000 SetSelf 0\n0002 LoadLocal 0\n0004 Return\n"),
 				24,
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadGlobal, 0),
-				code.Make(code.MakeClosure, 0, 1),
-				code.Make(code.BindGlobal, 0),
-				code.Make(code.LoadGlobal, 0),
-				code.Make(code.LoadConstant, 1),
-				code.Make(code.Call, 1),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 LoadGlobal 0\n0003 MakeClosure 0 1\n0007 BindGlobal 0\n0010 Pop\n0011 LoadGlobal 0\n0014 LoadConstant 1\n0017 Call 1\n0019 Pop\n",
 		},
 		{
 			input: `
-            let manyArg = fn(a, b, c) { a; b; return c };
+			manyArg := fn(a, b, c) { a; b; return c };
             manyArg(24, 25, 26);
             `,
-			expectedConstants: []interface{}{
-				[]code.Instructions{
-					code.Make(code.SetSelf, 0),
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.Pop),
-					code.Make(code.LoadLocal, 1),
-					code.Make(code.Pop),
-					code.Make(code.LoadLocal, 2),
-					code.Make(code.Return),
-				},
+			constants: []interface{}{
+				Instructions("0000 SetSelf 0\n0002 LoadLocal 0\n0004 Pop\n0005 LoadLocal 1\n0007 Pop\n0008 LoadLocal 2\n0010 Return\n"),
 				24,
 				25,
 				26,
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadGlobal, 0),
-				code.Make(code.MakeClosure, 0, 1),
-				code.Make(code.BindGlobal, 0),
-				code.Make(code.LoadGlobal, 0),
-				code.Make(code.LoadConstant, 1),
-				code.Make(code.LoadConstant, 2),
-				code.Make(code.LoadConstant, 3),
-				code.Make(code.Call, 3),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 LoadGlobal 0\n0003 MakeClosure 0 1\n0007 BindGlobal 0\n0010 Pop\n0011 LoadGlobal 0\n0014 LoadConstant 1\n0017 LoadConstant 2\n0020 LoadConstant 3\n0023 Call 3\n0025 Pop\n",
 		},
 	}
 
-	runCompilerTests(t, tests)
+	runCompilerTests2(t, tests)
 }
 
 func TestAssignmentExpressions(t *testing.T) {
 	tests := []compilerTestCase2{
 		{
 			input: `
-			let x = 1
+			x := 1
 			x = 2
 			`,
 			constants:    []interface{}{1, 2},
-			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 LoadConstant 1\n0009 AssignGlobal 0\n0012 Pop\n",
+			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 Pop\n0007 LoadConstant 1\n0010 AssignGlobal 0\n0013 Pop\n",
 		},
 	}
 
@@ -972,145 +841,90 @@ func TestAssignmentExpressions(t *testing.T) {
 }
 
 func TestAssignmentStatementScopes(t *testing.T) {
-	tests := []compilerTestCase{
+	tests := []compilerTestCase2{
 		{
 			input: `
-            let num = 0;
+			num := 0;
             fn() { num  = 55; }
             `,
-			expectedConstants: []interface{}{
+			constants: []interface{}{
 				0,
 				55,
-				[]code.Instructions{
-					code.Make(code.LoadConstant, 1),
-					code.Make(code.AssignGlobal, 0),
-					code.Make(code.LoadNull),
-					code.Make(code.Return),
-				},
+				Instructions("0000 LoadConstant 1\n0003 AssignGlobal 0\n0006 LoadNull\n0007 Return\n"),
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadConstant, 0),
-				code.Make(code.BindGlobal, 0),
-				code.Make(code.MakeClosure, 2, 0),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 Pop\n0007 MakeClosure 2 0\n0011 Pop\n",
 		},
 		{
 			input: `
-            fn() { let num = 0; num  = 55; }
+			fn() { num := 0; num  = 55; }
             `,
-			expectedConstants: []interface{}{
+			constants: []interface{}{
 				0,
 				55,
-				[]code.Instructions{
-					code.Make(code.LoadConstant, 0),
-					code.Make(code.BindLocal, 0),
-					code.Make(code.LoadConstant, 1),
-					code.Make(code.AssignLocal, 0),
-					code.Make(code.LoadNull),
-					code.Make(code.Return),
-				},
+				Instructions("0000 LoadConstant 0\n0003 BindLocal 0\n0005 Pop\n0006 LoadConstant 1\n0009 AssignLocal 0\n0011 LoadNull\n0012 Return\n"),
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.MakeClosure, 2, 0),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 MakeClosure 2 0\n0004 Pop\n",
 		},
 	}
 
-	runCompilerTests(t, tests)
+	runCompilerTests2(t, tests)
 }
 
-func TestLetStatementScopes(t *testing.T) {
-	tests := []compilerTestCase{
+func TestBindExpressionScopes(t *testing.T) {
+	tests := []compilerTestCase2{
 		{
 			input: `
-            let num = 55;
+			num := 55;
             fn() { return num }
             `,
-			expectedConstants: []interface{}{
+			constants: []interface{}{
 				55,
-				[]code.Instructions{
-					code.Make(code.LoadGlobal, 0),
-					code.Make(code.Return),
-				},
+				Instructions("0000 LoadGlobal 0\n0003 Return\n"),
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadConstant, 0),
-				code.Make(code.BindGlobal, 0),
-				code.Make(code.MakeClosure, 1, 0),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 Pop\n0007 MakeClosure 1 0\n0011 Pop\n",
 		},
 		{
 			input: `
             fn() {
-                let num = 55;
+				num := 55;
                 return num
             }
             `,
-			expectedConstants: []interface{}{
+			constants: []interface{}{
 				55,
-				[]code.Instructions{
-					code.Make(code.LoadConstant, 0),
-					code.Make(code.BindLocal, 0),
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.Return),
-				},
+				Instructions("0000 LoadConstant 0\n0003 BindLocal 0\n0005 Pop\n0006 LoadLocal 0\n0008 Return\n"),
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.MakeClosure, 1, 0),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 MakeClosure 1 0\n0004 Pop\n",
 		},
 		{
 			input: `
             fn() {
-                let a = 55;
-                let b = 77;
+				a := 55;
+				b := 77;
                 return a + b
             }
             `,
-			expectedConstants: []interface{}{
+			constants: []interface{}{
 				55,
 				77,
-				[]code.Instructions{
-					code.Make(code.LoadConstant, 0),
-					code.Make(code.BindLocal, 0),
-					code.Make(code.LoadConstant, 1),
-					code.Make(code.BindLocal, 1),
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.LoadLocal, 1),
-					code.Make(code.Add),
-					code.Make(code.Return),
-				},
+				Instructions("0000 LoadConstant 0\n0003 BindLocal 0\n0005 Pop\n0006 LoadConstant 1\n0009 BindLocal 1\n0011 Pop\n0012 LoadLocal 0\n0014 LoadLocal 1\n0016 Add\n0017 Return\n"),
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.MakeClosure, 2, 0),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 MakeClosure 2 0\n0004 Pop\n",
 		},
 		{
 			input: `
-			let a = 0;
-			let a = a + 1;
+			a := 0;
+			a := a + 1;
 			`,
-			expectedConstants: []interface{}{
+			constants: []interface{}{
 				0,
 				1,
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadConstant, 0),
-				code.Make(code.BindGlobal, 0),
-				code.Make(code.LoadGlobal, 0),
-				code.Make(code.LoadConstant, 1),
-				code.Make(code.Add),
-				code.Make(code.BindGlobal, 0),
-			},
+			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 Pop\n0007 LoadGlobal 0\n0010 LoadConstant 1\n0013 Add\n0014 BindGlobal 0\n0017 Pop\n",
 		},
 	}
 
-	runCompilerTests(t, tests)
+	runCompilerTests2(t, tests)
 }
 
 func TestBuiltins(t *testing.T) {
@@ -1154,7 +968,7 @@ func TestBuiltins(t *testing.T) {
 }
 
 func TestClosures(t *testing.T) {
-	tests := []compilerTestCase{
+	tests := []compilerTestCase2{
 		{
 			input: `
             fn(a) {
@@ -1163,23 +977,11 @@ func TestClosures(t *testing.T) {
                 }
             }
             `,
-			expectedConstants: []interface{}{
-				[]code.Instructions{
-					code.Make(code.LoadFree, 0),
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.Add),
-					code.Make(code.Return),
-				},
-				[]code.Instructions{
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.MakeClosure, 0, 1),
-					code.Make(code.Return),
-				},
+			constants: []interface{}{
+				Instructions("0000 LoadFree 0\n0002 LoadLocal 0\n0004 Add\n0005 Return\n"),
+				Instructions("0000 LoadLocal 0\n0002 MakeClosure 0 1\n0006 Return\n"),
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.MakeClosure, 1, 0),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 MakeClosure 1 0\n0004 Pop\n",
 		},
 		{
 			input: `
@@ -1191,91 +993,43 @@ func TestClosures(t *testing.T) {
                 }
             };
             `,
-			expectedConstants: []interface{}{
-				[]code.Instructions{
-					code.Make(code.LoadFree, 0),
-					code.Make(code.LoadFree, 1),
-					code.Make(code.Add),
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.Add),
-					code.Make(code.Return),
-				},
-				[]code.Instructions{
-					code.Make(code.LoadFree, 0),
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.MakeClosure, 0, 2),
-					code.Make(code.Return),
-				},
-				[]code.Instructions{
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.MakeClosure, 1, 1),
-					code.Make(code.Return),
-				},
+			constants: []interface{}{
+				Instructions("0000 LoadFree 0\n0002 LoadFree 1\n0004 Add\n0005 LoadLocal 0\n0007 Add\n0008 Return\n"),
+				Instructions("0000 LoadFree 0\n0002 LoadLocal 0\n0004 MakeClosure 0 2\n0008 Return\n"),
+				Instructions("0000 LoadLocal 0\n0002 MakeClosure 1 1\n0006 Return\n"),
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.MakeClosure, 2, 0),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 MakeClosure 2 0\n0004 Pop\n",
 		},
 		{
 			input: `
-            let global = 55;
+			global := 55;
 
             fn() {
-                let a = 66;
+				a := 66;
 
                 return fn() {
-                    let b = 77;
+					b := 77;
 
                     return fn() {
-                        let c = 88;
+						c := 88;
 
                         return global + a + b + c;
                     }
                 }
             }
             `,
-			expectedConstants: []interface{}{
+			constants: []interface{}{
 				55,
 				66,
 				77,
 				88,
-				[]code.Instructions{
-					code.Make(code.LoadConstant, 3),
-					code.Make(code.BindLocal, 0),
-					code.Make(code.LoadGlobal, 0),
-					code.Make(code.LoadFree, 0),
-					code.Make(code.Add),
-					code.Make(code.LoadFree, 1),
-					code.Make(code.Add),
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.Add),
-					code.Make(code.Return),
-				},
-				[]code.Instructions{
-					code.Make(code.LoadConstant, 2),
-					code.Make(code.BindLocal, 0),
-					code.Make(code.LoadFree, 0),
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.MakeClosure, 4, 2),
-					code.Make(code.Return),
-				},
-				[]code.Instructions{
-					code.Make(code.LoadConstant, 1),
-					code.Make(code.BindLocal, 0),
-					code.Make(code.LoadLocal, 0),
-					code.Make(code.MakeClosure, 5, 1),
-					code.Make(code.Return),
-				},
+				Instructions("0000 LoadConstant 3\n0003 BindLocal 0\n0005 Pop\n0006 LoadGlobal 0\n0009 LoadFree 0\n0011 Add\n0012 LoadFree 1\n0014 Add\n0015 LoadLocal 0\n0017 Add\n0018 Return\n"),
+				Instructions("0000 LoadConstant 2\n0003 BindLocal 0\n0005 Pop\n0006 LoadFree 0\n0008 LoadLocal 0\n0010 MakeClosure 4 2\n0014 Return\n"),
+				Instructions("0000 LoadConstant 1\n0003 BindLocal 0\n0005 Pop\n0006 LoadLocal 0\n0008 MakeClosure 5 1\n0012 Return\n"),
 			},
-			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadConstant, 0),
-				code.Make(code.BindGlobal, 0),
-				code.Make(code.MakeClosure, 6, 0),
-				code.Make(code.Pop),
-			},
+			instructions: "0000 LoadConstant 0\n0003 BindGlobal 0\n0006 Pop\n0007 MakeClosure 6 0\n0011 Pop\n",
 		},
 	}
 
-	runCompilerTests(t, tests)
+	runCompilerTests2(t, tests)
 }
