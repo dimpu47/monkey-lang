@@ -29,12 +29,19 @@ See: [Reading Guide](./ReadingGuide.md)
 > version of Monkey-lang in some places. FOr example I opted to have a single
 > `RETURN` Opcode.
 
-## Usage
+## Quickstart
+
+```#!sh
+$ go get github.com/prologic/monkey-lang/cmd/monkey-lang
+$ monkey-lang
+```
+
+## Development
 
 To build run `make`.
 
-```#!bash
-$ go get -u github.com/prologic/monkey-lang
+```#!sh
+$ go get github.com/prologic/monkey-lang
 $ cd $GOPATH/github.com/prologic/monkey-lang
 $ make
 This is the Monkey programming language!
@@ -47,82 +54,97 @@ To run the tests run `make test`
 You can also execute program files by invoking `monkey-lang <filename>`
 There are also some command-line options:
 
-```#!bash
+```#!sh
 $ ./monkey-lang -h
-Usage: monkey-lang [options] [<filename>]  -d	enable debug mode
+Usage: monkey-lang [options] [<filename>]
+  -c	compile input to bytecode
+  -d	enable debug mode
+  -e string
+    	engine to use (eval or vm) (default "vm")
   -i	enable interactive mode
   -v	display version information
-  ```
+```
 
 ## Monkey Language
 
 > See also: [examples](./examples)
 
-### Variable bindings and arithmetic expressions
+### Variable Bindings
 
-```sh
->> a := 10;
->> b := a * 2;
->> (a + b) / 2 - 3;
-12
->> c := 2.5;
->> b + c
-22.5
+```#!sh
+>> a := 10
 ```
 
-### If expressions
+### Artithmetic Expressions
+
+```#!sh
+>> a := 10
+>> b := a * 2
+>> (a + b) / 2 - 3
+12
+```
+
+### Conditional Expressions
 
 ```sh
->> a := 10;
->> b := a * 2;
->> c := if (b > a) { 99 } else { 100 };
+>> a := 10
+>> b := a * 2
+>> c := if (b > a) { 99 } else { 100 }
 >> c
 99
 ```
 
-### Functions and closures
+### Functions and Closures
 
 ```sh
->> multiply := fn(x, y) { x * y };
+>> multiply := fn(x, y) { x * y }
 >> multiply(50 / 2, 1 * 2)
 50
 >> fn(x) { x + 10 }(10)
 20
->> newAdder := fn(x) { fn(y) { x + y }; };
->> addTwo := newAdder(2);
->> addTwo(3);
+>> newAdder := fn(x) { fn(y) { x + y } }
+>> addTwo := newAdder(2)
+>> addTwo(3)
 5
->> sub := fn(a, b) { a - b };
->> applyFunc := fn(a, b, func) { func(a, b) };
->> applyFunc(10, 2, sub);
+>> sub := fn(a, b) { a - b }
+>> applyFunc := fn(a, b, func) { func(a, b) }
+>> applyFunc(10, 2, sub)
 8
+```
+
+### Recursive Functions
+
+```#!sh
+>> wrapper := fn() { inner := fn(x) { if (x == 0) { return 2 } else { return inner(x - 1) } } return inner(1) }
+>> wrapper()
+2
 ```
 
 ### Strings
 
 ```sh
->> makeGreeter := fn(greeting) { fn(name) { greeting + " " + name + "!" } };
->> hello := makeGreeter("Hello");
->> hello("skatsuta");
+>> makeGreeter := fn(greeting) { fn(name) { greeting + " " + name + "!" } }
+>> hello := makeGreeter("Hello")
+>> hello("skatsuta")
 Hello skatsuta!
 ```
 
 ### Arrays
 
 ```sh
->> myArray := ["Thorsten", "Ball", 28, fn(x) { x * x }];
+>> myArray := ["Thorsten", "Ball", 28, fn(x) { x * x }]
 >> myArray[0]
 Thorsten
 >> myArray[4 - 2]
 28
->> myArray[3](2);
+>> myArray[3](2)
 4
 ```
 
 ### Hashes
 
 ```sh
->> myHash := {"name": "Jimmy", "age": 72, true: "yes, a boolean", 99: "correct, an integer"};
+>> myHash := {"name": "Jimmy", "age": 72, true: "yes, a boolean", 99: "correct, an integer"}
 >> myHash["name"]
 Jimmy
 >> myHash["age"]
@@ -136,11 +158,11 @@ correct, an integer
 ### Builtin functions
 
 ```sh
->> len("hello");
+>> len("hello")
 5
->> len("∑");
+>> len("∑")
 1
->> myArray := ["one", "two", "three"];
+>> myArray := ["one", "two", "three"]
 >> len(myArray)
 3
 >> first(myArray)
@@ -154,6 +176,15 @@ three
 >> puts("Hello World")
 Hello World
 nil
+```
+
+### Objects
+
+```#!sh
+>> Person := fn(name, age) { self := {} self.name = name self.age = age self.str = fn() { return self.name + ", aged " + str(self.age) } return self }
+>> p := Person("John", 35)
+>> p.str()
+"John, aged 35"
 ```
 
 ## License
