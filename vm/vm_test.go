@@ -375,6 +375,17 @@ func TestArrayLiterals(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestArrayDuplication(t *testing.T) {
+	tests := []vmTestCase{
+		{"[1] * 3", []int{1, 1, 1}},
+		{"3 * [1]", []int{1, 1, 1}},
+		{"[1, 2] * 2", []int{1, 2, 1, 2}},
+		{"2 * [1, 2]", []int{1, 2, 1, 2}},
+	}
+
+	runVmTests(t, tests)
+}
+
 func TestHashLiterals(t *testing.T) {
 	tests := []vmTestCase{
 		{

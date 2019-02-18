@@ -316,8 +316,8 @@ Operator   | Types           | Action
 `*`        | `int * int`     | multiply ints
 `*`        | `str * int`     | repeat str n times
 `*`        | `int * str`     | repeat str n times
-`*`        | `array * int`   | repeat array n times, give new array (**TBD**)
-`*`        | `int * array`   | repeat array n times, give new array (**TBD**)
+`*`        | `array * int`   | repeat array n times, give new array
+`*`        | `int * array`   | repeat array n times, give new array
 `/`        | `int / int`     | divide ints, truncated
 `%`        | `int % int`     | divide ints, give remainder
 `+`        | `int + int`     | add ints

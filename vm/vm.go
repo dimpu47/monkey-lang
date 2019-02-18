@@ -143,6 +143,25 @@ func (vm *VM) executeBinaryOperation(op code.Opcode) error {
 
 	switch {
 
+	// [1] * 3
+	case left.Type() == object.ARRAY && right.Type() == object.INTEGER:
+		leftVal := left.(*object.Array).Elements
+		rightVal := int(right.(*object.Integer).Value)
+		elements := leftVal
+		for i := rightVal; i > 1; i-- {
+			elements = append(elements, leftVal...)
+		}
+		return vm.push(&object.Array{Elements: elements})
+	// 3 * [1]
+	case left.Type() == object.INTEGER && right.Type() == object.ARRAY:
+		leftVal := int(left.(*object.Integer).Value)
+		rightVal := right.(*object.Array).Elements
+		elements := rightVal
+		for i := leftVal; i > 1; i-- {
+			elements = append(elements, rightVal...)
+		}
+		return vm.push(&object.Array{Elements: elements})
+
 	// " " * 4
 	case left.Type() == object.STRING && right.Type() == object.INTEGER:
 		leftVal := left.(*object.String).Value
