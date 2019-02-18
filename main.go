@@ -75,6 +75,11 @@ func main() {
 
 	args := flag.Args()
 
+	copy(object.Arguments, args)
+	object.StandardInput = os.Stdin
+	object.StandardOutput = os.Stdout
+	object.ExitFunction = os.Exit
+
 	if compile {
 		if len(args) < 1 {
 			log.Fatal("no source file given to compile")

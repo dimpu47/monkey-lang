@@ -21,6 +21,7 @@ var Builtins = map[string]*Builtin{
 	"int":    &Builtin{Name: "int", Fn: Int},
 	"str":    &Builtin{Name: "str", Fn: Str},
 	"typeof": &Builtin{Name: "typeof", Fn: TypeOf},
+	"args":   &Builtin{Name: "args", Fn: Args},
 }
 
 // BuiltinsIndex ...

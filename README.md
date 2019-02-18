@@ -377,11 +377,11 @@ Operator   | Types           | Action
   with keys sorted), and something like `<fn name(...) at 0x...>` for functions..
 - `type(value)`
   Returns a `str` denoting the type of value: `nil`, `bool`, `int`, `str`, `array`, `hash`, or `fn`.
+- `args()`
+  Returns an array of command-line options passed to the program.
 
 Coming soon... 
 
-- `args()`
-  Returns an array of command-line options passed to the program.
 - `find(haystack, needle)
   Returns the index of `needle` `str` in `haystack` `str`,
   or the index of `needle` element in `haystack` array.
