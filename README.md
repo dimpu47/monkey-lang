@@ -383,6 +383,10 @@ Operator   | Types           | Action
   Returns a lowercased version of `str`.
 - `upper(str)`
   Returns an uppercased version of `str`.
+- `join(array, sep)`
+  Concatenates `str`s in `arrat` to form a single `str`, with the separator `str` between each element.
+- `split(str[, sep])`
+  Splits the `str` using given separator `sep`, and returns the parts (excluding the separator) as an `array`. If `sep` is not given or `null`, it splits on whitespace.
 
 Coming soon... 
 
@@ -390,10 +394,8 @@ Coming soon...
   Returns the index of `needle` `str` in `haystack` `str`,
   or the index of `needle` element in `haystack` array.
   Returns -1 if not found.
-- `join(list, sep)` concatenates strs in list to form a single str, with the separator str between each element.
 - `read([filename])` reads standard input or the given file and returns the contents as a str.
 - `sort(list[, func])` sorts the list in place using a stable sort, and returns nil. Elements in the list must be orderable with `<` (int, str, or list of those). If a key function is provided, it must take the element as an argument and return an orderable value to use as the sort key.
-- `split(str[, sep])` splits the str using given separator, and returns the parts (excluding the separator) as a list. If sep is not given or nil, it splits on whitespace.
 
 ### Objects
 
