@@ -211,6 +211,8 @@ func TestIntegerArithmetic(t *testing.T) {
 		{"-10", -10},
 		{"-50 + 100 + -50", 0},
 		{"(5 + 10 * 2 + 15 / 3) * 2 + -10", 50},
+		{"!1", false},
+		{"~1", -2},
 		{"5 % 2", 1},
 		{"1 | 2", 3},
 		{"2 ^ 4", 6},
@@ -225,6 +227,16 @@ func TestBooleanExpressions(t *testing.T) {
 		{"true", true},
 		{"false", false},
 		{"null", nil},
+		{"!true", false},
+		{"!false", true},
+		{"true && true", true},
+		{"false && true", false},
+		{"true && false", false},
+		{"false && false", false},
+		{"true || true", true},
+		{"false || true", true},
+		{"true || false", true},
+		{"false || false", false},
 		{"1 < 2", true},
 		{"1 > 2", false},
 		{"1 < 1", false},
@@ -982,6 +994,10 @@ func TestCallingRecursiveFunctionsInFunctions(t *testing.T) {
 }
 
 func TestExamples(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
 	matches, err := filepath.Glob("../examples/*.monkey")
 	if err != nil {
 		t.Error(err)

@@ -395,7 +395,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 		switch node.Operator {
 		case "!":
-			c.emit(code.Bang)
+			c.emit(code.Not)
+		case "~":
+			c.emit(code.BitwiseNOT)
 		case "-":
 			c.emit(code.Minus)
 		default:
@@ -456,6 +458,10 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.emit(code.BitwiseXOR)
 		case "&":
 			c.emit(code.BitwiseAND)
+		case "||":
+			c.emit(code.Or)
+		case "&&":
+			c.emit(code.And)
 		case ">":
 			c.emit(code.GreaterThan)
 		case ">=":

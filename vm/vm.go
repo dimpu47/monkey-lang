@@ -142,6 +142,8 @@ func (vm *VM) executeBinaryOperation(op code.Opcode) error {
 	rightType := right.Type()
 
 	switch {
+	case leftType == object.BOOLEAN && rightType == object.BOOLEAN:
+		return vm.executeBinaryBooleanOperation(op, left, right)
 	case leftType == object.INTEGER && rightType == object.INTEGER:
 		return vm.executeBinaryIntegerOperation(op, left, right)
 	case leftType == object.STRING && rightType == object.STRING:
@@ -164,6 +166,27 @@ func (vm *VM) executeBinaryStringOperation(
 	rightValue := right.(*object.String).Value
 
 	return vm.push(&object.String{Value: leftValue + rightValue})
+}
+
+func (vm *VM) executeBinaryBooleanOperation(
+	op code.Opcode,
+	left, right object.Object,
+) error {
+	leftValue := left.(*object.Boolean).Value
+	rightValue := right.(*object.Boolean).Value
+
+	var result bool
+
+	switch op {
+	case code.Or:
+		result = leftValue || rightValue
+	case code.And:
+		result = leftValue && rightValue
+	default:
+		return fmt.Errorf("unknown boolean operator: %d", op)
+	}
+
+	return vm.push(&object.Boolean{Value: result})
 }
 
 func (vm *VM) executeBinaryIntegerOperation(
@@ -264,7 +287,15 @@ func (vm *VM) executeStringComparison(
 	}
 }
 
-func (vm *VM) executeBangOperator() error {
+func (vm *VM) executeBitwiseNotOperator() error {
+	operand := vm.pop()
+	if i, ok := operand.(*object.Integer); ok {
+		return vm.push(&object.Integer{Value: ^i.Value})
+	}
+	return fmt.Errorf("expected int got=%T", operand)
+}
+
+func (vm *VM) executeNotOperator() error {
 	operand := vm.pop()
 
 	switch operand {
@@ -281,13 +312,10 @@ func (vm *VM) executeBangOperator() error {
 
 func (vm *VM) executeMinusOperator() error {
 	operand := vm.pop()
-
-	if operand.Type() != object.INTEGER {
-		return fmt.Errorf("unsupported type for negation: %s", operand.Type())
+	if i, ok := operand.(*object.Integer); ok {
+		return vm.push(&object.Integer{Value: -i.Value})
 	}
-
-	value := operand.(*object.Integer).Value
-	return vm.push(&object.Integer{Value: -value})
+	return fmt.Errorf("expected int got=%T", operand)
 }
 
 func (vm *VM) executeSetItem(left, index, value object.Object) error {
@@ -706,7 +734,10 @@ func (vm *VM) Run() error {
 				return err
 			}
 
-		case code.Add, code.Sub, code.Mul, code.Div, code.Mod, code.BitwiseOR, code.BitwiseXOR, code.BitwiseAND:
+		case code.Add, code.Sub, code.Mul, code.Div, code.Mod,
+			code.Or, code.And,
+			code.BitwiseOR, code.BitwiseXOR, code.BitwiseAND:
+
 			err := vm.executeBinaryOperation(op)
 			if err != nil {
 				return err
@@ -718,8 +749,14 @@ func (vm *VM) Run() error {
 				return err
 			}
 
-		case code.Bang:
-			err := vm.executeBangOperator()
+		case code.Not:
+			err := vm.executeNotOperator()
+			if err != nil {
+				return err
+			}
+
+		case code.BitwiseNOT:
+			err := vm.executeBitwiseNotOperator()
 			if err != nil {
 				return err
 			}

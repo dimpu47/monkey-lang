@@ -302,9 +302,12 @@ Operators      | Description
 `+ -`          | Addition, Subtraction
 `< <= > >= in` | Comparison
 `== !=`        | Equality
-`!`            | Bitwise not / Logical not
+`~`            | Bitwise not
 `&`            | Bitwise and
-<code>&#124;</code> | Bitwise or
+<code>&#124;</code>       | Bitwise or
+<code>&#124;&#124;</code> | Logical or (short-circuit)
+`&&`           | Logical and (short-circuit)
+`!`            | Logical not
 
 Several of the operators are overloaded. Here are the types they can operate on:
 
@@ -330,14 +333,14 @@ Operator   | Types           | Action
 `<`        | `str < str`     | true iff left < right (lexicographical)
 `<`        | `array < array` | true iff left < right (lexicographical, recursive)
 `<= > >=`  | same as `<`     | similar to `<`
-`in`       | `str in str`    | true iff left is substr of right
-`in`       | `any in array`  | true iff one of array elements == left (**TBD**)
-`in`       | `str in hash`   | true iff key in hash (**TBD**)
 `==`       | `any == any`    | deep equality (always false if different type)
 `!=`       | `any != any`    | same as `not ==`
-`!`        | `not bool`      | inverse of bool
-`&&`       | `bool and bool` | true iff both true, right not evaluated if left false
-<code>&#124;&#124;</code> | `bool or bool`  | true iff either true, right not evaluated if left true
+<code>&#124;</code> | <code>int &#124; int</code> | Bitwise or
+`&`        | `int & int`     | Bitwise and
+`~`        | `~int`          | Bitwise not (1's complement)
+<code>&#124;&#124;</code> | <code>bool &#124;&#124; bool</code> | true iff either true, right not evaluated if left true
+`&&`       | `bool && bool`  | true iff both true, right not evaluated if left false
+`!`        | `!bool`         | inverse of bool
 
 ### Builtin functions
 

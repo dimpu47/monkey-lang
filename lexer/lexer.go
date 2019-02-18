@@ -89,7 +89,7 @@ func (l *Lexer) NextToken() token.Token {
 			literal := string(ch) + string(l.ch)
 			tok = token.Token{Type: token.NEQ, Literal: literal}
 		} else {
-			tok = newToken(token.BANG, l.ch)
+			tok = newToken(token.NOT, l.ch)
 		}
 	case '/':
 		if l.peekChar() == '/' {
@@ -97,18 +97,34 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.COMMENT
 			tok.Literal = l.readLine()
 		} else {
-			tok = newToken(token.SLASH, l.ch)
+			tok = newToken(token.DIVIDE, l.ch)
 		}
 	case '*':
-		tok = newToken(token.ASTERISK, l.ch)
+		tok = newToken(token.MULTIPLY, l.ch)
 	case '%':
-		tok = newToken(token.PERCENT, l.ch)
+		tok = newToken(token.MODULO, l.ch)
 	case '&':
-		tok = newToken(token.AND, l.ch)
+		if l.peekChar() == '&' {
+			ch := l.ch
+			l.readChar()
+			literal := string(ch) + string(l.ch)
+			tok = token.Token{Type: token.AND, Literal: literal}
+		} else {
+			tok = newToken(token.BitwiseAND, l.ch)
+		}
 	case '|':
-		tok = newToken(token.OR, l.ch)
+		if l.peekChar() == '|' {
+			ch := l.ch
+			l.readChar()
+			literal := string(ch) + string(l.ch)
+			tok = token.Token{Type: token.OR, Literal: literal}
+		} else {
+			tok = newToken(token.BitwiseOR, l.ch)
+		}
 	case '^':
-		tok = newToken(token.XOR, l.ch)
+		tok = newToken(token.BitwiseXOR, l.ch)
+	case '~':
+		tok = newToken(token.BitwiseNOT, l.ch)
 	case '<':
 		if l.peekChar() == '=' {
 			l.readChar()

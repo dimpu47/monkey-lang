@@ -12,12 +12,16 @@ import (
 const (
 	_ int = iota
 	LOWEST
+	OR
+	AND
+	NOT
+	IN
 	ASSIGN      // := or =
 	EQUALS      // ==
 	LESSGREATER // > or <
-	OR          // |
-	XOR         // ^
-	AND         // &
+	BitwiseOR   // |
+	BitwiseXOR  // ^
+	BitwiseAND  // &
 	SUM         // + or -
 	PRODUCT     // * / or %
 	PREFIX      // -X or !X
@@ -27,25 +31,28 @@ const (
 )
 
 var precedences = map[token.Type]int{
-	token.BIND:     ASSIGN,
-	token.ASSIGN:   ASSIGN,
-	token.EQ:       EQUALS,
-	token.NEQ:      EQUALS,
-	token.LT:       LESSGREATER,
-	token.GT:       LESSGREATER,
-	token.LTE:      LESSGREATER,
-	token.GTE:      LESSGREATER,
-	token.OR:       OR,
-	token.XOR:      XOR,
-	token.AND:      AND,
-	token.PLUS:     SUM,
-	token.MINUS:    SUM,
-	token.SLASH:    PRODUCT,
-	token.ASTERISK: PRODUCT,
-	token.PERCENT:  PRODUCT,
-	token.LPAREN:   CALL,
-	token.LBRACKET: INDEX,
-	token.DOT:      INDEX,
+	token.OR:         OR,
+	token.AND:        AND,
+	token.NOT:        NOT,
+	token.BIND:       ASSIGN,
+	token.ASSIGN:     ASSIGN,
+	token.EQ:         EQUALS,
+	token.NEQ:        EQUALS,
+	token.LT:         LESSGREATER,
+	token.GT:         LESSGREATER,
+	token.LTE:        LESSGREATER,
+	token.GTE:        LESSGREATER,
+	token.BitwiseOR:  BitwiseOR,
+	token.BitwiseXOR: BitwiseXOR,
+	token.BitwiseAND: BitwiseAND,
+	token.PLUS:       SUM,
+	token.MINUS:      SUM,
+	token.DIVIDE:     PRODUCT,
+	token.MULTIPLY:   PRODUCT,
+	token.MODULO:     PRODUCT,
+	token.LPAREN:     CALL,
+	token.LBRACKET:   INDEX,
+	token.DOT:        INDEX,
 }
 
 type (
@@ -74,7 +81,6 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
-	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 	p.registerPrefix(token.TRUE, p.parseBoolean)
 	p.registerPrefix(token.FALSE, p.parseBoolean)
@@ -87,18 +93,24 @@ func New(l *lexer.Lexer) *Parser {
 	p.infixParseFns = make(map[token.Type]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
-	p.registerInfix(token.SLASH, p.parseInfixExpression)
-	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
-	p.registerInfix(token.PERCENT, p.parseInfixExpression)
-	p.registerInfix(token.OR, p.parseInfixExpression)
-	p.registerInfix(token.XOR, p.parseInfixExpression)
-	p.registerInfix(token.AND, p.parseInfixExpression)
+	p.registerInfix(token.DIVIDE, p.parseInfixExpression)
+	p.registerInfix(token.MULTIPLY, p.parseInfixExpression)
+	p.registerInfix(token.MODULO, p.parseInfixExpression)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
 	p.registerInfix(token.NEQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.LTE, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.GTE, p.parseInfixExpression)
+
+	p.registerPrefix(token.BitwiseNOT, p.parsePrefixExpression)
+	p.registerInfix(token.BitwiseOR, p.parseInfixExpression)
+	p.registerInfix(token.BitwiseXOR, p.parseInfixExpression)
+	p.registerInfix(token.BitwiseAND, p.parseInfixExpression)
+
+	p.registerPrefix(token.NOT, p.parsePrefixExpression)
+	p.registerInfix(token.OR, p.parseInfixExpression)
+	p.registerInfix(token.AND, p.parseInfixExpression)
 
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 

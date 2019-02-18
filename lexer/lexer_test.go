@@ -34,6 +34,8 @@ if (5 < 10) {
 [1, 2]
 {"foo": "bar"}
 d.foo
+&|^~
+!&&||
 `
 
 	tests := []struct {
@@ -74,10 +76,10 @@ d.foo
 		{token.IDENT, "ten"},
 		{token.RPAREN, ")"},
 		{token.SEMICOLON, ";"},
-		{token.BANG, "!"},
+		{token.NOT, "!"},
 		{token.MINUS, "-"},
-		{token.SLASH, "/"},
-		{token.ASTERISK, "*"},
+		{token.DIVIDE, "/"},
+		{token.MULTIPLY, "*"},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
 		{token.INT, "5"},
@@ -127,6 +129,13 @@ d.foo
 		{token.IDENT, "d"},
 		{token.DOT, "."},
 		{token.IDENT, "foo"},
+		{token.BitwiseAND, "&"},
+		{token.BitwiseOR, "|"},
+		{token.BitwiseXOR, "^"},
+		{token.BitwiseNOT, "~"},
+		{token.NOT, "!"},
+		{token.AND, "&&"},
+		{token.OR, "||"},
 		{token.EOF, ""},
 	}
 

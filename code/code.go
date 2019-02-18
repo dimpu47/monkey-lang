@@ -96,16 +96,19 @@ const (
 	Mul
 	Div
 	Mod
+	Or
+	And
+	Not
 	BitwiseOR
 	BitwiseXOR
 	BitwiseAND
+	BitwiseNOT
 	Equal
 	NotEqual
 	GreaterThan
 	// GreaterThanEqual ...
 	GreaterThanEqual
 	Minus
-	Bang
 	JumpIfFalse
 	Jump
 	Call
@@ -139,15 +142,18 @@ var definitions = map[Opcode]*Definition{
 	Mul:              {"Mul", []int{}},
 	Div:              {"Div", []int{}},
 	Mod:              {"Mod", []int{}},
+	Or:               {"Or", []int{}},
+	And:              {"And", []int{}},
+	Not:              {"Not", []int{}},
 	BitwiseOR:        {"BitwiseOR", []int{}},
 	BitwiseXOR:       {"BitwiseXOR", []int{}},
 	BitwiseAND:       {"BitwiseAND", []int{}},
+	BitwiseNOT:       {"BitwiseNOT", []int{}},
 	Equal:            {"Equal", []int{}},
 	NotEqual:         {"NotEqual", []int{}},
 	GreaterThan:      {"GreaterThan", []int{}},
 	GreaterThanEqual: {"GreaterThanEqual", []int{}},
 	Minus:            {"Minus", []int{}},
-	Bang:             {"Bang", []int{}},
 	JumpIfFalse:      {"JumpIfFalse", []int{2}},
 	Jump:             {"Jump", []int{2}},
 	Call:             {"Call", []int{1}},

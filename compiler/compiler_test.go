@@ -270,6 +270,39 @@ func TestIntegerArithmetic(t *testing.T) {
 			},
 		},
 		{
+			input:             "5 | 2",
+			expectedConstants: []interface{}{5, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.BitwiseOR),
+				code.Make(code.Pop),
+			},
+		},
+
+		{
+			input:             "5 ^ 2",
+			expectedConstants: []interface{}{5, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.BitwiseXOR),
+				code.Make(code.Pop),
+			},
+		},
+
+		{
+			input:             "5 & 2",
+			expectedConstants: []interface{}{5, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadConstant, 0),
+				code.Make(code.LoadConstant, 1),
+				code.Make(code.BitwiseAND),
+				code.Make(code.Pop),
+			},
+		},
+
+		{
 			input:             "-1",
 			expectedConstants: []interface{}{1},
 			expectedInstructions: []code.Instructions{
@@ -390,11 +423,31 @@ func TestBooleanExpressions(t *testing.T) {
 			},
 		},
 		{
+			input:             "true && false",
+			expectedConstants: []interface{}{},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadTrue),
+				code.Make(code.LoadFalse),
+				code.Make(code.And),
+				code.Make(code.Pop),
+			},
+		},
+		{
+			input:             "true || false",
+			expectedConstants: []interface{}{},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.LoadTrue),
+				code.Make(code.LoadFalse),
+				code.Make(code.Or),
+				code.Make(code.Pop),
+			},
+		},
+		{
 			input:             "!true",
 			expectedConstants: []interface{}{},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.LoadTrue),
-				code.Make(code.Bang),
+				code.Make(code.Not),
 				code.Make(code.Pop),
 			},
 		},

@@ -36,25 +36,36 @@ const (
 	PLUS = "+"
 	// MINUS the substraction operator
 	MINUS = "-"
-	// BANG the factorial operator
-	BANG = "!"
-	// ASTERISK the multiplication operator
-	ASTERISK = "*"
-	// SLASH the division operator
-	SLASH = "/"
-	// PERCENT the modulo operator
-	PERCENT = "%"
+	// MULTIPLY the multiplication operator
+	MULTIPLY = "*"
+	// DIVIDE the division operator
+	DIVIDE = "/"
+	// MODULO the modulo operator
+	MODULO = "%"
 
 	//
 	// Bitwise / Logical operators
 	//
 
 	// Bitwise AND
-	AND = "&" // && Logical AND
+	BitwiseAND = "&"
 	// Bitwise OR
-	OR = "|" // || Logical OR
+	BitwiseOR = "|"
 	// Bitwise XOR
-	XOR = "^"
+	BitwiseXOR = "^"
+	// Bitwise NOT
+	BitwiseNOT = "~"
+
+	//
+	// Logical operators
+	//
+
+	// NOT the not operator
+	NOT = "!"
+	// AND the and operator
+	AND = "&&"
+	// OR the or operator
+	OR = "||"
 
 	//
 	// Comparision operators
