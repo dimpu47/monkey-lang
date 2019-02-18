@@ -1,0 +1,3 @@
+#!./monkey-lang
+
+print(args())
