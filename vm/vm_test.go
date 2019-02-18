@@ -358,6 +358,8 @@ func TestStringExpressions(t *testing.T) {
 		{`"monkey"`, "monkey"},
 		{`"mon" + "key"`, "monkey"},
 		{`"mon" + "key" + "banana"`, "monkeybanana"},
+		{`" " * 4`, "    "},
+		{`4 * " "`, "    "},
 	}
 
 	runVmTests(t, tests)

@@ -142,6 +142,18 @@ func (vm *VM) executeBinaryOperation(op code.Opcode) error {
 	rightType := right.Type()
 
 	switch {
+
+	// " " * 4
+	case left.Type() == object.STRING && right.Type() == object.INTEGER:
+		leftVal := left.(*object.String).Value
+		rightVal := right.(*object.Integer).Value
+		return vm.push(&object.String{Value: strings.Repeat(leftVal, int(rightVal))})
+	// 4 * " "
+	case left.Type() == object.INTEGER && right.Type() == object.STRING:
+		leftVal := left.(*object.Integer).Value
+		rightVal := right.(*object.String).Value
+		return vm.push(&object.String{Value: strings.Repeat(rightVal, int(leftVal))})
+
 	case leftType == object.BOOLEAN && rightType == object.BOOLEAN:
 		return vm.executeBinaryBooleanOperation(op, left, right)
 	case leftType == object.INTEGER && rightType == object.INTEGER:

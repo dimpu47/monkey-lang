@@ -6,6 +6,7 @@ package eval
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/prologic/monkey-lang/ast"
 	"github.com/prologic/monkey-lang/object"
@@ -302,6 +303,18 @@ func evalInfixExpression(
 	left, right object.Object,
 ) object.Object {
 	switch {
+
+	// " " * 4
+	case left.Type() == object.STRING && right.Type() == object.INTEGER:
+		leftVal := left.(*object.String).Value
+		rightVal := right.(*object.Integer).Value
+		return &object.String{Value: strings.Repeat(leftVal, int(rightVal))}
+	// 4 * " "
+	case left.Type() == object.INTEGER && right.Type() == object.STRING:
+		leftVal := left.(*object.Integer).Value
+		rightVal := right.(*object.String).Value
+		return &object.String{Value: strings.Repeat(rightVal, int(leftVal))}
+
 	case left.Type() == object.BOOLEAN && right.Type() == object.BOOLEAN:
 		return evalBooleanInfixExpression(operator, left, right)
 	case left.Type() == object.INTEGER && right.Type() == object.INTEGER:

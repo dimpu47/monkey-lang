@@ -11,7 +11,7 @@ import (
 	"github.com/prologic/monkey-lang/parser"
 )
 
-func TestEvalIntegerExpression(t *testing.T) {
+func TestEvalExpressions(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected interface{}
@@ -37,6 +37,8 @@ func TestEvalIntegerExpression(t *testing.T) {
 		{"1 | 2", 3},
 		{"2 ^ 4", 6},
 		{"3 & 6", 2},
+		{`" " * 4`, "    "},
+		{`4 * " "`, "    "},
 	}
 
 	for _, tt := range tests {

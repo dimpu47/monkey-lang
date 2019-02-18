@@ -318,8 +318,8 @@ Operator   | Types           | Action
 `[]`       | `hash[str]`     | fetch hash value by key str
 `-`        | `int`           | negate int
 `*`        | `int * int`     | multiply ints
-`*`        | `str * int`     | repeat str n times (**TBD**)
-`*`        | `int * str`     | repeat str n times (**TBD**)
+`*`        | `str * int`     | repeat str n times
+`*`        | `int * str`     | repeat str n times
 `*`        | `array * int`   | repeat array n times, give new array (**TBD**)
 `*`        | `int * array`   | repeat array n times, give new array (**TBD**)
 `/`        | `int / int`     | divide ints, truncated
@@ -387,7 +387,7 @@ Coming soon...
 - `find(haystack, needle)
   Returns the index of `needle` `str` in `haystack` `str`,
   or the index of `needle` element in `haystack` array.
-  Returns -1 if not found. (**TBD**)
+  Returns -1 if not found.
 - `join(list, sep)` concatenates strs in list to form a single str, with the separator str between each element.
 - `lower(str)` returns a lowercased version of str.
 - `read([filename])` reads standard input or the given file and returns the contents as a str.
