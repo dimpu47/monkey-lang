@@ -387,13 +387,13 @@ Operator   | Types           | Action
   Concatenates `str`s in `arrat` to form a single `str`, with the separator `str` between each element.
 - `split(str[, sep])`
   Splits the `str` using given separator `sep`, and returns the parts (excluding the separator) as an `array`. If `sep` is not given or `null`, it splits on whitespace.
-
-Coming soon... 
-
 - `find(haystack, needle)
   Returns the index of `needle` `str` in `haystack` `str`,
   or the index of `needle` element in `haystack` array.
   Returns -1 if not found.
+
+Coming soon... 
+
 - `read([filename])` reads standard input or the given file and returns the contents as a str.
 - `sort(list[, func])` sorts the list in place using a stable sort, and returns nil. Elements in the list must be orderable with `<` (int, str, or list of those). If a key function is provided, it must take the element as an argument and return an orderable value to use as the sort key.
 

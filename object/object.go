@@ -52,6 +52,13 @@ const (
 	HASH = "hash"
 )
 
+// Comparable is the interface for comparing two Object and their underlying
+// values. It is the responsibility of the caller (left) to check for types.
+// Returns `true` iif the types and values are identical, `false` otherwise.
+type Comparable interface {
+	Equal(other Object) bool
+}
+
 // Immutable is the interface for all immutable objects which must implement
 // the Clone() method used by binding names to values.
 type Immutable interface {
@@ -84,6 +91,13 @@ type Integer struct {
 	Value int64
 }
 
+func (i *Integer) Equal(other Object) bool {
+	if obj, ok := other.(*Integer); ok {
+		return i.Value == obj.Value
+	}
+	return false
+}
+
 func (i *Integer) String() string {
 	return i.Inspect()
 }
@@ -103,6 +117,13 @@ func (i *Integer) Inspect() string { return fmt.Sprintf("%d", i.Value) }
 // an internal string value
 type String struct {
 	Value string
+}
+
+func (s *String) Equal(other Object) bool {
+	if obj, ok := other.(*String); ok {
+		return s.Value == obj.Value
+	}
+	return false
 }
 
 func (s *String) String() string {
@@ -126,6 +147,13 @@ type Boolean struct {
 	Value bool
 }
 
+func (b *Boolean) Equal(other Object) bool {
+	if obj, ok := other.(*Boolean); ok {
+		return b.Value == obj.Value
+	}
+	return false
+}
+
 func (b *Boolean) String() string {
 	return b.Inspect()
 }
@@ -143,6 +171,11 @@ func (b *Boolean) Inspect() string { return fmt.Sprintf("%t", b.Value) }
 
 // Null is the null type and used to represent the absence of a value
 type Null struct{}
+
+func (n *Null) Equal(other Object) bool {
+	_, ok := other.(*Null)
+	return ok
+}
 
 func (n *Null) String() string {
 	return n.Inspect()
@@ -292,6 +325,26 @@ type Array struct {
 	Elements []Object
 }
 
+func (ao *Array) Equal(other Object) bool {
+	if obj, ok := other.(*Array); ok {
+		if len(ao.Elements) != len(obj.Elements) {
+			return false
+		}
+		for i, el := range ao.Elements {
+			cmp, ok := el.(Comparable)
+			if !ok {
+				return false
+			}
+			if !cmp.Equal(obj.Elements[i]) {
+				return false
+			}
+		}
+
+		return true
+	}
+	return false
+}
+
 func (ao *Array) String() string {
 	return ao.Inspect()
 }
@@ -357,6 +410,32 @@ type HashPair struct {
 // Hash is a hash map and holds a map of HashKey to HashPair(s)
 type Hash struct {
 	Pairs map[HashKey]HashPair
+}
+
+func (h *Hash) Equal(other Object) bool {
+	if obj, ok := other.(*Hash); ok {
+		if len(h.Pairs) != len(obj.Pairs) {
+			return false
+		}
+		for _, pair := range h.Pairs {
+			left := pair.Value
+			hashed := left.(Hashable)
+			right, ok := obj.Pairs[hashed.HashKey()]
+			if !ok {
+				return false
+			}
+			cmp, ok := left.(Comparable)
+			if !ok {
+				return false
+			}
+			if !cmp.Equal(right.Value) {
+				return false
+			}
+		}
+
+		return true
+	}
+	return false
 }
 
 func (h *Hash) String() string {
