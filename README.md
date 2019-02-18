@@ -375,6 +375,8 @@ Operator   | Types           | Action
   the string itself for `str` (not quoted),
   the Monkey representation for array and hash (eg: `[1, 2]` and `{"a": 1}`
   with keys sorted), and something like `<fn name(...) at 0x...>` for functions..
+- `type(value)`
+  Returns a `str` denoting the type of value: `nil`, `bool`, `int`, `str`, `array`, `hash`, or `fn`.
 
 Coming soon... 
 
@@ -389,7 +391,6 @@ Coming soon...
 - `read([filename])` reads standard input or the given file and returns the contents as a str.
 - `sort(list[, func])` sorts the list in place using a stable sort, and returns nil. Elements in the list must be orderable with `<` (int, str, or list of those). If a key function is provided, it must take the element as an argument and return an orderable value to use as the sort key.
 - `split(str[, sep])` splits the str using given separator, and returns the parts (excluding the separator) as a list. If sep is not given or nil, it splits on whitespace.
-- `type(value)` returns a str denoting the type of value: `nil`, `bool`, `int`, `str`, `list`, `map`, or `func`.
 - `upper(str)` returns an uppercased version of str.
 
 ### Objects

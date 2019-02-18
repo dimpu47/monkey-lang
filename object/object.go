@@ -16,40 +16,40 @@ import (
 
 const (
 	// INTEGER is the Integer object type
-	INTEGER = "INTEGER"
+	INTEGER = "int"
 
 	// STRING is the String object type
-	STRING = "STRING"
+	STRING = "str"
 
 	// BOOLEAN is the Boolean object type
-	BOOLEAN = "BOOLEAN"
+	BOOLEAN = "bool"
 
 	// NULL is the Null object type
-	NULL = "NULL"
+	NULL = "null"
 
 	// RETURN is the Return object type
-	RETURN = "RETURN"
+	RETURN = "return"
 
 	// ERROR is the Error object type
-	ERROR = "ERROR"
+	ERROR = "error"
 
 	// FUNCTION is the Function object type
-	FUNCTION = "FUNCTION"
+	FUNCTION = "fn"
 
 	// COMPILED_FUNCTION is the CompiledFunction object type
 	COMPILED_FUNCTION = "COMPILED_FUNCTION"
 
 	// BUILTIN is the Builtin object type
-	BUILTIN = "BUILTIN"
+	BUILTIN = "builtin"
 
 	// CLOSURE is the Closure object type
-	CLOSURE = "CLOSURE"
+	CLOSURE = "closure"
 
 	// ARRAY is the Array object type
-	ARRAY = "ARRAY"
+	ARRAY = "array"
 
 	// HASH is the Hash object type
-	HASH = "HASH"
+	HASH = "hash"
 )
 
 // Immutable is the interface for all immutable objects which must implement
