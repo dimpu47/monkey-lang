@@ -12,11 +12,7 @@ Read the book and follow along with the commit history.
 
 ## Status
 
-> Currently working on a [self-host](https://github.com/prologic/monkey-lang/tree/self-host)
-> branch where I'm improving and modifying the original Monkey-lang implementation
-> to support writing Monkey in itself (*ala self-hosting*). So far I've managed to write a
-> [Brainfuck](https://github.com/prologic/monkey-lang/blob/self-host/examples/bf.monkey)
-> interpreter in Monkey with only a small number of improvements.
+> Still working on a self-hosted Monkey lang (*Monkey written in Monkey*).
 
 ## Read and Follow
 
