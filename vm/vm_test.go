@@ -386,6 +386,16 @@ func TestArrayDuplication(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestArrayMerging(t *testing.T) {
+	tests := []vmTestCase{
+		{"[] + [1]", []int{1}},
+		{"[1] + [2]", []int{1, 2}},
+		{"[1, 2] + [3, 4]", []int{1, 2, 3, 4}},
+	}
+
+	runVmTests(t, tests)
+}
+
 func TestHashLiterals(t *testing.T) {
 	tests := []vmTestCase{
 		{
@@ -708,7 +718,7 @@ func TestBuiltinFunctions(t *testing.T) {
 		{
 			`len(1)`,
 			&object.Error{
-				Message: "argument to `len` not supported, got INTEGER",
+				Message: "argument to `len` not supported, got int",
 			},
 		},
 		{`len("one", "two")`,
@@ -723,14 +733,14 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`first([])`, Null},
 		{`first(1)`,
 			&object.Error{
-				Message: "argument to `first` must be ARRAY, got INTEGER",
+				Message: "argument to `first` must be array, got int",
 			},
 		},
 		{`last([1, 2, 3])`, 3},
 		{`last([])`, Null},
 		{`last(1)`,
 			&object.Error{
-				Message: "argument to `last` must be ARRAY, got INTEGER",
+				Message: "argument to `last` must be array, got int",
 			},
 		},
 		{`rest([1, 2, 3])`, []int{2, 3}},
@@ -738,7 +748,7 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`push([], 1)`, []int{1}},
 		{`push(1, 1)`,
 			&object.Error{
-				Message: "argument to `push` must be ARRAY, got INTEGER",
+				Message: "argument to `push` must be array, got int",
 			},
 		},
 		{`input()`, ""},

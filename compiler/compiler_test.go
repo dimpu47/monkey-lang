@@ -999,11 +999,11 @@ func TestBuiltins(t *testing.T) {
             `,
 			expectedConstants: []interface{}{1},
 			expectedInstructions: []code.Instructions{
-				code.Make(code.LoadBuiltin, 7),
+				code.Make(code.LoadBuiltin, 10),
 				code.Make(code.MakeArray, 0),
 				code.Make(code.Call, 1),
 				code.Make(code.Pop),
-				code.Make(code.LoadBuiltin, 10),
+				code.Make(code.LoadBuiltin, 14),
 				code.Make(code.MakeArray, 0),
 				code.Make(code.LoadConstant, 0),
 				code.Make(code.Call, 2),
@@ -1014,7 +1014,7 @@ func TestBuiltins(t *testing.T) {
 			input: `fn() { return len([]) }`,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
-					code.Make(code.LoadBuiltin, 7),
+					code.Make(code.LoadBuiltin, 10),
 					code.Make(code.MakeArray, 0),
 					code.Make(code.Call, 1),
 					code.Make(code.Return),

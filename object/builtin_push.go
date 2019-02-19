@@ -7,7 +7,7 @@ func Push(args ...Object) Object {
 			len(args))
 	}
 	if args[0].Type() != ARRAY {
-		return newError("argument to `push` must be ARRAY, got %s",
+		return newError("argument to `push` must be array, got %s",
 			args[0].Type())
 	}
 

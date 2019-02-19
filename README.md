@@ -322,7 +322,7 @@ Operator   | Types           | Action
 `%`        | `int % int`     | divide ints, give remainder
 `+`        | `int + int`     | add ints
 `+`        | `str + str`     | concatenate strs, give new string
-`+`        | `array + array` | concatenate arrays, give new array (**TBD**)
+`+`        | `array + array` | concatenate arrays, give new array
 `+`        | `hash + hash`   | merge hashes into new hash, keys in right hash win (**TBD**)
 `-`        | `int - int`     | subtract ints
 `<`        | `int < int`     | true iff left < right

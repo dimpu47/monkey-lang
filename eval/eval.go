@@ -304,8 +304,16 @@ func evalInfixExpression(
 ) object.Object {
 	switch {
 
+	// [1] + [2]
+	case operator == "+" && left.Type() == object.ARRAY && right.Type() == object.ARRAY:
+		leftVal := left.(*object.Array).Elements
+		rightVal := right.(*object.Array).Elements
+		elements := make([]object.Object, len(leftVal)+len(rightVal))
+		elements = append(leftVal, rightVal...)
+		return &object.Array{Elements: elements}
+
 	// [1] * 3
-	case left.Type() == object.ARRAY && right.Type() == object.INTEGER:
+	case operator == "*" && left.Type() == object.ARRAY && right.Type() == object.INTEGER:
 		leftVal := left.(*object.Array).Elements
 		rightVal := int(right.(*object.Integer).Value)
 		elements := leftVal
@@ -314,7 +322,7 @@ func evalInfixExpression(
 		}
 		return &object.Array{Elements: elements}
 	// 3 * [1]
-	case left.Type() == object.INTEGER && right.Type() == object.ARRAY:
+	case operator == "*" && left.Type() == object.INTEGER && right.Type() == object.ARRAY:
 		leftVal := int(left.(*object.Integer).Value)
 		rightVal := right.(*object.Array).Elements
 		elements := rightVal
@@ -324,12 +332,12 @@ func evalInfixExpression(
 		return &object.Array{Elements: elements}
 
 	// " " * 4
-	case left.Type() == object.STRING && right.Type() == object.INTEGER:
+	case operator == "*" && left.Type() == object.STRING && right.Type() == object.INTEGER:
 		leftVal := left.(*object.String).Value
 		rightVal := right.(*object.Integer).Value
 		return &object.String{Value: strings.Repeat(leftVal, int(rightVal))}
 	// 4 * " "
-	case left.Type() == object.INTEGER && right.Type() == object.STRING:
+	case operator == "*" && left.Type() == object.INTEGER && right.Type() == object.STRING:
 		leftVal := left.(*object.Integer).Value
 		rightVal := right.(*object.String).Value
 		return &object.String{Value: strings.Repeat(rightVal, int(leftVal))}

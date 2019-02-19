@@ -268,27 +268,27 @@ func TestErrorHandling(t *testing.T) {
 	}{
 		{
 			"5 + true;",
-			"type mismatch: INTEGER + BOOLEAN",
+			"type mismatch: int + bool",
 		},
 		{
 			"5 + true; 5;",
-			"type mismatch: INTEGER + BOOLEAN",
+			"type mismatch: int + bool",
 		},
 		{
 			"-true",
-			"unknown operator: -BOOLEAN",
+			"unknown operator: -bool",
 		},
 		{
 			"true + false;",
-			"unknown operator: BOOLEAN + BOOLEAN",
+			"unknown operator: bool + bool",
 		},
 		{
 			"5; true + false; 5",
-			"unknown operator: BOOLEAN + BOOLEAN",
+			"unknown operator: bool + bool",
 		},
 		{
 			"if (10 > 1) { true + false; }",
-			"unknown operator: BOOLEAN + BOOLEAN",
+			"unknown operator: bool + bool",
 		},
 		{
 			`
@@ -300,7 +300,7 @@ if (10 > 1) {
   return 1;
 }
 `,
-			"unknown operator: BOOLEAN + BOOLEAN",
+			"unknown operator: bool + bool",
 		},
 		{
 			"foobar",
@@ -308,11 +308,11 @@ if (10 > 1) {
 		},
 		{
 			`"Hello" - "World"`,
-			"unknown operator: STRING - STRING",
+			"unknown operator: str - str",
 		},
 		{
 			`{"name": "Monkey"}[fn(x) { x }];`,
-			"unusable as hash key: FUNCTION",
+			"unusable as hash key: fn",
 		},
 	}
 
@@ -519,21 +519,21 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`len("")`, 0},
 		{`len("four")`, 4},
 		{`len("hello world")`, 11},
-		{`len(1)`, errors.New("argument to `len` not supported, got INTEGER")},
+		{`len(1)`, errors.New("argument to `len` not supported, got int")},
 		{`len("one", "two")`, errors.New("wrong number of arguments. got=2, want=1")},
 		{`len("∑")`, 1},
 		{`len([1, 2, 3])`, 3},
 		{`len([])`, 0},
 		{`first([1, 2, 3])`, 1},
 		{`first([])`, nil},
-		{`first(1)`, errors.New("argument to `first` must be ARRAY, got INTEGER")},
+		{`first(1)`, errors.New("argument to `first` must be array, got int")},
 		{`last([1, 2, 3])`, 3},
 		{`last([])`, nil},
-		{`last(1)`, errors.New("argument to `last` must be ARRAY, got INTEGER")},
+		{`last(1)`, errors.New("argument to `last` must be array, got int")},
 		{`rest([1, 2, 3])`, []int{2, 3}},
 		{`rest([])`, nil},
 		{`push([], 1)`, []int{1}},
-		{`push(1, 1)`, errors.New("argument to `push` must be ARRAY, got INTEGER")},
+		{`push(1, 1)`, errors.New("argument to `push` must be array, got int")},
 		{`print("Hello World")`, nil},
 		{`input()`, ""},
 		{`pop([])`, errors.New("cannot pop from an empty array")},
@@ -623,6 +623,24 @@ func TestArrayDuplication(t *testing.T) {
 	testIntegerObject(t, result.Elements[0], 1)
 	testIntegerObject(t, result.Elements[1], 1)
 	testIntegerObject(t, result.Elements[2], 1)
+}
+
+func TestArrayMerging(t *testing.T) {
+	input := "[1] + [2]"
+
+	evaluated := testEval(input)
+	result, ok := evaluated.(*object.Array)
+	if !ok {
+		t.Fatalf("object is not Array. got=%T (%+v)", evaluated, evaluated)
+	}
+
+	if len(result.Elements) != 2 {
+		t.Fatalf("array has wrong num of elements. got=%d",
+			len(result.Elements))
+	}
+
+	testIntegerObject(t, result.Elements[0], 1)
+	testIntegerObject(t, result.Elements[1], 2)
 }
 
 func TestArrayIndexExpressions(t *testing.T) {
