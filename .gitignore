@@ -2,4 +2,5 @@
 *.bak
 *.txt
 
+/dist
 /monkey-lang
