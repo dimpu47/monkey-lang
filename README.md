@@ -391,10 +391,13 @@ Operator   | Types           | Action
   Returns the index of `needle` `str` in `haystack` `str`,
   or the index of `needle` element in `haystack` array.
   Returns -1 if not found.
+- `read(filename)`
+  Reads the contents of the file `filename` and returns it as a `str`.
+- `write(filename, data)`
+  Writes `data` to a file `filename`.
 
 Coming soon... 
 
-- `read([filename])` reads standard input or the given file and returns the contents as a str.
 - `sort(list[, func])` sorts the list in place using a stable sort, and returns nil. Elements in the list must be orderable with `<` (int, str, or list of those). If a key function is provided, it must take the element as an argument and return an orderable value to use as the sort key.
 
 ### Objects
