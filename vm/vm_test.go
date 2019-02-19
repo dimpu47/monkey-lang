@@ -420,6 +420,26 @@ func TestHashLiterals(t *testing.T) {
 	runVmTests(t, tests)
 }
 
+func TestHashMerging(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			`{} + {"a": 1}`,
+			map[object.HashKey]int64{
+				(&object.String{Value: "a"}).HashKey(): 1,
+			},
+		},
+		{
+			`{"a": 1} + {"b": 2}`,
+			map[object.HashKey]int64{
+				(&object.String{Value: "a"}).HashKey(): 1,
+				(&object.String{Value: "b"}).HashKey(): 2,
+			},
+		},
+	}
+
+	runVmTests(t, tests)
+}
+
 func TestSelectorExpressions(t *testing.T) {
 	tests := []vmTestCase{
 		{`{"foo": 5}.foo`, 5},

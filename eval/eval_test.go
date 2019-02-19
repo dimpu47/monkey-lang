@@ -741,6 +741,33 @@ func TestHashLiterals(t *testing.T) {
 	}
 }
 
+func TestHashMerging(t *testing.T) {
+	input := `{"a": 1} + {"b": 2}`
+	evaluated := testEval(input)
+	result, ok := evaluated.(*object.Hash)
+	if !ok {
+		t.Fatalf("Eval didn't return Hash. got=%T (%+v)", evaluated, evaluated)
+	}
+
+	expected := map[object.HashKey]int64{
+		(&object.String{Value: "a"}).HashKey(): 1,
+		(&object.String{Value: "b"}).HashKey(): 2,
+	}
+
+	if len(result.Pairs) != len(expected) {
+		t.Fatalf("Hash has wrong num of pairs. got=%d", len(result.Pairs))
+	}
+
+	for expectedKey, expectedValue := range expected {
+		pair, ok := result.Pairs[expectedKey]
+		if !ok {
+			t.Errorf("no pair for given key in Pairs")
+		}
+
+		testIntegerObject(t, pair.Value, expectedValue)
+	}
+}
+
 func TestHashSelectorExpressions(t *testing.T) {
 	tests := []struct {
 		input    string

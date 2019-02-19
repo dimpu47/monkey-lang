@@ -304,6 +304,19 @@ func evalInfixExpression(
 ) object.Object {
 	switch {
 
+	// {"a": 1} + {"b": 2}
+	case operator == "+" && left.Type() == object.HASH && right.Type() == object.HASH:
+		leftVal := left.(*object.Hash).Pairs
+		rightVal := right.(*object.Hash).Pairs
+		pairs := make(map[object.HashKey]object.HashPair)
+		for k, v := range leftVal {
+			pairs[k] = v
+		}
+		for k, v := range rightVal {
+			pairs[k] = v
+		}
+		return &object.Hash{Pairs: pairs}
+
 	// [1] + [2]
 	case operator == "+" && left.Type() == object.ARRAY && right.Type() == object.ARRAY:
 		leftVal := left.(*object.Array).Elements

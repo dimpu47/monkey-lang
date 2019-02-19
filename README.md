@@ -323,7 +323,7 @@ Operator   | Types           | Action
 `+`        | `int + int`     | add ints
 `+`        | `str + str`     | concatenate strs, give new string
 `+`        | `array + array` | concatenate arrays, give new array
-`+`        | `hash + hash`   | merge hashes into new hash, keys in right hash win (**TBD**)
+`+`        | `hash + hash`   | merge hashes into new hash, keys in right hash win
 `-`        | `int - int`     | subtract ints
 `<`        | `int < int`     | true iff left < right
 `<`        | `str < str`     | true iff left < right (lexicographical)
